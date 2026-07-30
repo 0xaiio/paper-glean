@@ -4,7 +4,7 @@
 > （兴趣驱动的论文摘要与推荐工作台）
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/user/paper-glean/blob/main/LICENSE)
 [![Tests](https://github.com/user/paper-glean/actions/workflows/test.yml/badge.svg)](https://github.com/user/paper-glean/actions)
 
 ---
@@ -42,7 +42,7 @@
 - [设计原则](product/principles.md) — 本地优先、可解释推荐
 - [功能域](product/features.md) — 十大功能域（MVP/增强/远期）
 - [非目标](product/non-goals.md) — 明确不做的事项
-- [架构决策](product/decisions/) — ADR 记录
+- [架构决策](product/decisions/adr-001-fastapi-htmx.md) — ADR 记录
 
 ### 我是测试人员
 
