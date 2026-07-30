@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN" x-data="{ darkMode: localStorage.getItem('darkMode') !== 'false' }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Paper-Glean{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen"
+      x-data="appStore()"
+      @keydown.window="handleKeydown($event)">
+
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-14">
+                <div class="flex items-center space-x-8">
+                    <a href="/digest" class="text-xl font-bold text-primary">Paper-Glean</a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="/digest" class="px-3 py-2 rounded-md text-sm font-medium {% if request.url.path == '/digest' %}bg-gray-100 dark:bg-gray-700{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                            Digest
+                        </a>
+                        <a href="/profile" class="px-3 py-2 rounded-md text-sm font-medium {% if request.url.path == '/profile' %}bg-gray-100 dark:bg-gray-700{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                            Profile
+                        </a>
+                        <a href="/archive" class="px-3 py-2 rounded-md text-sm font-medium {% if request.url.path == '/archive' %}bg-gray-100 dark:bg-gray-700{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                            Archive
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
+                            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <span x-show="darkMode">☀️</span>
+                        <span x-show="!darkMode">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex justify-around py-2">
+            <a href="/digest" class="px-3 py-2 text-sm {% if request.url.path == '/digest' %}text-primary font-medium{% endif %}">Digest</a>
+            <a href="/profile" class="px-3 py-2 text-sm {% if request.url.path == '/profile' %}text-primary font-medium{% endif %}">Profile</a>
+            <a href="/archive" class="px-3 py-2 text-sm {% if request.url.path == '/archive' %}text-primary font-medium{% endif %}">Archive</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="/static/js/app.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

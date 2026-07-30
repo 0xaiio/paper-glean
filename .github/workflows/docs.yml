@@ -1,0 +1,52 @@
+name: Documentation
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'docs/**'
+      - 'glean/**'
+      - 'mkdocs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install -e ".[docs]"
+      
+      - name: Check PlantUML sync
+        run: |
+          # Check .puml and .png are in sync
+          for puml in docs/assets/diagrams/*.puml; do
+            png="docs/assets/images/$(basename $puml .puml).png"
+            if [ ! -f "$png" ] || [ "$puml" -nt "$png" ]; then
+              echo "ERROR: $png is out of sync with $puml"
+              echo "Run: python render-diagrams.py"
+              exit 1
+            fi
+          done
+      
+      - name: Build docs
+        run: |
+          cd docs
+          mkdocs build --strict
+      
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/site

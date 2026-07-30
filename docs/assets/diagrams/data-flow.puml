@@ -1,0 +1,43 @@
+@startuml data-flow
+!theme plain
+skinparam backgroundColor #FEFEFE
+
+|用户|
+start
+:运行 fetch;
+
+|核心库|
+:fetch_all(hours);
+:fetch_category(cat, start, end);
+
+|arXiv API|
+:返回 Atom XML;
+
+|核心库|
+:parse_xml;
+:annotate_hits;
+:save_day_data;
+:upsert_digest;
+
+|数据层|
+:写入 data/YYYYMMDD.json;
+:更新 arXiv-schedule.md;
+
+|用户|
+:浏览 digest;
+:打分 feedback;
+
+|核心库|
+:apply_feedback;
+:set_entry_weights;
+:patch_rating;
+
+|数据层|
+:更新 interests.md;
+:追加 feedback.jsonl;
+:更新 arXiv-schedule.md;
+
+|用户|
+stop
+
+@enduml

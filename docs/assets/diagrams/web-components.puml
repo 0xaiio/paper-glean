@@ -1,0 +1,46 @@
+@startuml web-components
+!theme plain
+skinparam backgroundColor #FEFEFE
+
+package "FastAPI 应用" as FastAPI {
+    [main.py] as Main
+    [routes.py] as Routes
+    [models.py] as Models
+    [templates_config.py] as TemplatesConfig
+}
+
+package "前端" as Frontend {
+    [HTMX] as HTMX
+    [Alpine.js] as Alpine
+    [Tailwind CSS] as Tailwind
+}
+
+package "模板" as Templates {
+    [base.html] as Base
+    [digest.html] as Digest
+    [profile.html] as Profile
+    [archive.html] as Archive
+    [partials/*.html] as Partials
+}
+
+package "核心库" as Core {
+    [glean/core.py] as CoreLib
+}
+
+Main --> Routes : 注册路由
+Routes --> Models : Pydantic 校验
+Routes --> TemplatesConfig : 模板渲染
+Routes --> CoreLib : 业务逻辑
+Routes --> HTMX : 返回 HTML 片段
+TemplatesConfig --> Templates : Jinja2 渲染
+HTMX --> Alpine : 客户端交互
+Alpine --> Tailwind : 样式
+
+note right of Routes
+  路由分类：
+  - HTML 页面: /digest, /profile, /archive
+  - API: /api/papers, /api/feedback
+  - HTMX: /htmx/paper-list
+end note
+
+@enduml

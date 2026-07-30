@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paper-glean"
+version = "0.1.0"
+description = "A personal, local-first paper recommendation and archiving workbench"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "paper-glean user"}
+]
+keywords = ["arxiv", "papers", "recommendation", "research", "local-first"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.6",
+    "filelock>=3.13.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "httpx>=0.25.0",
+    "pytest-asyncio>=0.21.0",
+    "paper-glean[web]",
+]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=1.0.0",
+]
+
+[project.scripts]
+arxiv-daily = "glean.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/user/paper-glean"
+Repository = "https://github.com/user/paper-glean"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["glean*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+glean = ["templates/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

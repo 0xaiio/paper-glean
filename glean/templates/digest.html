@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Digest - Paper-Glean{% endblock %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-6" x-data="digestStore()">
+    <!-- Left Sidebar: Date Navigator & Filters -->
+    <aside class="w-full lg:w-64 flex-shrink-0 space-y-4">
+        <!-- Date Selector -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="font-semibold mb-3 text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">Date</h3>
+            <select name="day"
+                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                    hx-get="/digest"
+                    hx-target="#paper-list"
+                    hx-push-url="true"
+                    hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                {% for d in days %}
+                <option value="{{ d }}" {% if d == current_day %}selected{% endif %}>{{ d[:4] }}-{{ d[4:6] }}-{{ d[6:] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="font-semibold mb-3 text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">Category</h3>
+            <select name="category"
+                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                    hx-get="/htmx/paper-list"
+                    hx-target="#paper-list"
+                    hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if cat == filter.category %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Hit Type Filters -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="font-semibold mb-3 text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">Filter</h3>
+            <div class="space-y-2">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="show_star" value="true" {% if filter.show_star %}checked{% endif %}
+                           class="rounded border-gray-300"
+                           hx-get="/htmx/paper-list"
+                           hx-target="#paper-list"
+                           hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                    <span class="text-sm">Star Hits</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="show_expand" value="true" {% if filter.show_expand %}checked{% endif %}
+                           class="rounded border-gray-300"
+                           hx-get="/htmx/paper-list"
+                           hx-target="#paper-list"
+                           hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                    <span class="text-sm">Expand Hits</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="show_other" value="true" {% if filter.show_other %}checked{% endif %}
+                           class="rounded border-gray-300"
+                           hx-get="/htmx/paper-list"
+                           hx-target="#paper-list"
+                           hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                    <span class="text-sm">Other</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="font-semibold mb-3 text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">Search</h3>
+            <input type="text" name="search" value="{{ filter.search or '' }}"
+                   placeholder="Search papers..."
+                   class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                   hx-get="/htmx/paper-list"
+                   hx-target="#paper-list"
+                   hx-trigger="keyup changed delay:300ms"
+                   hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+        </div>
+    </aside>
+
+    <!-- Main Content: Paper List -->
+    <div class="flex-1 min-w-0">
+        <div id="paper-list" class="space-y-3">
+            {% include "partials/paper_list.html" %}
+        </div>
+    </div>
+
+    <!-- Right Panel: Paper Detail (hidden on mobile, shown on lg) -->
+    <aside id="paper-detail" class="hidden lg:block w-96 flex-shrink-0">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sticky top-20">
+            <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-8">
+                Select a paper to view details
+            </p>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function digestStore() {
+    return {
+        selectedPaperId: null,
+        selectPaper(id) {
+            this.selectedPaperId = id;
+        }
+    }
+}
+</script>
+{% endblock %}

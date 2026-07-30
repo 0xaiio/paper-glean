@@ -1,0 +1,13 @@
+{% if papers %}
+    <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+        Showing {{ papers|length }} papers
+        {% if current_day %}for {{ current_day[:4] }}-{{ current_day[4:6] }}-{{ current_day[6:] }}{% endif %}
+    </div>
+    {% for paper in papers %}
+        {% include "partials/paper_card.html" %}
+    {% endfor %}
+{% else %}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+        <p class="text-gray-500 dark:text-gray-400">No papers found matching your filters.</p>
+    </div>
+{% endif %}

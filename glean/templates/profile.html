@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Paper-Glean{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">Interest Profile</h1>
+
+    <!-- Star Interests -->
+    <div class="mb-8">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span>★</span> Interest Points (重点关注)
+        </h2>
+        {% if star_entries %}
+        <div class="grid gap-4 md:grid-cols-2">
+            {% for entry in star_entries %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-semibold">{{ entry.title }}</h3>
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                        w={{ entry.weight }}
+                    </span>
+                </div>
+                <div class="flex flex-wrap gap-1 mb-2">
+                    {% for kw in entry.keywords %}
+                    <span class="px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-700">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-yellow-500 h-2 rounded-full" style="width: {{ entry.weight * 10 }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 dark:text-gray-400">No star interest entries found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Expand Interests -->
+    <div>
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span>🧐</span> Expansion Points (视野扩展)
+        </h2>
+        {% if expand_entries %}
+        <div class="grid gap-4 md:grid-cols-2">
+            {% for entry in expand_entries %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-semibold">{{ entry.title }}</h3>
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                        w={{ entry.weight }}
+                    </span>
+                </div>
+                <div class="flex flex-wrap gap-1 mb-2">
+                    {% for kw in entry.keywords %}
+                    <span class="px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-700">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full" style="width: {{ entry.weight * 10 }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 dark:text-gray-400">No expansion entries found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

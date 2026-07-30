@@ -1,0 +1,89 @@
+site_name: Paper-Glean 文档
+site_url: https://user.github.io/paper-glean/
+repo_url: https://github.com/user/paper-glean
+repo_name: paper-glean
+docs_dir: .
+site_dir: ../site
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: 切换到暗色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: 切换到亮色模式
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["."]
+          options:
+            docstring_style: google
+            show_source: true
+
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - toc:
+      permalink: true
+
+nav:
+  - 首页: index.md
+  - 用户指南:
+    - user-guide/index.md
+    - user-guide/installation.md
+    - user-guide/cli.md
+    - user-guide/web-app.md
+    - user-guide/interest-profile.md
+    - user-guide/feedback.md
+  - 开发者指南:
+    - developer-guide/index.md
+    - developer-guide/core-library.md
+    - developer-guide/web-layer.md
+    - developer-guide/data-schema.md
+    - developer-guide/api-reference.md
+    - developer-guide/contributing.md
+  - 产品文档:
+    - product/index.md
+    - product/vision.md
+    - product/roadmap.md
+    - product/principles.md
+    - product/features.md
+    - product/non-goals.md
+    - 架构决策:
+      - product/decisions/adr-001-fastapi-htmx.md
+      - product/decisions/adr-002-file-storage.md
+      - product/decisions/adr-003-no-database.md
+  - 测试文档:
+    - testing/index.md
+    - testing/test-plan.md
+    - testing/manual-tests.md
+    - testing/ci.md
+  - 术语表: glossary.md

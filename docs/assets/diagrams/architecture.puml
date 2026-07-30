@@ -1,0 +1,51 @@
+@startuml architecture
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+package "用户" as User {
+}
+
+package "Paper-Glean" as PG {
+    package "CLI" as CLI {
+        [arxiv_daily.py] as CLIEntry
+        [glean/cli.py] as CLICore
+    }
+    package "Web 应用" as Web {
+        [FastAPI] as FastAPIApp
+        [HTMX] as HTMX
+        [Jinja2 模板] as Templates
+    }
+    package "核心库" as Core {
+        [glean/core.py] as CoreLib
+    }
+}
+
+package "外部服务" as External {
+    [arXiv API] as ArxivAPI
+}
+
+package "数据层" as Data {
+    [data/*.json] as DataJSON
+    [interests.md] as Interests
+    [feedback.jsonl] as Feedback
+    [arXiv-schedule.md] as Digest
+}
+
+User --> CLIEntry : 命令行
+User --> FastAPIApp : 浏览器
+CLIEntry --> CLICore
+CLICore --> CoreLib
+FastAPIApp --> CoreLib
+CoreLib --> ArxivAPI : HTTP 请求
+CoreLib --> DataJSON : 读写
+CoreLib --> Interests : 读写
+CoreLib --> Feedback : 追加
+CoreLib --> Digest : 读写
+
+note right of CoreLib
+  本地优先原则：
+  Markdown/JSON 为唯一事实源
+end note
+
+@enduml

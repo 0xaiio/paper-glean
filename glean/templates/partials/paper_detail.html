@@ -1,0 +1,112 @@
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+    {% if paper %}
+        <!-- Title -->
+        <h2 class="text-lg font-bold mb-2">{{ paper.title }}</h2>
+
+        <!-- Authors -->
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            {{ paper.authors|join(', ') }}
+        </p>
+
+        <!-- Meta -->
+        <div class="flex flex-wrap gap-2 mb-3">
+            <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 dark:bg-gray-700">{{ paper.primary }}</span>
+            {% for cat in paper.categories %}
+                {% if cat != paper.primary %}
+                <span class="px-2 py-0.5 text-xs rounded-full bg-gray-50 dark:bg-gray-700 text-gray-500">{{ cat }}</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Scores -->
+        {% if paper.score_star or paper.score_expand %}
+        <div class="flex gap-4 mb-3 text-sm">
+            {% if paper.score_star %}
+            <span class="text-yellow-600 dark:text-yellow-400">★ Score: {{ paper.score_star }}</span>
+            {% endif %}
+            {% if paper.score_expand %}
+            <span class="text-blue-600 dark:text-blue-400">🧐 Score: {{ paper.score_expand }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Abstract -->
+        <div class="mb-4">
+            <h4 class="font-semibold text-sm mb-1">Abstract</h4>
+            <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ paper.abstract }}</p>
+        </div>
+
+        <!-- Why Recommended -->
+        {% if paper.hits_star or paper.hits_expand %}
+        <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <h4 class="font-semibold text-sm mb-2">Why Recommended</h4>
+            {% if paper.hits_star %}
+            <div class="mb-1">
+                <span class="text-xs text-yellow-600 dark:text-yellow-400 font-medium">★ Hits:</span>
+                <span class="text-xs">{{ paper.hits_star|join(', ') }}</span>
+            </div>
+            {% endif %}
+            {% if paper.hits_expand %}
+            <div>
+                <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">🧐 Hits:</span>
+                <span class="text-xs">{{ paper.hits_expand|join(', ') }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ paper.pdf_url }}" target="_blank"
+               class="px-4 py-2 bg-primary text-white text-sm rounded-md hover:bg-blue-600">
+                Open PDF
+            </a>
+            <a href="{{ paper.abs_url }}" target="_blank"
+               class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
+                arXiv Page
+            </a>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
+                    hx-post="/api/download/{{ paper.id }}"
+                    hx-swap="none">
+                Download
+            </button>
+        </div>
+
+        <!-- Feedback -->
+        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h4 class="font-semibold text-sm mb-2">Rate this paper</h4>
+            <div class="flex gap-4">
+                <div>
+                    <span class="text-xs text-gray-500">★ Interest:</span>
+                    <div class="flex gap-1 mt-1">
+                        {% for i in range(1, 6) %}
+                        <button class="w-8 h-8 rounded text-sm hover:bg-yellow-100 dark:hover:bg-yellow-900"
+                                hx-post="/api/feedback"
+                                hx-vals='{"id": "{{ paper.id }}", "stars": {{ i }}}'
+                                hx-swap="none">
+                            {{ '★' if i <= 3 else '☆' }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500">🧐 Curiosity:</span>
+                    <div class="flex gap-1 mt-1">
+                        {% for i in range(1, 6) %}
+                        <button class="w-8 h-8 rounded text-sm hover:bg-blue-100 dark:hover:bg-blue-900"
+                                hx-post="/api/feedback"
+                                hx-vals='{"id": "{{ paper.id }}", "curiosity": {{ i }}}'
+                                hx-swap="none">
+                            {{ '🧐' if i <= 3 else '○' }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-8">
+            Select a paper to view details
+        </p>
+    {% endif %}
+</div>

@@ -1,0 +1,30 @@
+@startuml feedback-loop
+!theme plain
+skinparam backgroundColor #FEFEFE
+
+start
+:用户阅读论文;
+
+if (打分?) then (是)
+  :提交评分 (1-5 ★/🧐);
+  :apply_feedback();
+  
+  fork
+    :更新 interests.md
+    权重 ±1;
+  fork again
+    :追加 feedback.jsonl
+    审计日志;
+  fork again
+    :patch_rating()
+    更新 digest 表格;
+  end fork
+  
+  :次日 fetch 时
+  新权重生效;
+else (否)
+endif
+
+stop
+
+@enduml
