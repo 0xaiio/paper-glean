@@ -79,3 +79,122 @@ def test_api_interests(client):
 def test_htmx_paper_list(client):
     response = client.get("/htmx/paper-list")
     assert response.status_code == 200
+
+
+def test_watch_page(client):
+    response = client.get("/watch")
+    assert response.status_code == 200
+    assert "学者监控" in response.text
+
+
+def test_api_watch_researchers(client):
+    response = client.get("/api/watch/researchers")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+def test_api_watch_new(client):
+    response = client.get("/api/watch/new")
+    assert response.status_code == 200
+    data = response.json()
+    assert "count" in data
+    assert isinstance(data["items"], list)
+
+
+def test_api_watch_events(client):
+    response = client.get("/api/watch/events")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+# ------------------------------------------------------------------
+# /api/watch/* mutation endpoints (isolated — never touch the real
+# watchlist.md / data/watch_new.json of the working repo)
+# ------------------------------------------------------------------
+
+_WATCH_SAMPLE = """# 学者监控名单
+
+## 监控中
+
+### 魏恒峰 Hengfeng Wei
+- homepage: https://hengxin.github.io
+- enabled: true
+
+## 已暂停
+"""
+
+
+@pytest.fixture
+def isolated_watch(tmp_path, monkeypatch):
+    from glean import notify, watch
+
+    wl = tmp_path / "watchlist.md"
+    wl.write_text(_WATCH_SAMPLE, encoding="utf-8")
+    monkeypatch.setattr(watch, "WATCHLIST_MD", wl)
+    monkeypatch.setattr(watch, "WATCH_STATE", tmp_path / "watch_state.json")
+    monkeypatch.setattr(watch, "WATCH_EVENTS", tmp_path / "watch_events.jsonl")
+    monkeypatch.setattr(watch, "WATCH_DIGEST_MD", tmp_path / "WATCH-digest.md")
+    monkeypatch.setattr(notify, "WATCH_NEW", tmp_path / "watch_new.json")
+    return tmp_path
+
+
+def test_api_watch_add_then_toggle_then_remove(client, isolated_watch):
+    added = client.post(
+        "/api/watch/researchers",
+        data={
+            "name": "Test Person",
+            "homepage": "https://example.edu/~tp",
+            "tags": "db; formal",
+        },
+    )
+    assert added.status_code == 200
+    body = added.json()
+    assert body["success"] is True
+    assert body["researcher"]["name"] == "Test Person"
+    assert body["researcher"]["tags"] == ["db", "formal"]
+    key = body["researcher"]["key"]
+
+    listed = client.get("/api/watch/researchers").json()
+    assert "Test Person" in [r["name"] for r in listed]
+
+    toggled = client.post(f"/api/watch/researchers/{key}/toggle?enabled=false")
+    assert toggled.status_code == 200
+    assert toggled.json()["enabled"] is False
+    after_toggle = {r["key"]: r for r in client.get("/api/watch/researchers").json()}
+    assert after_toggle[key]["enabled"] is False
+
+    removed = client.delete(f"/api/watch/researchers/{key}")
+    assert removed.status_code == 200
+    assert removed.json()["success"] is True
+    assert "Test Person" not in [
+        r["name"] for r in client.get("/api/watch/researchers").json()
+    ]
+
+
+def test_api_watch_add_duplicate_is_conflict(client, isolated_watch):
+    first = client.post(
+        "/api/watch/researchers",
+        data={"name": "魏恒峰 Hengfeng Wei", "homepage": "https://hengxin.github.io"},
+    )
+    assert first.status_code == 409
+
+
+def test_api_watch_remove_unknown_is_404(client, isolated_watch):
+    response = client.delete("/api/watch/researchers/no-such-key")
+    assert response.status_code == 404
+
+
+def test_api_watch_ack_clears_badge(client, isolated_watch):
+    from glean import notify
+
+    notify.WATCH_NEW.parent.mkdir(parents=True, exist_ok=True)
+    notify.WATCH_NEW.write_text(
+        '{"day": "2026-09-14", "items": [{"title": "A New Paper", "kind": "paper"}]}',
+        encoding="utf-8",
+    )
+    assert client.get("/api/watch/new").json()["count"] == 1
+
+    acked = client.post("/api/watch/ack")
+    assert acked.status_code == 200
+    assert acked.json()["cleared"] == 1
+    assert client.get("/api/watch/new").json()["count"] == 0

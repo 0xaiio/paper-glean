@@ -12,6 +12,24 @@ DIGEST_MD = REPO_DIR / "arXiv-schedule.md"
 INTERESTS_MD = REPO_DIR / "interests.md"
 FEEDBACK_LOG = REPO_DIR / "feedback.jsonl"
 
+# --- Watch & notify (monitor researchers, push new work) -----------------
+# Markdown is the source of truth for *who* we watch; JSON only holds the
+# "already seen" fingerprints needed for diffing.
+WATCHLIST_MD = REPO_DIR / "watchlist.md"
+WATCH_DIGEST_MD = REPO_DIR / "WATCH-digest.md"
+WATCH_STATE = DATA_DIR / "watch_state.json"
+WATCH_EVENTS = REPO_DIR / "watch_events.jsonl"
+# Unacknowledged new items — what the Web UI badges as NEW (cleared on "mark read").
+WATCH_NEW = DATA_DIR / "watch_new.json"
+
+# Watch tuning knobs
+WATCH_LOOKBACK_YEARS = 2  # ignore anything older than this when first seeding
+WATCH_MAX_ITEMS = 300  # per-researcher cap on items kept for diffing
+WATCH_TIMEOUT = 30  # seconds, per HTTP request
+WATCH_REQUEST_INTERVAL = 1.5  # politeness delay between researchers
+WATCH_ITEM_KINDS = ("paper", "video", "report", "talk", "other")
+
+
 # PDF storage directory (configurable via environment variable)
 ARXIV_DIR = Path(os.environ.get("ARXIV_DIR", Path.home() / "papers"))
 

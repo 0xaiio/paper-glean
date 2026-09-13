@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
 
-from glean import __version__
+from glean import __version__, notify
 from glean.config import CATEGORIES
 from glean.core import (
     apply_feedback,
@@ -17,7 +17,20 @@ from glean.core import (
     load_day_data,
     load_interest_entries,
 )
-from glean.web.models import DayInfo, FeedbackRequest, InterestEntryResponse
+from glean.watch import (
+    add_researcher,
+    load_events as load_watch_events,
+    load_watchlist,
+    remove_researcher,
+    run as run_watch,
+    set_enabled,
+)
+from glean.web.models import (
+    DayInfo,
+    FeedbackRequest,
+    InterestEntryResponse,
+    WatchResearcher,
+)
 from glean.web.templates_config import templates
 
 router = APIRouter()
@@ -223,6 +236,114 @@ async def api_download(paper_id: str) -> dict:
     if not dest:
         raise HTTPException(status_code=500, detail="Download failed")
     return {"success": True, "path": str(dest)}
+
+
+# ------------------------------------------------------------------
+# Watch (researcher monitoring) — pages
+# ------------------------------------------------------------------
+
+@router.get("/watch", response_class=HTMLResponse)
+async def watch_page(request: Request) -> HTMLResponse:
+    """Monitoring dashboard: who we watch + what's new."""
+    entries = load_watchlist()
+    new_items = notify.load_new()
+    events = load_watch_events(limit=30)
+    return templates.TemplateResponse(
+        "watch.html",
+        {
+            "request": request,
+            "researchers": entries,
+            "new_items": new_items,
+            "events": events,
+            "channels": notify.enabled_channels(),
+        },
+    )
+
+
+# ------------------------------------------------------------------
+# Watch — API
+# ------------------------------------------------------------------
+
+@router.get("/api/watch/researchers")
+async def api_watch_researchers() -> list[WatchResearcher]:
+    """List every monitored researcher (enabled and paused)."""
+    return [WatchResearcher(**e) for e in load_watchlist()]
+
+
+@router.post("/api/watch/researchers")
+async def api_watch_add(
+    name: str = Form(...),
+    homepage: str = Form(""),
+    dblp: str = Form(""),
+    s2: str = Form(""),
+    tags: str = Form(""),
+) -> dict:
+    """Add a researcher to watchlist.md (form-encoded; the page uses HTMX)."""
+    tag_list = [t.strip() for t in tags.split(";") if t.strip()]
+    try:
+        entry = add_researcher(
+            name, homepage or None, dblp or None, s2 or None, tag_list
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return {"success": True, "researcher": entry}
+
+
+@router.delete("/api/watch/researchers/{key}")
+async def api_watch_remove(key: str) -> dict:
+    """Remove a researcher (and forget their seen-state)."""
+    entries = load_watchlist()
+    target = next((e for e in entries if e["key"] == key), None)
+    if target is None:
+        raise HTTPException(status_code=404, detail="not found")
+    return {"success": remove_researcher(target["name"])}
+
+
+@router.post("/api/watch/researchers/{key}/toggle")
+async def api_watch_toggle(key: str, enabled: bool = True) -> dict:
+    """Pause / resume one researcher."""
+    entries = load_watchlist()
+    target = next((e for e in entries if e["key"] == key), None)
+    if target is None:
+        raise HTTPException(status_code=404, detail="not found")
+    return {"success": set_enabled(target["name"], enabled), "enabled": enabled}
+
+
+@router.get("/api/watch/new")
+async def api_watch_new() -> dict:
+    """Unacknowledged new items — what the UI badges as NEW."""
+    items = notify.load_new()
+    return {"count": len(items), "items": items}
+
+
+@router.post("/api/watch/ack")
+async def api_watch_ack() -> dict:
+    """Clear the NEW badges."""
+    return {"success": True, "cleared": notify.ack_all()}
+
+
+@router.get("/api/watch/events")
+async def api_watch_events(limit: int = Query(50, ge=1, le=500)) -> list[dict]:
+    """Push history, newest first."""
+    return load_watch_events(limit=limit)
+
+
+@router.post("/api/watch/run")
+async def api_watch_run(only: str | None = None, force: bool = False) -> dict:
+    """Trigger a scan. Runs in a worker thread — it does network I/O."""
+    import asyncio
+
+    result = await asyncio.to_thread(
+        run_watch, only, **{"use_network": True, "force": force, "push": True}
+    )
+    return {
+        "run_id": result["run_id"],
+        "new_count": len(result["new_items"]),
+        "grouped": {k: len(v) for k, v in result["grouped"].items()},
+        "baselined": result["baselined"],
+        "errors": result["errors"],
+        "pushed_to": result["pushed_to"],
+    }
 
 
 # ------------------------------------------------------------------

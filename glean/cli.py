@@ -10,6 +10,7 @@ import argparse
 import sys
 from datetime import datetime, timezone
 
+from glean import notify
 from glean.config import DEFAULT_CAP
 from glean.core import (
     annotate_hits,
@@ -24,6 +25,13 @@ from glean.core import (
     find_paper,
 )
 from glean.serve import DEFAULT_HOST, DEFAULT_PORT, base_url, ensure, log_path
+from glean.watch import (
+    add_researcher,
+    load_watchlist,
+    remove_researcher,
+    run as run_watch,
+    set_enabled,
+)
 
 
 def _run_fetch(hours: int, cap: int, date: str | None) -> tuple[str, int, str]:
@@ -86,6 +94,98 @@ def cmd_serve(args: argparse.Namespace) -> None:
         from glean.web.main import create_app
 
         uvicorn.run(create_app(), host=args.host, port=args.port)
+
+
+def cmd_watch_add(args: argparse.Namespace) -> None:
+    """Add a researcher to watchlist.md."""
+    tags = [t.strip() for t in args.tags.split(";") if t.strip()] if args.tags else []
+    try:
+        entry = add_researcher(args.name, args.homepage, args.dblp, args.s2, tags)
+    except ValueError as exc:
+        print(f"[ERR] {exc}")
+        return
+    src = [s for s in ("homepage", "dblp", "s2") if entry.get(s)]
+    print(f"[OK] 已添加: {entry['name']} (key={entry['key']}, 源={'/'.join(src) or '仅主页'})")
+    print("[NEXT] 运行 `arxiv_daily.py watch run --only <姓名>` 建立基线")
+
+
+def cmd_watch_remove(args: argparse.Namespace) -> None:
+    """Remove a researcher and forget their seen-state."""
+    if remove_researcher(args.name):
+        print(f"[OK] 已移除: {args.name}")
+    else:
+        print(f"[ERR] 未找到: {args.name}")
+
+
+def cmd_watch_toggle(args: argparse.Namespace) -> None:
+    """Pause / resume a researcher."""
+    if set_enabled(args.name, args.enable):
+        print(f"[OK] {'已启用' if args.enable else '已暂停'}: {args.name}")
+    else:
+        print(f"[ERR] 未找到: {args.name}")
+
+
+def cmd_watch_list(args: argparse.Namespace) -> None:
+    """Show the watchlist."""
+    entries = load_watchlist()
+    if not entries:
+        print("[INFO] 名单为空; 用 `watch add <姓名> --homepage <URL>` 添加")
+        return
+    for e in entries:
+        if not args.all and not e.get("enabled", True):
+            continue
+        mark = "●" if e.get("enabled", True) else "○"
+        src = "/".join(s for s in ("homepage", "dblp", "s2") if e.get(s)) or "无可用源"
+        tags = f"  tags={','.join(e['tags'])}" if e.get("tags") else ""
+        print(f"{mark} {e['name']}  [{src}]{tags}")
+
+
+def cmd_watch_run(args: argparse.Namespace) -> None:
+    """Scan every enabled researcher and push what is new."""
+    res = run_watch(only=args.only, force=args.force, push=not args.no_push)
+    for b in res["baselined"]:
+        print(f"[BASE] {b} — 已建立基线，本次不推送（加 --force 可强制推送）")
+    for name, items in res["grouped"].items():
+        print(f"[NEW] {name}: {len(items)} 条新作")
+        for it in items:
+            kind = {"paper": "论文", "video": "视频", "report": "技术报告",
+                    "talk": "报告/演讲", "other": "其它"}.get(it.get("kind"), "其它")
+            flag = " ⚠️低置信" if (it.get("confidence") or 1.0) < 0.6 else ""
+            print(f"      · [{kind}] {it['title'][:80]}{flag}")
+    if not res["grouped"] and not res["baselined"]:
+        print("[OK] 没有新作")
+    for err in res["errors"]:
+        print(f"[WARN] {err}")
+    if res["new_items"]:
+        print(f"[OK] 共 {len(res['new_items'])} 条新作 -> WATCH-digest.md (run {res['run_id']})")
+        print(f"[OK] 推送通道: {', '.join(res['pushed_to']) or '无（仅落盘 digest）'}")
+
+
+def cmd_watch_ack(args: argparse.Namespace) -> None:
+    """Clear the Web UI's NEW badges."""
+    print(f"[OK] 已标记 {notify.ack_all()} 条新作为已读")
+
+
+def cmd_watch_push_test(args: argparse.Namespace) -> None:
+    """Report which push channels would fire, and send a probe payload."""
+    states = notify.enabled_channels()
+    for name, on in states.items():
+        print(f"[{'ON ' if on else 'OFF'}] {name}")
+    if not states["webhook"]:
+        print("[HINT] 设置环境变量 PAPER_GLEAN_WEBHOOK_URL 以启用 webhook")
+    if args.send:
+        probe = [
+            {
+                "researcher": "推送自检",
+                "title": "paper-glean 推送通道自检",
+                "kind": "other",
+                "url": "",
+                "fingerprint": "probe",
+            }
+        ]
+        done = notify.push(probe)
+        print(f"[OK] 自检已发送 -> {', '.join(done) or '无通道'}")
+        notify.ack_all()
 
 
 def cmd_download(args: argparse.Namespace) -> None:
@@ -181,6 +281,46 @@ def main() -> None:
     sv.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"默认 {DEFAULT_PORT}")
     sv.add_argument("--reload", action="store_true", help="开发模式: 代码变更自动重载")
     sv.set_defaults(func=cmd_serve)
+
+    w = sub.add_parser("watch", help="学者监控与推送(名单见 watchlist.md)")
+    wsub = w.add_subparsers(dest="watch_cmd", required=True)
+
+    wa = wsub.add_parser("add", help="添加监控对象")
+    wa.add_argument("name", help="姓名，建议「中文名 英文名」")
+    wa.add_argument("--homepage", help="个人主页 URL(首选解析源)")
+    wa.add_argument("--dblp", help="DBLP PID(pid/xx/yyyy) 或作者全名(兜底)")
+    wa.add_argument("--s2", help="Semantic Scholar author id(兜底)")
+    wa.add_argument("--tags", help="标签，分号分隔")
+    wa.set_defaults(func=cmd_watch_add)
+
+    wr = wsub.add_parser("remove", help="移除监控对象(同时清除其已见状态)")
+    wr.add_argument("name")
+    wr.set_defaults(func=cmd_watch_remove)
+
+    we = wsub.add_parser("enable", help="启用监控对象")
+    we.add_argument("name")
+    we.set_defaults(func=cmd_watch_toggle, enable=True)
+
+    wd = wsub.add_parser("disable", help="暂停监控对象(保留条目与历史)")
+    wd.add_argument("name")
+    wd.set_defaults(func=cmd_watch_toggle, enable=False)
+
+    wl = wsub.add_parser("list", help="列出监控名单")
+    wl.add_argument("--all", action="store_true", help="同时显示已暂停的条目")
+    wl.set_defaults(func=cmd_watch_list)
+
+    wu = wsub.add_parser("run", help="扫描全部启用对象并推送新作")
+    wu.add_argument("--only", help="只扫描指定姓名/key")
+    wu.add_argument("--force", action="store_true", help="首次运行也推送(默认只建基线)")
+    wu.add_argument("--no-push", action="store_true", help="只落盘 digest，不推送")
+    wu.set_defaults(func=cmd_watch_run)
+
+    wk = wsub.add_parser("ack", help="清除 Web 端的 NEW 徽标(标记已读)")
+    wk.set_defaults(func=cmd_watch_ack)
+
+    wt = wsub.add_parser("push-test", help="检查推送通道并可选发一条自检")
+    wt.add_argument("--send", action="store_true", help="实际发送一条自检消息")
+    wt.set_defaults(func=cmd_watch_push_test)
 
     args = ap.parse_args()
     args.func(args)

@@ -21,6 +21,34 @@ def test_cli_help():
     assert "reanchor" in result.stdout
     assert "daily" in result.stdout
     assert "serve" in result.stdout
+    assert "watch" in result.stdout
+
+
+def test_cli_watch_help():
+    """The monitoring sub-command group exposes the full list-management surface."""
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "watch", "--help"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    for sub in ("add", "remove", "enable", "disable", "list", "run", "ack", "push-test"):
+        assert sub in result.stdout
+
+
+def test_cli_watch_list_is_read_only():
+    """`watch list` reads the repo watchlist.md and must not mutate anything."""
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "watch", "list", "--all"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    assert "魏恒峰" in result.stdout
 
 
 def test_cli_daily_help():

@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-from glean import __version__
+from glean import __version__, notify
 from glean.web.routes import router
 from glean.web.templates_config import templates
 
@@ -20,6 +20,9 @@ def create_app() -> FastAPI:
         description="A personal, local-first paper recommendation workbench",
         version=__version__,
     )
+
+    # Template global: how many unread monitored items (nav badge).
+    templates.env.globals["watch_new_count"] = lambda: len(notify.load_new())
 
     # Static files
     static_dir = Path(__file__).resolve().parent.parent.parent / "glean_static"

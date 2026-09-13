@@ -56,3 +56,16 @@ class FilterState(BaseModel):
     show_star: bool = True
     show_expand: bool = True
     show_other: bool = False
+
+
+class WatchResearcher(BaseModel):
+    """One monitored researcher (mirrors a watchlist.md entry)."""
+
+    key: str
+    name: str
+    homepage: str | None = None
+    dblp: str | None = None
+    s2: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    enabled: bool = True
+    note: str = ""

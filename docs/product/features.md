@@ -125,6 +125,28 @@
 
 **远期**：RSS 输出端点
 
+## 11. 监控与推送（M1.x 已实现）
+
+**MVP（已实现）**：
+- 名单 `watchlist.md`（Markdown 真相源），CLI / Web / 直接编辑三种增删
+- 解析顺序 **个人主页 → DBLP → Semantic Scholar**；主页唯一覆盖视频/TR/talk
+- 不做 Google Scholar（无官方 API、违反 ToS、易封）；以 DBLP + S2 公开 API 覆盖
+- 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
+- 推送四通道：`file`（digest + Web NEW 徽标）、Web 高亮、`desktop`、`webhook`
+  （`generic`/`feishu`/`wecom`）；全部 fail-soft
+- Web `/watch` 页面：名单增删 + NEW 徽标 + 推送历史
+
+**增强**：
+- 主页解析 JS 渲染兜底
+- 按 tags 订阅推送
+- S2 补全摘要/venue/引用数
+
+**远期**：
+- 从高分论文作者自动发现监控对象
+- 与 arXiv 日报合并为统一简报
+
+**已知边界**：主页解析为启发式，置信度 < 0.5 丢弃；偏漏报而非误报。
+
 ## 10. 移动端 / PWA
 
 **MVP**：响应式布局（手机浏览器可用）

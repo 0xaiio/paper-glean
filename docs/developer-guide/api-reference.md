@@ -56,6 +56,46 @@
         - start_background
         - ensure
 
+## 学者监控
+
+::: glean.watch
+    options:
+      members:
+        - slugify
+        - fingerprint
+        - load_watchlist
+        - add_researcher
+        - remove_researcher
+        - set_enabled
+        - fetch_dblp
+        - fetch_s2
+        - collect_items
+        - load_state
+        - save_state
+        - append_events
+        - load_events
+        - render_section
+        - upsert_watch_digest
+        - run
+
+## 主页解析
+
+::: glean.homeparse
+    options:
+      members:
+        - fetch_html
+        - parse_homepage
+
+## 推送
+
+::: glean.notify
+    options:
+      members:
+        - push
+        - load_new
+        - ack_all
+        - enabled_channels
+
 ## 数据模型
 
 ::: glean.web.models

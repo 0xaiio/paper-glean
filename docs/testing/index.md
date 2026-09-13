@@ -27,6 +27,9 @@
 |------|----------|----------|----------|
 | `glean/core.py` | ✅ | — | — |
 | `glean/serve.py` | ✅ | ✅ | — |
+| `glean/watch.py` | ✅ | — | ✅ |
+| `glean/homeparse.py` | — | — | ✅ |
+| `glean/notify.py` | ✅ | — | ✅ |
 | `glean/cli.py` | — | ✅ | ✅ |
 | `glean/web/routes.py` | — | ✅ | ✅ |
 | `glean/web/models.py` | ✅ | — | — |

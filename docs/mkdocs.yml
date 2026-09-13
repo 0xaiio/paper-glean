@@ -61,6 +61,7 @@ nav:
     - user-guide/installation.md
     - user-guide/cli.md
     - user-guide/scheduling.md
+    - user-guide/watching.md
     - user-guide/web-app.md
     - user-guide/interest-profile.md
     - user-guide/feedback.md

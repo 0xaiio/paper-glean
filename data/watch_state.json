@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "researchers": {
+    "魏恒峰-hengfeng-wei": {
+      "name": "魏恒峰 Hengfeng Wei",
+      "baseline": true,
+      "last_checked": "2026-09-13T16:15:43.015624+00:00",
+      "fingerprints": [
+        "8066d05ee3a4ab63",
+        "648a196591060c5e",
+        "c735d122a51f1e0e",
+        "6da869844e7c0885",
+        "6e9a3c948e3353da",
+        "05437b75c407b83d",
+        "9e33f91e2b894e98",
+        "e2beb1beeaaf02b7",
+        "e1f389000de26179",
+        "9591cb7680073b2d",
+        "f42a9909a864fc91",
+        "718681b4327f776c"
+      ],
+      "sources": [
+        "homepage"
+      ]
+    },
+    "alexey-gotsman": {
+      "name": "Alexey Gotsman",
+      "baseline": true,
+      "last_checked": "2026-09-13T16:15:46.395385+00:00",
+      "fingerprints": [
+        "1f83da986680d766",
+        "4cc7e49fcc33e825",
+        "7d7bbf79e91b1e51",
+        "f10e30cfb14b46f5",
+        "91fda416fe5e2a1d",
+        "071a5879494ef884",
+        "d0f92581dc22f14c",
+        "44a355feb2334cd6",
+        "fa612f90e90712d1",
+        "52fa0d695a6b9581",
+        "a5f8787d9580dddd"
+      ],
+      "sources": [
+        "homepage"
+      ]
+    },
+    "hagit-attiya": {
+      "name": "Hagit Attiya",
+      "baseline": true,
+      "last_checked": "2026-09-13T16:15:57.917873+00:00",
+      "fingerprints": [],
+      "sources": []
+    }
+  }
+}

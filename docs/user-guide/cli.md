@@ -13,6 +13,7 @@ arxiv-daily <command> [options]
 | `fetch` | 抓取 arXiv 论文并生成 digest |
 | `daily` | 每日流水线：fetch → digest →（可选）确保本地 Web 服务在线 |
 | `serve` | 启动本地 Web 应用（前台） |
+| `watch` | 学者监控与推送（子命令见下，详见 [学者监控与推送](watching.md)） |
 | `download` | 按 ID 下载 PDF |
 | `feedback` | 人工调整推荐指数 |
 | `reanchor` | 补齐 digest 锚点与跳转链接 |
@@ -126,6 +127,49 @@ python -X utf8 arxiv_daily.py serve [--host H] [--port P] [--reload]
 
 与 `python -m glean.web` 等价。区别在于 `daily --serve` 是**后台独立进程**
 （写日志到 `logs/serve-<host>-<port>.log`、可脱离父进程存活），`serve` 是前台。
+
+---
+
+## watch — 学者监控与推送
+
+按**人**跟踪新作（论文 / 视频 / 技术报告 / talk）。名单是 `watchlist.md`。
+完整说明见 [学者监控与推送](watching.md)。
+
+```powershell
+python -X utf8 arxiv_daily.py watch <action> [options]
+```
+
+| action | 说明 | 主要参数 |
+|--------|------|---------|
+| `add` | 添加监控对象 | `<姓名>` `--homepage` `--dblp` `--s2` `--tags` |
+| `remove` | 移除监控对象（同时清除其已见状态） | `<姓名>` |
+| `enable` / `disable` | 启用 / 暂停（保留条目与历史） | `<姓名>` |
+| `list` | 列出名单 | `--all`（含已暂停） |
+| `run` | 扫描并推送新作 | `--only` `--force` `--no-push` |
+| `ack` | 清除 Web 端 NEW 徽标 | — |
+| `push-test` | 检查推送通道 | `--send`（发自检消息） |
+
+### 示例
+
+```powershell
+# 添加（主页为首选解析源；DBLP/S2 兜底）
+python -X utf8 arxiv_daily.py watch add "魏恒峰 Hengfeng Wei" `
+  --homepage https://hengxin.github.io --tags "分布式一致性;形式化方法"
+
+# 扫描（首次建基线不推送；之后只推新作）
+python -X utf8 arxiv_daily.py watch run
+
+# 只扫一人 / 强制首次也推送 / 只落盘不推送
+python -X utf8 arxiv_daily.py watch run --only "Alexey Gotsman"
+python -X utf8 arxiv_daily.py watch run --force
+python -X utf8 arxiv_daily.py watch run --no-push
+```
+
+### 行为说明
+
+- **解析顺序**：个人主页 → DBLP → Semantic Scholar；显式配置了 `dblp`/`s2` 时会并行合并去重。
+- **首次建基线**：新加入的对象第一次运行只记录「已见」，**不推送**历史成果（除非 `--force`）。
+- **fail-soft**：单个对象抓取失败只记录 `[WARN]`，不影响其余；推送通道失败同理。
 
 ---
 

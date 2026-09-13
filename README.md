@@ -15,7 +15,7 @@
 
 | 角色 | 文档 |
 |------|------|
-| 用户 | [快速开始](docs/user-guide/index.md) / [CLI 参考](docs/user-guide/cli.md) / [Web 应用](docs/user-guide/web-app.md) |
+| 用户 | [快速开始](docs/user-guide/index.md) / [CLI 参考](docs/user-guide/cli.md) / [Web 应用](docs/user-guide/web-app.md) / [定时运行](docs/user-guide/scheduling.md) / [学者监控与推送](docs/user-guide/watching.md) |
 | 开发者 | [架构概览](docs/developer-guide/index.md) / [系统设计](docs/developer-guide/system-design.md) / [核心库](docs/developer-guide/core-library.md) / [API 参考](docs/developer-guide/api-reference.md) |
 | 产品经理 | [产品愿景](docs/product/vision.md) / [路线图](docs/product/roadmap.md) / [设计原则](docs/product/principles.md) / [需求与现状审阅](docs/product/review.md) |
 | 设计 | [界面设计规范](docs/design/index.md) / [设计系统与令牌](docs/design/design-system.md) / [需求摘要](docs/design/requirements-brief.md) / [质量审查报告](docs/design/critique.md) / [高保真原型](docs/design/prototype.html) |
@@ -45,6 +45,19 @@ python -X utf8 arxiv_daily.py daily --serve
 仓库内已内置定时流水线（`daily` / `serve` 命令 + Windows 计划任务脚本），
 详见 [定时运行](docs/user-guide/scheduling.md)。
 
+### 学者监控与推送
+
+按**人**（而非类别）跟踪新作：论文 / 视频 / 技术报告 / talk，发现即落盘
+`WATCH-digest.md` 并推送（本地 digest + Web 高亮 + 桌面通知 + 可选 webhook）。
+
+```powershell
+python -X utf8 arxiv_daily.py watch add "魏恒峰 Hengfeng Wei" --homepage https://hengxin.github.io
+python -X utf8 arxiv_daily.py watch run      # 首次建基线，之后只推新作
+```
+
+名单是 `watchlist.md`（Markdown 真相源），可随时增删。详见
+[学者监控与推送](docs/user-guide/watching.md)。
+
 ---
 
 ## 核心特性
@@ -52,6 +65,7 @@ python -X utf8 arxiv_daily.py daily --serve
 - **本地优先**：数据全部在本地仓库，可 Git 版本化、可离线
 - **双界面**：CLI 脚本 + Web 应用，满足不同场景
 - **定时就绪**：仓库内 `daily` 一条命令抓取并确保 Web 服务在线，可直接挂平台/系统定时任务
+- **按人监控**：盯住指定学者的主页，出现新论文/视频/技术报告即推送
 - **兴趣驱动**：基于 interests.md 画像做关键词命中和推荐
 - **反馈闭环**：打分即调整权重，次日自动生效
 - **可解释**：每条推荐说明命中了哪个条目、权重多少
@@ -63,6 +77,7 @@ python -X utf8 arxiv_daily.py daily --serve
 - **脚本层**：纯标准库 Python，负责抓取、去重、命中标记、下载
 - **Agent 层**：语义理解，填写推荐小节，解析新材料
 - **Web 层**：FastAPI + HTMX + Alpine.js，卡片式浏览与打分
+- **监控层**：`watch.py` 按人抓取 → `homeparse.py` 解析主页 → `notify.py` 四通道推送
 
 ---
 
@@ -70,16 +85,20 @@ python -X utf8 arxiv_daily.py daily --serve
 
 | 文件 | 说明 |
 |------|------|
-| `glean/` | **Python 包**：`core.py` 核心库 · `cli.py` CLI · `config.py` 配置 · `serve.py` 服务保活 · `web/` FastAPI 视图层 · `templates/` Jinja2 模板 |
+| `glean/` | **Python 包**：`core.py` 核心库 · `cli.py` CLI · `config.py` 配置 · `serve.py` 服务保活 · `watch.py` 学者监控 · `homeparse.py` 主页解析 · `notify.py` 推送 · `web/` FastAPI 视图层 · `templates/` Jinja2 模板 |
 | arxiv_daily.py | 向后兼容薄包装 → `glean.cli:main` |
 | scripts/ | 定时基础设施：`run_daily.ps1` 任务体 · `register_task.ps1` 注册 Windows 计划任务 |
 | interests.md | 兴趣画像：兴趣点/扩展点条目 + keywords + weight |
+| watchlist.md | **监控名单**：学者姓名 / 主页 / DBLP / S2 / 标签 / 启停 |
 | feedback.jsonl | 人工调整推荐指数的反馈日志（审计轨迹） |
-| arXiv-schedule.md | 每日 digest，按日期章节组织 |
+| arXiv-schedule.md | 每日 digest（按 arXiv 类别），按日期章节组织 |
+| WATCH-digest.md | 监控 digest（按人），只追加新发现的条目 |
 | data/YYYYMMDD.json | 当天全部论文原始数据 |
+| data/watch_state.json | 监控「已见指纹」——决定什么算「新作」 |
+| watch_events.jsonl | 监控推送审计日志（被 git 忽略） |
 | logs/ | 后台服务日志（`serve-<host>-<port>.log`，被 git 忽略） |
 | glean_static/ | 前端静态资源（CSS / Alpine.js） |
-| tests/ | pytest 测试（core / web / cli） |
+| tests/ | pytest 测试（core / web / cli / serve / watch / notify，共 73 项） |
 | plan.md | Web 应用需求规格（M1 已实现，目标界面见 docs/design/） |
 | survey.md | 现有系统调研与自研/采购决策 |
 | docs/ | **项目文档（本文档体系）** |
@@ -100,6 +119,7 @@ python -X utf8 arxiv_daily.py daily --serve
 
 - 完整 CLI 用法：[docs/user-guide/cli.md](docs/user-guide/cli.md)
 - 定时运行（平台任务 / Windows 计划任务）：[docs/user-guide/scheduling.md](docs/user-guide/scheduling.md)
+- 学者监控与推送：[docs/user-guide/watching.md](docs/user-guide/watching.md)
 - Web 键盘快捷键：[docs/user-guide/web-app.md](docs/user-guide/web-app.md)
 - 兴趣画像管理：[docs/user-guide/interest-profile.md](docs/user-guide/interest-profile.md)
 - 反馈机制：[docs/user-guide/feedback.md](docs/user-guide/feedback.md)

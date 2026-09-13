@@ -46,6 +46,9 @@ paper-glean/
 │   ├── core.py         # 业务逻辑（共享）
 │   ├── cli.py          # CLI 入口
 │   ├── serve.py        # 本地 Web 服务保活
+│   ├── watch.py        # 学者监控编排
+│   ├── homeparse.py    # 个人主页启发式解析（零依赖）
+│   ├── notify.py       # 推送通道
 │   ├── config.py       # 常量配置
 │   └── web/            # Web 应用
 │       ├── __init__.py
@@ -62,6 +65,8 @@ paper-glean/
 │   ├── test_core.py
 │   ├── test_web.py
 │   ├── test_serve.py
+│   ├── test_watch.py
+│   ├── test_notify.py
 │   └── test_cli.py
 ├── data/               # 论文数据
 ├── docs/               # 文档

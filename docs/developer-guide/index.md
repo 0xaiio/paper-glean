@@ -41,18 +41,31 @@
 ```
 glean/
 ├── core.py          # 纯业务逻辑（共享）
-├── cli.py           # CLI 包装器（fetch/daily/serve/download/feedback/reanchor）
+├── cli.py           # CLI 包装器（fetch/daily/serve/watch/download/feedback/reanchor）
 ├── serve.py         # 本地 Web 服务保活（探测 / 后台拉起 / ensure）
+├── watch.py         # 学者监控（名单 / 解析编排 / 指纹 diff / 事件）
+├── homeparse.py     # 个人主页启发式解析（stdlib html.parser，零依赖）
+├── notify.py        # 推送四通道（file / desktop / webhook / Web NEW）
 ├── config.py        # 常量与配置
 └── web/
-    ├── main.py      # FastAPI 应用工厂
-    ├── routes.py    # 路由定义（含 /api/ping 存活探测）
+    ├── main.py      # FastAPI 应用工厂（含 watch_new_count 模板全局）
+    ├── routes.py    # 路由定义（含 /api/ping 与 /api/watch/*）
     ├── models.py    # Pydantic 模型
     └── templates/   # Jinja2 模板
 ```
 
 > 仓库根另含 `scripts/`（`run_daily.ps1` / `register_task.ps1`），
 > 提供 Windows 计划任务形式的定时入口；详见 [定时运行](../user-guide/scheduling.md)。
+
+### 监控层
+
+- **按人而非按类别**：arXiv 日报抓「今天这些类别新增了什么」，监控抓「这几个人
+  最近挂出了什么」——后者才能覆盖视频 / 技术报告 / talk。
+- **解析顺序**：`homeparse`（主页，首选，唯一覆盖非论文）→ `fetch_dblp` → `fetch_s2`
+  （兜底，且显式配置时并行合并去重）。
+- **「新」的定义**：`fingerprint = sha1(规范化标题 + 可选 URL 主机指纹)`，
+  与 `data/watch_state.json` 比对；首次运行建基线不推送。
+- **推送**：`notify.push()` 串行调用各通道，任一通道失败均不影响其余。
 
 ### 数据流
 

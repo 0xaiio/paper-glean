@@ -60,6 +60,9 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/core.py` | HTTP/XML、抓取、命中标注、digest 生成、反馈、下载、持久化 | CLI 参数、HTTP 路由 |
 | `glean/cli.py` | argparse 子命令 `fetch`/`daily`/`serve`/`download`/`feedback`/`reanchor`；控制台输出 | 业务逻辑（全部委托 core / serve） |
 | `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）、后台 detached 拉起、`ensure()` 复用已在线的实例；日志落 `logs/` | 业务逻辑、路由 |
+| `glean/watch.py` | 监控编排：名单解析/增删/启停、主页→DBLP→S2 解析、指纹 diff、事件与 digest | HTTP 细节（委托 homeparse / core.http_get） |
+| `glean/homeparse.py` | 个人主页启发式解析（stdlib `html.parser`），输出带 `kind` 与 `confidence` 的条目 | 网络（由调用方 fetch） |
+| `glean/notify.py` | 推送：`file` / Web NEW / `desktop` / `webhook`，全 fail-soft；**密钥只从环境变量读** | 决定是否推送、推送什么 |
 | `glean/web/main.py` | `create_app()` 应用工厂；挂载 `/static`；`/` 重定向 | 路由实现 |
 | `glean/web/routes.py` | 页面路由、REST API（含 `/api/ping` 存活探测）、HTMX 片段 | 业务逻辑（全部委托 core） |
 | `glean/web/models.py` | Pydantic 响应/请求模型（`FeedbackRequest` 带 0–5 校验） | 持久化 |
