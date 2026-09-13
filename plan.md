@@ -154,7 +154,10 @@ Web 应用**没有自己的数据库**，直接复用现有三件套作为初始
 
 ### 4.9 通知渠道　[自研]
 
-- **MVP**：无（每日定时任务已有 Quest/schtasks 通道）。
+- **MVP**：无独立推送渠道。**调度已就位**：仓库内 `daily` 命令（fetch → 确保 Web
+  服务在线）+ `scripts/register_task.ps1`（Windows 计划任务），或 WorkBuddy 平台
+  定时任务——由 agent 抓取、填写推荐、`present_files` 呈递页面。见
+  [docs/user-guide/scheduling.md](docs/user-guide/scheduling.md)。
 - **增强**：每日 digest 邮件（本地 SMTP 配置）；Telegram / 企业微信 webhook
   推送「今日 ★≥4 论文 N 篇」摘要卡。
 - **远期**：RSS 输出端点（本地服务暴露 `/feed.xml`）。

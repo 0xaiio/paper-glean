@@ -25,7 +25,8 @@
 
 ```
 ┌──────────────────────────── 表现层（Presentation） ────────────────────────────┐
-│  CLI: glean/cli.py  ·  arxiv_daily.py（薄包装）        Web: glean/web/ + 模板 + 静态资源 │
+│  CLI: glean/cli.py  ·  arxiv_daily.py（薄包装）  ·  scripts/*.ps1（定时）        │
+│  Web: glean/web/ + 模板 + 静态资源   ·   保活: glean/serve.py                    │
 └───────────────────────────────────┬───────────────────────────────────────────┘
                                     │  统一调用（逻辑不分叉）
 ┌───────────────────────────────────▼───────────────────────────────────────────┐
@@ -57,12 +58,14 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 |------|------|--------|
 | `glean/config.py` | 仓库路径、`ARXIV_DIR`（可用环境变量覆盖）、9 个 arXiv 类别、UA、digest 头部 | 任何逻辑 |
 | `glean/core.py` | HTTP/XML、抓取、命中标注、digest 生成、反馈、下载、持久化 | CLI 参数、HTTP 路由 |
-| `glean/cli.py` | argparse 子命令 `fetch`/`download`/`feedback`/`reanchor`；控制台输出 | 业务逻辑（全部委托 core） |
+| `glean/cli.py` | argparse 子命令 `fetch`/`daily`/`serve`/`download`/`feedback`/`reanchor`；控制台输出 | 业务逻辑（全部委托 core / serve） |
+| `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）、后台 detached 拉起、`ensure()` 复用已在线的实例；日志落 `logs/` | 业务逻辑、路由 |
 | `glean/web/main.py` | `create_app()` 应用工厂；挂载 `/static`；`/` 重定向 | 路由实现 |
-| `glean/web/routes.py` | 页面路由、REST API、HTMX 片段 | 业务逻辑（全部委托 core） |
+| `glean/web/routes.py` | 页面路由、REST API（含 `/api/ping` 存活探测）、HTMX 片段 | 业务逻辑（全部委托 core） |
 | `glean/web/models.py` | Pydantic 响应/请求模型（`FeedbackRequest` 带 0–5 校验） | 持久化 |
 | `glean/web/templates_config.py` | 自定义 Jinja 环境，规避 Starlette 上下文不可哈希的缓存缺陷 | — |
 | `arxiv_daily.py` | 向后兼容入口 → `glean.cli:main` | — |
+| `scripts/run_daily.ps1` / `register_task.ps1` | Windows 计划任务入口（ASCII-only）与注册器 | 业务逻辑 |
 
 ---
 

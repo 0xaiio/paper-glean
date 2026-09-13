@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
 
+from glean import __version__
 from glean.config import CATEGORIES
 from glean.core import (
     apply_feedback,
@@ -124,6 +127,22 @@ async def archive_page(request: Request) -> HTMLResponse:
 # ------------------------------------------------------------------
 # API Endpoints
 # ------------------------------------------------------------------
+
+@router.get("/api/ping")
+async def api_ping() -> dict:
+    """Liveness probe.
+
+    Used by the daily scheduler (``arxiv-daily daily --serve``) and by
+    ``glean.serve.ensure`` to decide whether the local web app is already
+    online before spawning a new process. Keep this dependency-free and cheap.
+    """
+    return {
+        "status": "ok",
+        "service": "paper-glean",
+        "version": __version__,
+        "time": datetime.now(timezone.utc).isoformat(),
+    }
+
 
 @router.get("/api/days")
 async def api_days() -> list[DayInfo]:

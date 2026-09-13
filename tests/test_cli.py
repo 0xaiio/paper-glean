@@ -19,6 +19,34 @@ def test_cli_help():
     assert "download" in result.stdout
     assert "feedback" in result.stdout
     assert "reanchor" in result.stdout
+    assert "daily" in result.stdout
+    assert "serve" in result.stdout
+
+
+def test_cli_daily_help():
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "daily", "--help"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    assert "--serve" in result.stdout
+    assert "--host" in result.stdout
+    assert "--port" in result.stdout
+
+
+def test_cli_serve_help():
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "serve", "--help"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    assert "--reload" in result.stdout
 
 
 def test_arxiv_daily_wrapper():

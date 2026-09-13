@@ -23,18 +23,69 @@ from glean.core import (
     apply_feedback,
     find_paper,
 )
+from glean.serve import DEFAULT_HOST, DEFAULT_PORT, base_url, ensure, log_path
 
 
-def cmd_fetch(args: argparse.Namespace) -> None:
-    """Fetch papers and update digest."""
-    day = args.date or datetime.now().strftime("%Y%m%d")
-    papers, start, end = fetch_all(args.hours)
+def _run_fetch(hours: int, cap: int, date: str | None) -> tuple[str, int, str]:
+    """Fetch a time window and update both the JSON data file and the digest.
+
+    Returns ``(day, paper_count, data_file)``. Shared by ``fetch`` and ``daily``
+    so the two entry points can never drift apart.
+    """
+    day = date or datetime.now().strftime("%Y%m%d")
+    papers, start, end = fetch_all(hours)
     if annotate_hits(papers):
         n = sum(1 for p in papers if p.get("hits_star") or p.get("hits_expand"))
         print(f"[INFO] interests.md keywords: {n}/{len(papers)} papers hit")
     data_file = save_day_data(day, papers, start, end)
-    upsert_digest(day, day_section(day, papers, start, end, args.cap))
-    print(f"[OK] {len(papers)} papers -> arXiv-schedule.md section {day}; data -> {data_file}")
+    upsert_digest(day, day_section(day, papers, start, end, cap))
+    return day, len(papers), str(data_file)
+
+
+def cmd_fetch(args: argparse.Namespace) -> None:
+    """Fetch papers and update digest."""
+    day, n, data_file = _run_fetch(args.hours, args.cap, args.date)
+    print(f"[OK] {n} papers -> arXiv-schedule.md section {day}; data -> {data_file}")
+
+
+def cmd_daily(args: argparse.Namespace) -> None:
+    """One-command daily pipeline: fetch -> digest -> optionally serve.
+
+    This is the entry point used by the scheduled task. It is deliberately
+    fail-soft: the digest is already written when the web app is brought up, so
+    a failure to serve degrades to a warning instead of a non-zero exit.
+    """
+    day, n, data_file = _run_fetch(args.hours, args.cap, args.date)
+    print(f"[OK] {n} papers -> arXiv-schedule.md section {day}; data -> {data_file}")
+    print("[NEXT] agent 填写 ★/🧐 推荐小节（见 docs/user-guide/scheduling.md）")
+
+    if not args.serve:
+        print("[HINT] 需要顺带拉起本地 Web 服务请加 --serve")
+        return
+
+    online, started = ensure(args.host, args.port)
+    url = base_url(args.host, args.port)
+    if online:
+        print(f"[OK] web app {'started' if started else 'already online'} -> {url}")
+    else:
+        print(f"[WARN] web app 未在 {args.host}:{args.port} 上线; 日志: {log_path(args.host, args.port)}")
+        print("[WARN] digest 与 data/*.json 已生成，可直接阅读 arXiv-schedule.md")
+
+
+def cmd_serve(args: argparse.Namespace) -> None:
+    """Start the web app in the foreground (manual / development use)."""
+    try:
+        import uvicorn
+    except ModuleNotFoundError:  # pragma: no cover - depends on optional extra
+        print('[ERR] 缺少 Web 依赖; 请先安装: pip install -e ".[web]"')
+        return
+
+    if args.reload:
+        uvicorn.run("glean.web.__main__:app", host=args.host, port=args.port, reload=True)
+    else:
+        from glean.web.main import create_app
+
+        uvicorn.run(create_app(), host=args.host, port=args.port)
 
 
 def cmd_download(args: argparse.Namespace) -> None:
@@ -115,6 +166,21 @@ def main() -> None:
     ra = sub.add_parser("reanchor", help="为指定日期章节补齐锚点与推荐表跳转链接")
     ra.add_argument("--date", help="YYYYMMDD(默认今天)")
     ra.set_defaults(func=cmd_reanchor)
+
+    dl = sub.add_parser("daily", help="每日流水线: fetch -> digest -> (可选)确保本地 Web 服务在线")
+    dl.add_argument("--hours", type=int, default=24, help="抓取时间窗口(小时), 默认 24")
+    dl.add_argument("--cap", type=int, default=DEFAULT_CAP, help="digest 中每类别最多列出的论文数")
+    dl.add_argument("--date", help="覆盖章节日期 YYYYMMDD(默认今天)")
+    dl.add_argument("--serve", action="store_true", help="结束后确保本地 Web 服务在线(不在线则后台拉起)")
+    dl.add_argument("--host", default=DEFAULT_HOST, help=f"Web 服务地址, 默认 {DEFAULT_HOST}")
+    dl.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"Web 服务端口, 默认 {DEFAULT_PORT}")
+    dl.set_defaults(func=cmd_daily)
+
+    sv = sub.add_parser("serve", help="启动本地 Web 应用(前台)")
+    sv.add_argument("--host", default=DEFAULT_HOST, help=f"默认 {DEFAULT_HOST}")
+    sv.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"默认 {DEFAULT_PORT}")
+    sv.add_argument("--reload", action="store_true", help="开发模式: 代码变更自动重载")
+    sv.set_defaults(func=cmd_serve)
 
     args = ap.parse_args()
     args.func(args)

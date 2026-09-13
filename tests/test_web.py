@@ -45,6 +45,17 @@ def test_api_days(client):
     assert isinstance(data, list)
 
 
+def test_api_ping(client):
+    """Liveness endpoint used by the daily scheduler's service probe."""
+    response = client.get("/api/ping")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["service"] == "paper-glean"
+    assert "version" in data
+    assert "time" in data
+
+
 def test_api_papers(client):
     response = client.get("/api/papers")
     assert response.status_code == 200

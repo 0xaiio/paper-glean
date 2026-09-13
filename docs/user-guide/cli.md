@@ -11,6 +11,8 @@ arxiv-daily <command> [options]
 | 命令 | 说明 |
 |------|------|
 | `fetch` | 抓取 arXiv 论文并生成 digest |
+| `daily` | 每日流水线：fetch → digest →（可选）确保本地 Web 服务在线 |
+| `serve` | 启动本地 Web 应用（前台） |
 | `download` | 按 ID 下载 PDF |
 | `feedback` | 人工调整推荐指数 |
 | `reanchor` | 补齐 digest 锚点与跳转链接 |
@@ -62,6 +64,68 @@ python -X utf8 arxiv_daily.py fetch --cap 50
 |------|------|
 | `data/YYYYMMDD.json` | 当天全部论文原始数据 |
 | `arXiv-schedule.md` | 更新 digest 章节 |
+
+---
+
+## daily — 每日流水线
+
+`fetch` + 确保本地 Web 服务在线的合并入口，供定时任务使用。
+
+```powershell
+python -X utf8 arxiv_daily.py daily [options]
+```
+
+### 参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `--hours` | int | 24 | 回溯时间窗口（小时） |
+| `--cap` | int | 100 | 每类别列表上限 |
+| `--date` | str | 今天 | 指定 digest 章节日期（YYYYMMDD） |
+| `--serve` | flag | 关 | 结束后确保 Web 服务在线（不在线则后台拉起） |
+| `--host` | str | `127.0.0.1` | Web 服务地址 |
+| `--port` | int | `8000` | Web 服务端口 |
+
+### 示例
+
+```powershell
+# 抓取并在需要时拉起 Web 服务
+python -X utf8 arxiv_daily.py daily --serve
+
+# 仅抓取（等价于 fetch）
+python -X utf8 arxiv_daily.py daily
+
+# 指定端口，避免与其他本地服务冲突
+python -X utf8 arxiv_daily.py daily --serve --port 8100
+```
+
+### 行为说明
+
+- 抓取部分与 `fetch` 完全一致（共用同一实现，产物相同）。
+- **fail-soft**：digest 先落盘，服务拉不起来只警告、不报错退出，
+  最坏情况下你仍有 `arXiv-schedule.md` 可读。
+- 服务在线判定口径是 `GET /api/ping` 返回 200；已在线则复用，不重复启动。
+
+详见 [定时运行](scheduling.md)。
+
+---
+
+## serve — 启动 Web 应用
+
+前台启动本地 Web 应用，用于手动 / 开发场景。
+
+```powershell
+python -X utf8 arxiv_daily.py serve [--host H] [--port P] [--reload]
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `--host` | str | `127.0.0.1` | 绑定地址 |
+| `--port` | int | `8000` | 绑定端口 |
+| `--reload` | flag | 关 | 开发模式：代码变更自动重载 |
+
+与 `python -m glean.web` 等价。区别在于 `daily --serve` 是**后台独立进程**
+（写日志到 `logs/serve-<host>-<port>.log`、可脱离父进程存活），`serve` 是前台。
 
 ---
 

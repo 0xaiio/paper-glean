@@ -45,6 +45,7 @@ paper-glean/
 │   ├── __init__.py
 │   ├── core.py         # 业务逻辑（共享）
 │   ├── cli.py          # CLI 入口
+│   ├── serve.py        # 本地 Web 服务保活
 │   ├── config.py       # 常量配置
 │   └── web/            # Web 应用
 │       ├── __init__.py
@@ -54,9 +55,13 @@ paper-glean/
 │       ├── models.py
 │       ├── templates_config.py
 │       └── templates/
+├── scripts/            # 定时基础设施
+│   ├── run_daily.ps1   # 任务体（ASCII-only）
+│   └── register_task.ps1
 ├── tests/              # 测试
 │   ├── test_core.py
 │   ├── test_web.py
+│   ├── test_serve.py
 │   └── test_cli.py
 ├── data/               # 论文数据
 ├── docs/               # 文档

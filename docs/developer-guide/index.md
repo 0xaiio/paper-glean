@@ -41,14 +41,18 @@
 ```
 glean/
 ├── core.py          # 纯业务逻辑（共享）
-├── cli.py           # CLI 包装器
+├── cli.py           # CLI 包装器（fetch/daily/serve/download/feedback/reanchor）
+├── serve.py         # 本地 Web 服务保活（探测 / 后台拉起 / ensure）
 ├── config.py        # 常量与配置
 └── web/
     ├── main.py      # FastAPI 应用工厂
-    ├── routes.py    # 路由定义
+    ├── routes.py    # 路由定义（含 /api/ping 存活探测）
     ├── models.py    # Pydantic 模型
     └── templates/   # Jinja2 模板
 ```
+
+> 仓库根另含 `scripts/`（`run_daily.ps1` / `register_task.ps1`），
+> 提供 Windows 计划任务形式的定时入口；详见 [定时运行](../user-guide/scheduling.md)。
 
 ### 数据流
 

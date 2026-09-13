@@ -21,16 +21,31 @@
 |----------|----------|------|
 | `test_digest_page` | GET /digest 返回 HTML | ✅ |
 | `test_api_papers` | GET /api/papers 返回 JSON | ✅ |
-| `test_api_feedback` | POST /api/feedback 更新数据 | ✅ |
+| `test_api_ping` | GET /api/ping 存活探测返回 service/version/time | ✅ |
+| `test_api_interests` | GET /api/interests 返回画像 | ✅ |
 | `test_htmx_paper_list` | GET /htmx/paper-list 返回片段 | ✅ |
+
+### `tests/test_serve.py`
+
+| 测试函数 | 测试内容 | 状态 |
+|----------|----------|------|
+| `test_base_url_and_ping_url` | URL 拼接 | ✅ |
+| `test_no_proxy_opener_carries_no_active_proxy` | 回环探测不受 `*_PROXY` 劫持 | ✅ |
+| `test_probe_reaches_loopback_despite_bogus_env_proxy` | 端到端：环境代理为坏地址时仍能探到本地服务 | ✅ |
+| `test_probe_hits_ping_path` | 探测打的是 `/api/ping` | ✅ |
+| `test_probe_false_on_error` | 连接失败返回 False（不抛异常） | ✅ |
+| `test_log_path_lives_under_logs` | 日志落 `logs/` | ✅ |
+| `test_ensure_reuses_online_instance` | 已在线的实例被复用而非重复拉起 | ✅ |
+| `test_ensure_reports_failure_when_spawn_fails` | 拉起失败时 fail-soft 返回 `(False, False)` | ✅ |
 
 ### `tests/test_cli.py`
 
 | 测试函数 | 测试内容 | 状态 |
 |----------|----------|------|
-| `test_cli_fetch` | fetch 子命令执行 | ✅ |
-| `test_cli_download` | download 子命令执行 | ✅ |
-| `test_cli_feedback` | feedback 子命令执行 | ✅ |
+| `test_cli_help` | 列出全部六个子命令 | ✅ |
+| `test_cli_daily_help` | `daily` 暴露 `--serve/--host/--port` | ✅ |
+| `test_cli_serve_help` | `serve` 暴露 `--reload` | ✅ |
+| `test_arxiv_daily_wrapper` | 薄包装器仍可调用 | ✅ |
 
 ## 集成测试场景
 
@@ -68,8 +83,9 @@ And    文件系统同步更新
 每次发布前必须验证：
 
 - [ ] `pytest tests/ -v` 全部通过
-- [ ] CLI 四个子命令均可正常执行
+- [ ] CLI 六个子命令均可正常执行
 - [ ] Web 应用可启动，三个页面可访问
+- [ ] `arxiv_daily.py daily --serve` 后 `curl --noproxy '*' http://127.0.0.1:8000/api/ping` 返回 200
 - [ ] 键盘快捷键工作正常
 - [ ] 反馈打分后文件正确更新
 - [ ] 幂等：重复 fetch 不产生重复数据

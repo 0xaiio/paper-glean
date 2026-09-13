@@ -26,6 +26,7 @@
 | 组件 | 单元测试 | 集成测试 | 手工测试 |
 |------|----------|----------|----------|
 | `glean/core.py` | ✅ | — | — |
+| `glean/serve.py` | ✅ | ✅ | — |
 | `glean/cli.py` | — | ✅ | ✅ |
 | `glean/web/routes.py` | — | ✅ | ✅ |
 | `glean/web/models.py` | ✅ | — | — |

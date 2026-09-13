@@ -123,6 +123,9 @@ feedback.jsonl
 *.pyc
 __pycache__/
 
+# Runtime logs from the detached web service (see glean/serve.py)
+logs/
+
 # Agent workspace (local memory / scratch, not part of the project)
 .workbuddy/
 

@@ -114,7 +114,10 @@
 
 ## 9. 通知渠道
 
-**MVP**：无（定时任务已有 Quest/schtasks 通道）
+**MVP**：无独立推送渠道。**调度已实现**：仓库内 `arxiv_daily.py daily`
+（fetch → 确保本地 Web 服务在线）+ `scripts/register_task.ps1`（Windows 计划任务），
+或 WorkBuddy 平台定时任务（agent 抓取 + 填推荐 + `present_files` 呈递）。
+见 [定时运行](../user-guide/scheduling.md)。
 
 **增强**：
 - 每日 digest 邮件

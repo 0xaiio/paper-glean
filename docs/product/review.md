@@ -5,6 +5,12 @@
 > 审阅范围：需求文档（`plan.md` / `survey.md` / `interests.md`）与仓库内全部代码、文档资产
 > 阅读方式：**结论先行**；正文严格区分「事实（可核实）」与「判断（有推理）」两类陈述。
 
+> **2026-09-13 跟进（调度集成）**：`plan.md §4.9` / `docs/product/features.md §9`
+> 原描述「定时任务已有 Quest/schtasks 通道」属未落地的占位。本轮新增：
+> `glean/serve.py`（保活 + 代理绕过）+ `arxiv_daily.py daily/serve` 子命令 +
+> `/api/ping` 存活探测 + `scripts/run_daily.ps1` 与 `scripts/register_task.ps1`
+> （Windows 计划任务）+ 上述文档一致化。详见 [定时运行](../user-guide/scheduling.md)。
+
 ---
 
 ## 1. 结论摘要
@@ -52,14 +58,16 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 |------|------|------|
 | `glean/config.py` | 路径常量、arXiv 类别、UA、digest 头 | ✅ |
 | `glean/core.py` | 纯业务逻辑：抓取/命中/生成 digest/反馈/下载/持久化 | ✅ 共享核心 |
-| `glean/cli.py` | argparse 壳：`fetch`/`download`/`feedback`/`reanchor` | ✅ |
+| `glean/cli.py` | argparse 壳：`fetch`/`daily`/`serve`/`download`/`feedback`/`reanchor` | ✅ |
+| `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）+ 后台 detached 拉起 + `ensure()` 复用 | ✅ |
 | `glean/web/main.py` | FastAPI 应用工厂、静态挂载 | ✅ |
-| `glean/web/routes.py` | 页面 / API / HTMX 片段三类路由 | ✅ |
+| `glean/web/routes.py` | 页面 / API（含 `/api/ping` 存活探测）/ HTMX 片段三类路由 | ✅ |
 | `glean/web/models.py` | Pydantic 响应模型 | ✅ |
 | `glean/web/templates_config.py` | `NoCacheJinja2Templates`（规避 dict 上下文不可哈希） | ✅ |
 | `glean/templates/**` | Jinja2 模板（base / digest / profile / archive + 3 个 partial） | ✅ |
 | `glean_static/**` | `css/app.css`、`js/app.js`（Alpine 键盘流） | ✅ |
 | `arxiv_daily.py` | 向后兼容薄包装 → `glean.cli:main` | ✅ |
+| `scripts/run_daily.ps1` / `scripts/register_task.ps1` | Windows 计划任务入口与注册器（ASCII-only） | ✅ |
 
 ### 3.2 数据资产
 
@@ -78,7 +86,9 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 ### 3.4 测试资产
 
 `tests/test_core.py`（纯函数单元测试）、`tests/test_web.py`（`TestClient` 集成测试，
-覆盖 3 页面 + 5 个 API + 1 个 HTMX 片段）、`tests/test_cli.py`（子进程验证 CLI 与包装器）。
+覆盖 3 页面 + 6 个 API（含 `/api/ping`）+ 1 个 HTMX 片段）、`tests/test_serve.py`
+（`probe` / `ensure` 单元 + 端到端环回服务存活测试，含环境代理绕过回归）、
+`tests/test_cli.py`（子进程验证 CLI 六个子命令与包装器）。共 **29 个测试**。
 
 ---
 
