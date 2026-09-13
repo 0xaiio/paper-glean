@@ -55,7 +55,7 @@ python -m glean.web
 python -X utf8 arxiv_daily.py download 2607.25916 2607.25793
 ```
 
-PDF 将保存到 `arXiv/` 目录，按命名规则自动命名。
+PDF 将保存到 `$ARXIV_DIR`（默认 `~/papers`，可用环境变量覆盖），按命名规则自动命名。
 
 ## 下一步
 

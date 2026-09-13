@@ -20,7 +20,7 @@
                                 ┌──────────────────────────────┐
                                 │ 填写 ★ 重点关注 / 🧐 视野扩展   │
                                 │ arxiv_daily.py download <id>… │
-                                │ → PDF 落盘到 arXiv/ (按命名规则) │
+                                │ → PDF 落盘到 $ARXIV_DIR (按命名规则)│
                                 └──────────────────────────────┘
 ```
 
@@ -73,3 +73,10 @@ glean/
 | 模板 | Jinja2 | 服务端 HTML 渲染 |
 | 样式 | Tailwind CSS | 实用优先 CSS |
 | 数据 | Markdown + JSON | 本地文件存储 |
+
+## 延伸阅读
+
+- [系统设计](system-design.md) — 分层架构、核心接口、数据流、关键机制、扩展点与并发现状
+- [Web 层详解](web-layer.md) — FastAPI + HTMX 路由与模板细节
+- [数据规范](data-schema.md) — 四个数据文件的精确 schema
+- [界面设计规范](../design/index.md) — Web 界面的目标形态与交互契约

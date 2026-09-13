@@ -27,6 +27,7 @@
 了解系统架构与参与开发：
 
 - [架构概览](developer-guide/index.md) — 系统架构与模块关系
+- [系统设计](developer-guide/system-design.md) — 分层架构、核心接口、数据流与扩展点
 - [核心库](developer-guide/core-library.md) — `glean/core.py` 模块详解
 - [Web 层](developer-guide/web-layer.md) — FastAPI + HTMX 实现
 - [数据规范](developer-guide/data-schema.md) — 文件格式精确 schema
@@ -42,7 +43,16 @@
 - [设计原则](product/principles.md) — 本地优先、可解释推荐
 - [功能域](product/features.md) — 十大功能域（MVP/增强/远期）
 - [非目标](product/non-goals.md) — 明确不做的事项
-- [架构决策](product/decisions/adr-001-fastapi-htmx.md) — ADR 记录
+- [需求与现状审阅](product/review.md) — 需求/实现/文档一致性核查
+- [架构决策](product/decisions/adr-001-fastapi-htmx.md) — ADR 记录（含设计系统选型 ADR-004）
+
+### 我是设计师
+
+了解界面设计与目标形态：
+
+- [界面设计规范](design/index.md) — 信息架构、交互契约、页面规格
+- [设计系统与令牌](design/design-system.md) — 色彩/排版/间距/组件令牌
+- [高保真原型](design/prototype.html) — 可交互的 Web 界面原型（三页）
 
 ### 我是测试人员
 

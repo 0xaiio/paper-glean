@@ -12,7 +12,7 @@
 ## 文件格式
 
 ```markdown
-## 兴趣点 ★
+## 兴趣点（★ 重点关注推荐依据）
 
 ### 分布式计算与共识
 - keywords: consensus; BFT; Paxos; Raft; distributed systems
@@ -24,13 +24,15 @@
 - weight: 3
 - 来源: Lamport 主页
 
-## 扩展点 🧐
+## 扩展点（🧐 视野扩展推荐依据）
 
 ### 机器学习系统
 - keywords: ML systems; training infrastructure; distributed ML
 - weight: 2
 - 来源: arxiv.org/abs/2607.25916
 ```
+
+> 小节标题只需**含「兴趣点」/「扩展点」字样**即可被解析（如 `## 兴趣点 ★` 亦可）。
 
 ### 字段说明
 

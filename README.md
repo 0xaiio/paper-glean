@@ -16,17 +16,18 @@
 | 角色 | 文档 |
 |------|------|
 | 用户 | [快速开始](docs/user-guide/index.md) / [CLI 参考](docs/user-guide/cli.md) / [Web 应用](docs/user-guide/web-app.md) |
-| 开发者 | [架构概览](docs/developer-guide/index.md) / [核心库](docs/developer-guide/core-library.md) / [API 参考](docs/developer-guide/api-reference.md) |
-| 产品经理 | [产品愿景](docs/product/vision.md) / [路线图](docs/product/roadmap.md) / [设计原则](docs/product/principles.md) |
+| 开发者 | [架构概览](docs/developer-guide/index.md) / [系统设计](docs/developer-guide/system-design.md) / [核心库](docs/developer-guide/core-library.md) / [API 参考](docs/developer-guide/api-reference.md) |
+| 产品经理 | [产品愿景](docs/product/vision.md) / [路线图](docs/product/roadmap.md) / [设计原则](docs/product/principles.md) / [需求与现状审阅](docs/product/review.md) |
+| 设计 | [界面设计规范](docs/design/index.md) / [设计系统与令牌](docs/design/design-system.md) / [需求摘要](docs/design/requirements-brief.md) / [质量审查报告](docs/design/critique.md) / [高保真原型](docs/design/prototype.html) |
 | 测试人员 | [测试策略](docs/testing/index.md) / [手工测试](docs/testing/manual-tests.md) |
 
 ---
 
 ## 快速开始
 
-`powershell
+```powershell
 # 安装
-pip install -e .[web]
+pip install -e ".[web]"
 
 # 抓取今日论文
 python -X utf8 arxiv_daily.py fetch
@@ -34,7 +35,7 @@ python -X utf8 arxiv_daily.py fetch
 # 启动 Web 应用
 python -m glean.web
 # 打开 http://127.0.0.1:8000
-`
+```
 
 ---
 
@@ -60,14 +61,18 @@ python -m glean.web
 
 | 文件 | 说明 |
 |------|------|
-| arxiv_daily.py | 抓取 + 下载 + 反馈 + 锚点维护脚本 |
+| `glean/` | **Python 包**：`core.py` 核心库 · `cli.py` CLI · `config.py` 配置 · `web/` FastAPI 视图层 · `templates/` Jinja2 模板 |
+| arxiv_daily.py | 向后兼容薄包装 → `glean.cli:main` |
 | interests.md | 兴趣画像：兴趣点/扩展点条目 + keywords + weight |
 | feedback.jsonl | 人工调整推荐指数的反馈日志（审计轨迹） |
 | arXiv-schedule.md | 每日 digest，按日期章节组织 |
 | data/YYYYMMDD.json | 当天全部论文原始数据 |
-| plan.md | Web 应用设计（头脑风暴稿，M1 已实现） |
+| glean_static/ | 前端静态资源（CSS / Alpine.js） |
+| tests/ | pytest 测试（core / web / cli） |
+| plan.md | Web 应用需求规格（M1 已实现，目标界面见 docs/design/） |
 | survey.md | 现有系统调研与自研/采购决策 |
 | docs/ | **项目文档（本文档体系）** |
+| site/ | MkDocs 构建产物（`cd docs && mkdocs build`） |
 
 ---
 

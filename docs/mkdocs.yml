@@ -63,8 +63,14 @@ nav:
     - user-guide/web-app.md
     - user-guide/interest-profile.md
     - user-guide/feedback.md
+  - 设计:
+    - design/index.md
+    - design/requirements-brief.md
+    - design/design-system.md
+    - design/critique.md
   - 开发者指南:
     - developer-guide/index.md
+    - developer-guide/system-design.md
     - developer-guide/core-library.md
     - developer-guide/web-layer.md
     - developer-guide/data-schema.md
@@ -77,10 +83,12 @@ nav:
     - product/principles.md
     - product/features.md
     - product/non-goals.md
+    - product/review.md
     - 架构决策:
       - product/decisions/adr-001-fastapi-htmx.md
       - product/decisions/adr-002-file-storage.md
       - product/decisions/adr-003-no-database.md
+      - product/decisions/adr-004-design-system.md
   - 测试文档:
     - testing/index.md
     - testing/test-plan.md

@@ -91,7 +91,7 @@ python -X utf8 arxiv_daily.py download 2607.25916 2607.25793 2607.25979
 
 ### 命名规则
 
-PDF 保存到 `arXiv/` 目录，文件名格式：
+PDF 保存到 `$ARXIV_DIR`（默认 `~/papers`，可设同名环境变量覆盖），文件名格式：
 
 ```
 arXiv<年份> <id><版本> <去标点标题>.pdf

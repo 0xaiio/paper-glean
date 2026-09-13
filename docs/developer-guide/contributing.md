@@ -59,10 +59,11 @@ paper-glean/
 │   ├── test_web.py
 │   └── test_cli.py
 ├── data/               # 论文数据
-├── arXiv/              # 下载的 PDF
 ├── docs/               # 文档
 └── glean_static/       # Web 静态资源
 ```
+
+> PDF 默认下载到 `$ARXIV_DIR`（`~/papers`），**不在仓库内**——可用环境变量指向任意本地论文库。
 
 ## 代码规范
 

@@ -123,5 +123,8 @@ feedback.jsonl
 *.pyc
 __pycache__/
 
+# Agent workspace (local memory / scratch, not part of the project)
+.workbuddy/
+
 # Data files (keep structure, ignore large/generated)
 # Note: data/*.json is kept as it's the source of truth

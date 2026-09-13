@@ -65,7 +65,7 @@ python -X utf8 arxiv_daily.py feedback 2607.25992 --curiosity 5
 
 ```json
 {
-  "time": "2026-07-29T10:30:00",
+  "time": "2026-07-29T10:30:00+00:00",
   "id": "2607.25916",
   "day": "20260729",
   "title": "Hermes: BFT Consensus with Trusted Components",
@@ -73,7 +73,7 @@ python -X utf8 arxiv_daily.py feedback 2607.25992 --curiosity 5
   "abstract_head": "We present Hermes...",
   "adjustments": [
     {
-      "kind": "stars",
+      "kind": "star",
       "rating": 3,
       "delta": -1,
       "matched_entries": ["分布式计算与共识"],
@@ -81,10 +81,13 @@ python -X utf8 arxiv_daily.py feedback 2607.25992 --curiosity 5
     }
   ],
   "weight_updates": {
-    "分布式计算与共识": {"old": 4, "new": 3}
+    "分布式计算与共识": 3
   }
 }
 ```
+
+> 字段口径：`kind` 为 `star` / `expand`；`weight_updates` 为 `{条目标题: 新权重(int)}`。
+> 完整 schema 见 [数据规范](../developer-guide/data-schema.md)。
 
 ## 权重演化时间线
 

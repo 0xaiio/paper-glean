@@ -47,7 +47,7 @@
 2. 按 `d` 键或点击下载按钮
 
 **预期**：
-- PDF 下载到 `arXiv/` 目录
+- PDF 下载到 `$ARXIV_DIR`（默认 `~/papers`）目录
 - 文件名符合命名规则
 - 下载按钮状态变为"已下载"
 
@@ -85,7 +85,7 @@ python -X utf8 arxiv_daily.py download 2607.25916
 ```
 
 **预期**：
-- PDF 下载到 `arXiv/` 目录
+- PDF 下载到 `$ARXIV_DIR`（默认 `~/papers`）目录
 - 文件以 `%PDF` 开头
 - 文件名符合命名规则
 

@@ -54,6 +54,17 @@ jobs:
 - Python 3.10, 3.11, 3.12
 - Ubuntu Latest
 
+### 文档工作流 (`.github/workflows/docs.yml`)
+
+在 `docs/**`、`glean/**`、`mkdocs.yml` 变更时触发，含三个**门禁**：
+
+1. **PlantUML 同步检查**：若某 `.puml` 比对应 `.png` 新（即改了图未重新渲染），
+   直接失败，并提示运行 `python render-diagrams.py`。
+2. **严格构建**：`cd docs && mkdocs build --strict`——任何警告都视为错误，
+   包括**存在但未加入 `nav` 的 Markdown 文件**（因此新增文档页必须同步登记到
+   `docs/mkdocs.yml` 的 `nav`，`design/prototype.html` 这类静态资源除外）。
+3. **部署**：仅 `main` 分支推送时，通过 `peaceiris/actions-gh-pages` 发布到 GitHub Pages。
+
 ## 本地预提交检查
 
 在提交前建议运行：
