@@ -86,9 +86,9 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 | `glean/venueparse.py` | 会议/期刊页启发式解析（cfp/program/papers）+ ccfddl RSS + Crossref 卷期 | ✅ |
 | `glean/notify.py` | 推送四通道 `file`/Web NEW/`desktop`/`webhook`（generic·feishu·wecom），全 fail-soft；支持 `watch`/`ccf` 双命名空间 | ✅ |
 | `glean/web/main.py` | FastAPI 应用工厂、静态挂载；`watch_new_count` / `ccf_new_count` 模板全局（导航未读角标） | ✅ |
-| `glean/web/routes.py` | 页面 / API（含 `/api/ping` 存活探测）/ HTMX 片段三类路由 | ✅ |
-| `glean/web/models.py` | Pydantic 响应模型 | ✅ |
-| `glean/web/templates_config.py` | `NoCacheJinja2Templates`（规避 dict 上下文不可哈希） | ✅ |
+| `glean/web/routes.py` | 页面 / API（含 `/api/ping` 存活探测）/ HTMX 片段三类路由；`PaperFilters` 查询参数组与 `_require_paper` / `_require_entry` / `_run_summary` 三个共用助手 | ✅ |
+| `glean/web/models.py` | Pydantic 线上模型 + `PaperFilters`（`Depends()` 注入的查询参数组） | ✅ |
+| `glean/web/templates_config.py` | Starlette `Jinja2Templates`（模板环境 + `format_timestamp` 过滤器）；已去掉过时的私有 API 兼容子类 | ✅ |
 | `glean/templates/**` | Jinja2 模板（base / digest / profile / archive / **watch** / **ccf** + 3 个 partial） | ✅ |
 | `glean_static/**` | `css/app.css`、`js/app.js`（Alpine 键盘流） | ✅ |
 | `watchlist.md` | **学者监控名单真相源**：姓名/主页/DBLP/S2/tags/enabled，两节（监控中/已暂停） | ✅ |
@@ -119,11 +119,13 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 
 ### 3.4 测试资产
 
-`tests/test_core.py`（纯函数单元测试）、`tests/test_web.py`（`TestClient` 集成测试，
+`tests/test_core.py`（纯函数单元测试，含 `list_available_days` 只认 `YYYYMMDD`
+日文件、不把 `data/` 里的监控状态文件当日期）、`tests/test_web.py`（`TestClient` 集成测试，
 覆盖 5 页面 + 6 个 API（含 `/api/ping`）+ 1 个 HTMX 片段 + 8 个 `/api/watch/*` 端点
 （4 只读 + add/toggle/delete/ack 四个写操作）+ `/api/ccf/*` 端点（venues/new/events 只读，
-add/toggle/toggle-area/ack/remove 五个写操作），
-写操作均隔离到 `tmp_path` 不碰真实文件）、
+add/toggle/toggle-area/ack/remove 五个写操作）+ 共享筛选项在页面/API/HTMX 三处行为一致 +
+`paper_card` 推荐理由契约，
+写操作与筛选断言均隔离到 `tmp_path` 不碰真实文件）、
 `tests/test_serve.py`（`probe` / `ensure` 单元 + 端到端环回服务存活测试，含环境代理绕过回归）、
 `tests/test_monitor.py`（**监控内核**：身份基元、状态容错、审计字段、digest 幂等与新日期插入、
 首轮静默建基线 → 增量、`--force`、逐条失败隔离、`prepare` 错误与 context 透传、`accept`
@@ -135,7 +137,7 @@ add/toggle/toggle-area/ack/remove 五个写操作），
 Crossref 卷期分组与指纹稳定性）、
 `tests/test_notify.py`（文件通道去重/ack、**双命名空间隔离**、桌面通道开关、webhook 三种载荷与失败降级）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组）。
-共 **144 个测试，全部通过**（`pytest -q` → `144 passed`）。
+共 **153 个测试，全部通过**（`pytest -q` → `153 passed`）。
 
 ---
 
@@ -156,9 +158,17 @@ Crossref 卷期分组与指纹稳定性）、
 | D9 | 多处（`user-guide/index.md`、`user-guide/cli.md`、`testing/manual-tests.md`、`product/features.md`、`developer-guide/contributing.md`、`developer-guide/index.md`） | 「PDF 落盘到 `arXiv/` 目录」（暗示在仓库内） | `config.ARXIV_DIR` 默认 `~/papers`，**位于仓库之外**，可用环境变量覆盖 | 高：用户按文档找不到下载的 PDF | 已全部改为 `$ARXIV_DIR`（默认 `~/papers`） |
 
 **另发现**（判断，非文档错误）：`glean/templates/partials/paper_card.html` 的
-「Why recommended」区块用 `interest.title in paper.hits_star` 判断——但 `hits_star`
+「Why recommended」区块曾用 `interest.title in paper.hits_star` 判断——但 `hits_star`
 存的是**命中关键词**而非条目标题，该区块因而**永不渲染**。属实现缺陷，
-已在 §6 风险中记录，建议 M1.x 修复。
+**已于 2026-09-14 修复**（改为按 `interest.keywords` 与 `hits_*` 求交集，
+`data-schema.md` 中自相矛盾的字段说明也一并订正）。
+
+**另发现**（同上，已修）：`core.list_available_days()` 原以 `data/*.json` 通配枚举日期，
+而 `data/` 同时存放 `watch_state.json` / `ccf_state.json` / `watch_new.json`
+（见 `data-schema.md`），于是返回 `['watch_state', 'watch_new', 'ccf_state', '20260729']`；
+`/digest` 与 `/api/papers` 的默认日期取首个元素 = `watch_state`，
+**首页因此默认显示 0 篇**。**已于 2026-09-14 修复**（新增 `core.day_files()` 只认
+8 位数字日文件，`list_available_days` / `find_paper` 共用）。
 
 ---
 
@@ -169,7 +179,7 @@ Crossref 卷期分组与指纹稳定性）、
 | 能力 | plan.md §5 目标 | M1 现状 | 缺口 |
 |------|----------------|---------|------|
 | 三栏布局 | 日期/过滤器 + 卡片流 + 详情面板 | ✅ 已实现（lg 断点以下折叠） | — |
-| 卡内「为什么推荐」 | 卡片自带命中条目 + 权重 + agent 理由 | ⚠ 因 §4 注记的缺陷未渲染 | 需修 |
+| 卡内「为什么推荐」 | 卡片自带命中条目 + 权重 + agent 理由 | ✅ 已实现（命中条目 + 权重；hover 显示命中关键词） | 缺 agent 理由文本 |
 | 键盘流 | `j/k` `1-5` `Shift+1-5` `d` `s` `o` `/` `⌘K` | ⚠ `app.js` 实现 j/k/1-5/Shift+1-5/d/o// | 缺 `s` 收藏、`⌘K` 命令面板 |
 | 打分即生效 + 角标提示 | 打分校卡角标显示权重变动 | ⚠ 仅详情面板有按钮，无角标提示、无需更新卡片 | 缺 |
 | 权重演化时间线 | 回放 `feedback.jsonl` 画折线 | ❌ `profile` 仅有静态条目卡 + 权重条 | 缺 |
@@ -186,7 +196,8 @@ Crossref 卷期分组与指纹稳定性）、
 | 风险 | 级别 | 说明 | 建议 |
 |------|------|------|------|
 | 文档与实现漂移 | 中 | §4 六处，其中 3 处为高影响 | 修复后，在 CI 中加入「文档-代码一致性」检查项（可选） |
-| 卡内推荐理由失效 | 中 | 违反第 4 条原则「可解释」 | M1.x 修：让 `hits_*` 同时携带条目标题，或模板改为关键词匹配 |
+| 卡内推荐理由失效 | 已修 | 违反第 4 条原则「可解释」 | 2026-09-14 已改为关键词交集匹配，并补 `test_web.py` 端到端回归 |
+| 默认视图在未标注数据上为空 | 中 | `data/20260729.json` 是旧版产物，不含 `hits_*`/`score_*`；默认筛选（★+🧐，不含 Other）会把 128 篇全部滤掉，首页显示「No papers found」。属**既有行为**，与本次重构无关 | 待定：① 读时用 `annotate_hits` 重算（推荐项，`interests.md` 本就是真相源）；② 默认勾上 Other；③ 重新抓取数据。需产品决策 |
 | 并发写入 | 低 | 声明了 `filelock` 但未使用；Web 与 CLI 可同时写 `interests.md` | 落实 ADR-002 的原子写入，或删除未用依赖 |
 | 未用依赖 | 低 | `pyproject.toml` 的 `filelock` 未被引用 | 二选一：实现文件锁 or 移除依赖 |
 

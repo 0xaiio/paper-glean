@@ -1,3 +1,9 @@
+{#
+  契约（调用方必须提供）：
+  - paper     ：一条论文记录。`hits_star` / `hits_expand` 装的是**命中的关键词**
+                （来自 interests.md 条目的 `keywords:` 行），不是条目标题。
+  - interests ：`load_interest_entries()` 的结果（含 title / keywords / weight）。
+#}
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow"
      data-paper-id="{{ paper.id }}"
      hx-get="/htmx/paper-detail/{{ paper.id }}"
@@ -38,12 +44,15 @@
     </p>
 
     <!-- Why recommended -->
-    {% if paper.hits_star or paper.hits_expand %}
+    {% set hits = (paper.hits_star or []) + (paper.hits_expand or []) %}
+    {% if hits %}
     <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
         <span class="font-medium">Why recommended:</span>
         {% for interest in interests %}
-            {% if interest.title in paper.hits_star or interest.title in paper.hits_expand %}
-                <span class="inline-block mr-2">{{ interest.title }} (w={{ interest.weight }})</span>
+            {# 条目本身没有命中记录，命中的是它的关键词 —— 所以要按关键词求交集 #}
+            {% set matched = interest.keywords | select("in", hits) | list %}
+            {% if matched %}
+                <span class="inline-block mr-2" title="{{ matched | join(', ') }}">{{ interest.title }} (w={{ interest.weight }})</span>
             {% endif %}
         {% endfor %}
     </div>

@@ -61,14 +61,17 @@ paper-glean/
 │   ├── venueparse.py   # ccfddl RSS / 会议主页 / Crossref 解析
 │   ├── notify.py       # 推送通道（watch / ccf 双命名空间）
 │   ├── config.py       # 常量配置
-│   └── web/            # Web 应用
-│       ├── __init__.py
-│       ├── __main__.py
-│       ├── main.py
-│       ├── routes.py
-│       ├── models.py
-│       ├── templates_config.py
-│       └── templates/
+│   ├── web/            # Web 应用
+│   │   ├── __init__.py
+│   │   ├── __main__.py
+│   │   ├── main.py
+│   │   ├── routes.py
+│   │   ├── models.py
+│   │   └── templates_config.py
+│   └── templates/      # Jinja2 模板（与 web/ 平级）
+│       ├── base.html / digest.html / profile.html / archive.html
+│       ├── watch.html / ccf.html / redirect.html
+│       └── partials/   # paper_list / paper_card / paper_detail
 ├── scripts/            # 定时基础设施
 │   ├── run_daily.ps1   # 任务体（ASCII-only）
 │   ├── gen_ccf_catalog.py  # 重新生成 CCF-A 名录
@@ -137,8 +140,19 @@ type:
 
 1. 在 `glean/web/routes.py` 中添加路由
 2. 如需新数据模型，在 `glean/web/models.py` 中添加 Pydantic 模型
-3. 如需新模板，在 `glean/web/templates/` 中添加
+3. 如需新模板，在 `glean/templates/`（与 `glean/web/` 平级）中添加
 4. 在 `tests/test_web.py` 中添加测试
+
+三条「不要抄第二遍」的纪律（对应本轮重构消掉的重复）：
+
+| 重复源 | 唯一出处 |
+|--------|----------|
+| 论文筛选的六个查询参数（`day` / `category` / `search` / `show_*`） | `models.PaperFilters` + `routes.Filters`（`Depends()` 注入），过滤逻辑只在 `_filter_papers` |
+| 导航项（桌面/移动两份版式） | `base.html` 顶部的 `nav_items` 列表 |
+| `hx-include` 的六项选择器 | `digest.html` 顶部的 `hx_include` 变量 |
+
+「查表或 404」「跑一次监控并汇总结果」分别走 `_require_paper` / `_require_entry`
+与 `_run_summary`，不要在路由里各写一遍。
 
 ### 4. 添加新的监控线
 

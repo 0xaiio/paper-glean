@@ -13,9 +13,13 @@
 | `test_match_keywords` | 关键词整词匹配逻辑 | ✅ |
 | `test_load_interest_entries` | 解析 interests.md 的条目结构 | ✅ |
 | `test_find_paper_existing` / `test_find_paper_nonexistent` | 按 id 查论文（命中 / 未命中） | ✅ |
+| `test_list_available_days_ignores_monitor_state` | **回归**：只认 `YYYYMMDD` 日文件，不把 `data/` 里的监控状态文件当日期 | ✅ |
+| `test_list_available_days_is_empty_without_data_dir` | `data/` 不存在时返回 `[]` | ✅ |
+| `test_find_paper_skips_monitor_state_files` | 查找时不因状态文件（无 `papers` 键）出错 | ✅ |
 
 > 「键路径」测试（用 `tmp_path` 覆盖写盘路径）分别落在 `test_watch.py` / `test_ccf.py` /
-> `test_monitor.py`，`test_core.py` 只测纯函数与只读路径。
+> `test_monitor.py`，`test_core.py` 只测纯函数与只读路径（日期枚举三个用例也把
+> `DATA_DIR` 重定向到 `tmp_path`）。
 
 ### `tests/test_monitor.py`
 
@@ -70,10 +74,19 @@
 | `test_api_ccf_remove_unknown_is_404` | 删除不存在条目返回 404 | ✅ |
 | `test_api_ccf_toggle_area_is_bulk` | 按 area 批量勾选/取消 | ✅ |
 | `test_api_ccf_ack_clears_only_ccf_badge` | ack 只清 CCF 徽标，不影响学者徽标 | ✅ |
+| `test_nav_lists_every_route_in_both_renditions` | 桌面/移动导航同源，五个路由在两个版式里都在（防漏改一处） | ✅ |
+| `test_api_days_counts_only_real_days` | `/api/days` 只统计真正的日文件（隔离数据目录） | ✅ |
+| `test_default_day_is_the_newest_day_with_papers` | 默认日期取最新有论文的一天，而非目录里的状态文件 | ✅ |
+| `test_filter_group_is_shared_by_api_partial_and_page` | 同一组筛选参数在 API / HTMX 片段 / 整页三处语义一致（含「全不勾 = 空」） | ✅ |
+| `test_api_papers_category_search_and_paging` | category / search / limit / offset 组合 | ✅ |
+| `test_htmx_paper_card_explains_why_recommended` | **端到端**：卡片按命中关键词反查条目名与权重；无命中则不渲染该区块 | ✅ |
+| `test_htmx_paper_card_unknown_id_is_404` | 卡片/详情片段的未知 id 返回 404 | ✅ |
 
 > 注：`/api/watch/*` 与 `/api/ccf/*` 的写操作分别通过 `isolated_watch` /
 > `isolated_ccf` fixture 把 `watchlist.md`、`ccf.md` 及其状态/未读文件
-> 重定向到 `tmp_path`，**不会改动仓库内的真实文件**。
+> 重定向到 `tmp_path`，**不会改动仓库内的真实文件**；
+> 筛选与日期断言用 `isolated_papers` fixture 重定向 `core.DATA_DIR` / `core.INTERESTS_MD`，
+> 并在同一目录里放一份 `watch_state.json` 以守住日期枚举的回归。
 
 ### `tests/test_watch.py`
 
@@ -237,9 +250,11 @@ And    CCF 页面 NEW 徽标 +1（学者页面徽标不受影响）
 
 每次发布前必须验证：
 
-- [ ] `pytest tests/ -v` 全部通过（当前 144 项）
+- [ ] `pytest tests/ -v` 全部通过（当前 153 项）
 - [ ] CLI 八个子命令均可正常执行（fetch / download / feedback / reanchor / daily / serve / watch / ccf）
 - [ ] Web 应用可启动，五个页面可访问（/digest /profile /archive /watch /ccf）
+- [ ] `/digest` 默认日期是最新**有论文**的一天（不得出现 `watch_state` 之类假日期）
+- [ ] 卡片「Why recommended」在有命中时列出条目标题与权重
 - [ ] `arxiv_daily.py daily --serve` 后 `curl --noproxy '*' http://127.0.0.1:8000/api/ping` 返回 200
 - [ ] 键盘快捷键工作正常
 - [ ] 反馈打分后文件正确更新

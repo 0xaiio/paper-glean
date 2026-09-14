@@ -25,6 +25,7 @@
         - reanchor_day
         - sanitize_title
         - download_paper
+        - day_files
         - save_day_data
         - load_day_data
         - list_available_days

@@ -313,8 +313,8 @@ def upsert_digest(day: str, section: str) -> None:
 # ------------------------------------------------------------------
 
 def find_paper(pid: str) -> tuple[dict[str, Any] | None, str | None]:
-    """Find a paper by id in data/*.json (newest first)."""
-    for f in sorted(DATA_DIR.glob("*.json"), reverse=True):
+    """Find a paper by id in data/*.json (newest day first)."""
+    for f in day_files():
         data = json.loads(f.read_text(encoding="utf-8"))
         for p in data.get("papers", []):
             if p["id"] == pid:
@@ -509,6 +509,23 @@ def download_paper(pid: str) -> Path | None:
 # Data persistence
 # ------------------------------------------------------------------
 
+# A day file is ``data/YYYYMMDD.json`` and nothing else. ``data/`` also holds
+# the monitor state (``watch_state.json`` / ``ccf_state.json`` / ``*_new.json``),
+# so matching on ``*.json`` would hand back those state files as if they were
+# days — which made the web UI default to a day with zero papers.
+_DAY_FILE_RE = re.compile(r"^\d{8}$")
+
+
+def day_files() -> list[Path]:
+    """Return ``data/*.json`` files that really are days (newest first)."""
+    if not DATA_DIR.exists():
+        return []
+    return sorted(
+        (f for f in DATA_DIR.glob("*.json") if _DAY_FILE_RE.match(f.stem)),
+        reverse=True,
+    )
+
+
 def save_day_data(day: str, papers: list[dict[str, Any]], start: datetime, end: datetime) -> Path:
     """Save daily paper data to JSON file."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -534,6 +551,4 @@ def load_day_data(day: str) -> dict[str, Any] | None:
 
 def list_available_days() -> list[str]:
     """Return list of available day strings (YYYYMMDD) from data directory."""
-    if not DATA_DIR.exists():
-        return []
-    return sorted([f.stem for f in DATA_DIR.glob("*.json")], reverse=True)
+    return [f.stem for f in day_files()]

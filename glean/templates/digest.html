@@ -3,6 +3,10 @@
 {% block title %}Digest - Paper-Glean{% endblock %}
 
 {% block content %}
+{# 六个筛选项要一起提交，选择器只写一次，避免新增筛选器时漏改某处。
+   `|safe`：这是模板内的硬编码选择器，且 autoescape 会把其中的单引号转成
+   `&#39;`——浏览器解析后虽然等价，但属性值就不逐字等于原选择器了。 #}
+{% set hx_include = "[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']" %}
 <div class="flex flex-col lg:flex-row gap-6" x-data="digestStore()">
     <!-- Left Sidebar: Date Navigator & Filters -->
     <aside class="w-full lg:w-64 flex-shrink-0 space-y-4">
@@ -14,7 +18,7 @@
                     hx-get="/digest"
                     hx-target="#paper-list"
                     hx-push-url="true"
-                    hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                    hx-include="{{ hx_include | safe }}">
                 {% for d in days %}
                 <option value="{{ d }}" {% if d == current_day %}selected{% endif %}>{{ d[:4] }}-{{ d[4:6] }}-{{ d[6:] }}</option>
                 {% endfor %}
@@ -28,7 +32,7 @@
                     class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm"
                     hx-get="/htmx/paper-list"
                     hx-target="#paper-list"
-                    hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                    hx-include="{{ hx_include | safe }}">
                 <option value="">All Categories</option>
                 {% for cat in categories %}
                 <option value="{{ cat }}" {% if cat == filter.category %}selected{% endif %}>{{ cat }}</option>
@@ -45,7 +49,7 @@
                            class="rounded border-gray-300"
                            hx-get="/htmx/paper-list"
                            hx-target="#paper-list"
-                           hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                           hx-include="{{ hx_include | safe }}">
                     <span class="text-sm">Star Hits</span>
                 </label>
                 <label class="flex items-center space-x-2 cursor-pointer">
@@ -53,7 +57,7 @@
                            class="rounded border-gray-300"
                            hx-get="/htmx/paper-list"
                            hx-target="#paper-list"
-                           hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                           hx-include="{{ hx_include | safe }}">
                     <span class="text-sm">Expand Hits</span>
                 </label>
                 <label class="flex items-center space-x-2 cursor-pointer">
@@ -61,7 +65,7 @@
                            class="rounded border-gray-300"
                            hx-get="/htmx/paper-list"
                            hx-target="#paper-list"
-                           hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                           hx-include="{{ hx_include | safe }}">
                     <span class="text-sm">Other</span>
                 </label>
             </div>
@@ -76,7 +80,7 @@
                    hx-get="/htmx/paper-list"
                    hx-target="#paper-list"
                    hx-trigger="keyup changed delay:300ms"
-                   hx-include="[name='day'], [name='category'], [name='search'], [name='show_star'], [name='show_expand'], [name='show_other']">
+                   hx-include="{{ hx_include | safe }}">
         </div>
     </aside>
 

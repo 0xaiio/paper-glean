@@ -15,6 +15,12 @@
 
 ## data/YYYYMMDD.json
 
+> **文件命名即契约**：只有文件名 stem 恰为 8 位数字（`YYYYMMDD`）的 JSON 才算「一天」。
+> `data/` 同时存放监控状态文件（`watch_state.json` / `ccf_state.json` / `watch_new.json`），
+> 因此**枚举日期必须按此规则过滤**——`core.day_files()` 是唯一入口，
+> `list_available_days()` 与 `find_paper()` 都走它。
+> 早期实现用 `data/*.json` 通配，会把状态文件当成日期，导致 Web 首页默认落在「0 篇」的假日期上。
+
 ### 顶层结构
 
 ```json
@@ -72,10 +78,13 @@
 | `published` | str | 是 | 发布时间，ISO 8601 |
 | `abs_url` | str | 是 | 摘要页 URL |
 | `pdf_url` | str | 是 | PDF URL |
-| `hits_star` | [str] | 否 | 命中的兴趣点条目名 |
-| `hits_expand` | [str] | 否 | 命中的扩展点条目名 |
-| `score_star` | int | 否 | 兴趣点权重和 |
-| `score_expand` | int | 否 | 扩展点权重和 |
+| `hits_star` | [str] | 否 | 命中的**关键词**（`interests.md` 条目的 `keywords:` 值），不是条目标题 |
+| `hits_expand` | [str] | 否 | 同上，扩展点一侧 |
+| `score_star` | int | 否 | 命中的兴趣点条目权重之和 |
+| `score_expand` | int | 否 | 命中的扩展点条目权重之和 |
+
+> 消费者若要显示「命中了哪**个条目**」，必须用 `interest.keywords` 与 `hits_*` 求交集，
+> 而不是拿 `interest.title` 去 `in hits_*`（`partials/paper_card.html` 曾因此永不渲染）。
 
 !!! note "兼容性说明"
     早期数据文件（如 `20260729.json`）可能不含 `hits_*` 和 `score_*` 字段，解析时必须容错。

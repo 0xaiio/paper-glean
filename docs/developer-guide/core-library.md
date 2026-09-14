@@ -36,7 +36,8 @@
 | `download_paper` | `(pid) -> Path \| None` | 下载并按命名规则落盘 |
 | `save_day_data` | `(day, papers, start, end) -> Path` | 写 `data/YYYYMMDD.json` |
 | `load_day_data` | `(day) -> dict \| None` | 读 `data/YYYYMMDD.json` |
-| `list_available_days` | `() -> list[str]` | 枚举可用日期（倒序） |
+| `day_files` | `() -> list[Path]` | `data/` 中真正的日文件（stem 恰为 8 位数字），倒序 |
+| `list_available_days` | `() -> list[str]` | 枚举可用日期（倒序，只含 `YYYYMMDD`） |
 
 ---
 
@@ -151,10 +152,14 @@ arXiv<年份> <id><版本> <去标点标题>.pdf      # 目录 = config.ARXIV_DI
 
 `sanitize_title()` 负责 `\mathbb{X}`→`X`、`\varepsilon`→`epsilon`、去标点/空格归一。
 
-### `save_day_data` / `load_day_data` / `list_available_days`
+### `day_files` / `save_day_data` / `load_day_data` / `list_available_days`
 
-`data/YYYYMMDD.json` 的写、读、枚举。**现状为直接 `write_text`，未实现原子写入**
+`data/YYYYMMDD.json` 的枚举、写、读。**现状为直接 `write_text`，未实现原子写入**
 （见 [ADR-002 现状标注](../product/decisions/adr-002-file-storage.md)）。
+
+日期枚举统一经由 `day_files()`：它只接受 stem 恰为 8 位数字的文件。
+`data/` 同时存放监控状态（`watch_state.json` / `ccf_state.json` / `watch_new.json`），
+用 `data/*.json` 通配会把它们当成日期——Web 首页曾因此默认落在「0 篇」的假日期上。
 
 ---
 

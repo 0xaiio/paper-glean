@@ -37,8 +37,9 @@ def create_app() -> FastAPI:
     async def root(request: Request) -> HTMLResponse:
         """Redirect to digest page."""
         return templates.TemplateResponse(
+            request,
             "redirect.html",
-            {"request": request, "target": "/digest"},
+            {"target": "/digest"},
         )
 
     return app

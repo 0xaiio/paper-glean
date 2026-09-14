@@ -68,9 +68,9 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/venueparse.py` | 会议/期刊页启发式解析（`cfp`/`program`/`papers`）+ ccfddl RSS + Crossref 卷期 | 网络（由调用方 fetch） |
 | `glean/notify.py` | 推送：`file` / Web NEW / `desktop` / `webhook`，全 fail-soft；**密钥只从环境变量读**；`watch`/`ccf` 双命名空间 | 决定是否推送、推送什么 |
 | `glean/web/main.py` | `create_app()` 应用工厂；挂载 `/static`；`/` 重定向 | 路由实现 |
-| `glean/web/routes.py` | 页面路由、REST API（含 `/api/ping` 存活探测）、HTMX 片段 | 业务逻辑（全部委托 core） |
-| `glean/web/models.py` | Pydantic 响应/请求模型（`FeedbackRequest` 带 0–5 校验） | 持久化 |
-| `glean/web/templates_config.py` | 自定义 Jinja 环境，规避 Starlette 上下文不可哈希的缓存缺陷 | — |
+| `glean/web/routes.py` | 页面路由、REST API（含 `/api/ping` 存活探测）、HTMX 片段；共享 `PaperFilters` 查询参数组 + `_require_paper` / `_require_entry` / `_run_summary` 助手 | 业务逻辑（全部委托 core） |
+| `glean/web/models.py` | Pydantic 线上模型（`FeedbackRequest` 带 0–5 校验）+ `PaperFilters`（`Depends()` 注入的查询参数组） | 持久化 |
+| `glean/web/templates_config.py` | 共享 Jinja2 环境（Starlette `Jinja2Templates`）+ `format_timestamp` 过滤器 | — |
 | `arxiv_daily.py` | 向后兼容入口 → `glean.cli:main` | — |
 | `scripts/run_daily.ps1` / `register_task.ps1` | Windows 计划任务入口（ASCII-only）与注册器 | 业务逻辑 |
 
@@ -123,7 +123,8 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 |------|------|------|
 | `sanitize_title` | `(title) -> str` | 清理 LaTeX 记号（`\mathbb{X}`→`X`、`\varepsilon`→`epsilon`）与文件系统非法字符 |
 | `download_paper` | `(pid) -> Path \| None` | 落盘 `arXiv<年份> <id><版本> <去标点标题>.pdf`；**校验 `%PDF` 魔数**；返回目标路径 |
-| `save_day_data` / `load_day_data` / `list_available_days` | — | `data/*.json` 读写与枚举（倒序） |
+| `day_files` | `() -> list[Path]` | `data/` 中真正的日文件（stem 恰为 8 位数字），倒序；**唯一的日期枚举入口** |
+| `save_day_data` / `load_day_data` / `list_available_days` | — | `data/*.json` 读写与枚举（倒序，只认 `YYYYMMDD`） |
 
 ---
 

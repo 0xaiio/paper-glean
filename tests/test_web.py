@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -87,6 +89,17 @@ def test_default_theme_is_light(client):
     assert "localStorage.getItem('darkMode') !== 'false'" not in html
     # Pre-paint script: dark users must not see a light flash before Alpine (defer) boots.
     assert "document.documentElement.classList.add('dark')" in html
+
+
+def test_nav_lists_every_route_in_both_renditions(client):
+    """Both navs come from one list, so a new page must show up in both.
+
+    Guards the de-duplication: the desktop and mobile bars used to be two hand
+    written blocks that could drift (adding a page to one and forgetting the other).
+    """
+    html = client.get("/digest").text
+    for href in ("/digest", "/profile", "/archive", "/watch", "/ccf"):
+        assert html.count(f'href="{href}"') >= 2, f"{href} missing from one nav"
 
 
 def test_htmx_paper_list(client):
@@ -354,3 +367,132 @@ def test_api_ccf_ack_clears_only_ccf_badge(client, isolated_ccf):
     assert acked.status_code == 200
     assert acked.json()["cleared"] == 1
     assert client.get("/api/ccf/new").json()["count"] == 0
+
+
+# ------------------------------------------------------------------
+# Paper listing: one shared filter group, one shared filter function
+# (isolated — never touches the real data/*.json or interests.md)
+# ------------------------------------------------------------------
+
+_INTERESTS_SAMPLE = """# 研究兴趣
+
+## 兴趣点
+
+### 数据溯源
+- keywords: provenance
+- weight: 5
+
+## 扩展点
+
+### 分布式协作
+- keywords: crdt
+- weight: 3
+"""
+
+
+def _paper(pid: str, title: str, **over) -> dict:
+    base = {
+        "id": pid,
+        "version": "v1",
+        "title": title,
+        "authors": ["A"],
+        "abstract": f"{title} abstract",
+        "primary": "cs.DB",
+        "categories": ["cs.DB"],
+        "published": "2026-08-01T00:00:00Z",
+        "abs_url": f"https://arxiv.org/abs/{pid}",
+        "pdf_url": f"https://arxiv.org/pdf/{pid}",
+        "hits_star": [],
+        "hits_expand": [],
+        "score_star": 0,
+        "score_expand": 0,
+    }
+    base.update(over)
+    return base
+
+
+@pytest.fixture
+def isolated_papers(tmp_path, monkeypatch):
+    """One day with a star hit, an expand hit and an unannotated paper."""
+    from glean import core
+
+    day = {
+        "day": "20260801",
+        "window_utc": ["2026-07-31T00:00:00Z", "2026-08-01T00:00:00Z"],
+        "papers": [
+            _paper("2608.00001", "Star Paper", hits_star=["provenance"], score_star=5),
+            _paper("2608.00002", "Expand Paper", hits_expand=["crdt"], score_expand=3),
+            _paper("2608.00003", "Plain Paper", primary="cs.LO", categories=["cs.LO"]),
+        ],
+    }
+    (tmp_path / "20260801.json").write_text(json.dumps(day), encoding="utf-8")
+    # Monitor state shares the directory — it must not surface as a day.
+    (tmp_path / "watch_state.json").write_text('{"version": 1}', encoding="utf-8")
+    interests = tmp_path / "interests.md"
+    interests.write_text(_INTERESTS_SAMPLE, encoding="utf-8")
+
+    monkeypatch.setattr(core, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(core, "INTERESTS_MD", interests)
+    return tmp_path
+
+
+def test_api_days_counts_only_real_days(client, isolated_papers):
+    assert client.get("/api/days").json() == [{"day": "20260801", "paper_count": 3}]
+
+
+def test_default_day_is_the_newest_day_with_papers(client, isolated_papers):
+    body = client.get("/api/papers").json()
+    assert body["day"] == "20260801"
+    assert [p["id"] for p in body["papers"]] == ["2608.00001", "2608.00002"]
+
+
+def test_filter_group_is_shared_by_api_partial_and_page(client, isolated_papers):
+    """The same six params must mean the same thing on all three entry points."""
+    # HTMX partial: same default view as the API.
+    partial = client.get("/htmx/paper-list").text
+    assert "Star Paper" in partial and "Expand Paper" in partial
+    assert "Plain Paper" not in partial
+    # Page: the full digest view renders the same set.
+    page = client.get("/digest").text
+    assert "Star Paper" in page and "Plain Paper" not in page
+    # API: "Other" is opt-in, and that single flag admits the unannotated paper.
+    assert client.get("/api/papers?show_other=true").json()["total"] == 3
+    # Nothing ticked at all = empty, not "everything".
+    none_on = client.get(
+        "/api/papers?show_star=false&show_expand=false&show_other=false"
+    ).json()
+    assert none_on["total"] == 0
+
+
+def test_api_papers_category_search_and_paging(client, isolated_papers):
+    assert client.get("/api/papers?show_other=true&category=cs.LO").json()["total"] == 1
+    assert client.get("/api/papers?show_other=true&search=plain").json()["total"] == 1
+    assert client.get("/api/papers?search=no-such-word").json()["total"] == 0
+
+    page = client.get("/api/papers?show_other=true&limit=2&offset=2").json()
+    assert [p["id"] for p in page["papers"]] == ["2608.00003"]
+    assert page["total"] == 3 and page["limit"] == 2 and page["offset"] == 2
+
+
+def test_htmx_paper_card_explains_why_recommended(client, isolated_papers):
+    """End-to-end version of the contract fixed in partials/paper_card.html:
+    hits_star carries matched *keywords*, and the card maps them back to entries.
+
+    Asserts on the rendered label (``Why recommended:``); the ``<!-- ... -->``
+    above it is a literal comment in the template and is always emitted.
+    """
+    html = client.get("/htmx/paper-card/2608.00001").text
+    assert "Why recommended:" in html
+    assert "数据溯源" in html and "w=5" in html
+
+    expand = client.get("/htmx/paper-card/2608.00002").text
+    assert "分布式协作" in expand and "w=3" in expand
+    assert "数据溯源" not in expand
+
+    plain = client.get("/htmx/paper-card/2608.00003").text
+    assert "Why recommended:" not in plain
+
+
+def test_htmx_paper_card_unknown_id_is_404(client, isolated_papers):
+    assert client.get("/htmx/paper-card/no-such-id").status_code == 404
+    assert client.get("/htmx/paper-detail/no-such-id").status_code == 404

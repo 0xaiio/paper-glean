@@ -1,26 +1,29 @@
-"""Pydantic models for the web API."""
+"""Models for the web API: wire schemas (Pydantic) plus shared query groups."""
 
 from __future__ import annotations
+
+from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
 
 
-class PaperResponse(BaseModel):
-    """Paper data for API responses."""
+@dataclass
+class PaperFilters:
+    """The query-string filter group shared by every paper listing.
 
-    id: str
-    title: str
-    authors: list[str]
-    abstract: str
-    primary: str
-    categories: list[str]
-    published: str
-    abs_url: str
-    pdf_url: str
-    hits_star: list[str] = Field(default_factory=list)
-    hits_expand: list[str] = Field(default_factory=list)
-    score_star: int = 0
-    score_expand: int = 0
+    ``/digest``, ``/api/papers`` and ``/htmx/paper-list`` all accept exactly
+    these six parameters and all feed them to the same filter function, so the
+    group is declared once here and injected with ``Depends()``.  A plain
+    dataclass (not a Pydantic model) is what lets FastAPI read each field from
+    the query string rather than from a request body.
+    """
+
+    day: str | None = None
+    category: str | None = None
+    search: str | None = None
+    show_star: bool = True
+    show_expand: bool = True
+    show_other: bool = False
 
 
 class FeedbackRequest(BaseModel):
@@ -45,17 +48,6 @@ class DayInfo(BaseModel):
 
     day: str
     paper_count: int
-
-
-class FilterState(BaseModel):
-    """Current filter state."""
-
-    day: str | None = None
-    category: str | None = None
-    search: str | None = None
-    show_star: bool = True
-    show_expand: bool = True
-    show_other: bool = False
 
 
 class CcfVenue(BaseModel):
