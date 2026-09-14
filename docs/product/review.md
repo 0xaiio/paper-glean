@@ -78,8 +78,9 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 | `glean/core.py` | 纯业务逻辑：抓取/命中/生成 digest/反馈/下载/持久化 | ✅ 共享核心 |
 | `glean/cli.py` | argparse 壳：`fetch`/`daily`/`serve`/`download`/`feedback`/`reanchor` | ✅ |
 | `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）+ 后台 detached 拉起 + `ensure()` 复用 | ✅ |
-| `glean/watch.py` | 学者监控：名单解析/增删/启停、主页→DBLP→S2 解析编排、指纹 diff、事件与 digest | ✅ |
-| `glean/ccf.py` | 会议期刊监控：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源编排、指纹 diff、事件与 digest | ✅ |
+| `glean/monitor.py` | **监控内核（watch/ccf 共享）**：`run_monitor()` 统一实现基线 → 指纹 diff → digest → 推送 → 审计；含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of`。**不发网络请求**（抓取由调用方注入） | ✅ |
+| `glean/watch.py` | 学者监控：名单解析/增删/启停、主页→DBLP→S2 解析、digest 文案；diff/基线/推送/审计委托 `monitor` | ✅ |
+| `glean/ccf.py` | 会议期刊监控：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源、digest 文案；diff/基线/推送/审计委托 `monitor` | ✅ |
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（71 会议 + 22 期刊，含官网/领域/DBLP/ISSN），由 `scripts/gen_ccf_catalog.py` 生成 | ✅ |
 | `glean/homeparse.py` | 主页启发式解析（stdlib `html.parser` 零依赖）：论文/视频/TR/talk + 置信度 | ✅ |
 | `glean/venueparse.py` | 会议/期刊页启发式解析（cfp/program/papers）+ ccfddl RSS + Crossref 卷期 | ✅ |
@@ -124,13 +125,17 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 add/toggle/toggle-area/ack/remove 五个写操作），
 写操作均隔离到 `tmp_path` 不碰真实文件）、
 `tests/test_serve.py`（`probe` / `ensure` 单元 + 端到端环回服务存活测试，含环境代理绕过回归）、
-`tests/test_watch.py`（名单增删启停、解析优先级、指纹、基线/差异、事件、digest 幂等）、
+`tests/test_monitor.py`（**监控内核**：身份基元、状态容错、审计字段、digest 幂等与新日期插入、
+首轮静默建基线 → 增量、`--force`、逐条失败隔离、`prepare` 错误与 context 透传、`accept`
+钩子、推送降级、`use_network` 透传）、
+`tests/test_watch.py`（名单增删启停、解析优先级、指纹、基线/差异、事件、digest 幂等、
+无 `## ` 小节时前言不被抹掉的回归）、
 `tests/test_ccf.py`（勾选框名单、目录同步保留勾选、三源分工、跨源去重、基线/差异、事件、digest 幂等）、
 `tests/test_venueparse.py`（venue 页 cfp/program/papers 分类、nav/logo 剔除、ccfddl 匹配与实体反转义、
 Crossref 卷期分组与指纹稳定性）、
 `tests/test_notify.py`（文件通道去重/ack、**双命名空间隔离**、桌面通道开关、webhook 三种载荷与失败降级）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组）。
-共 **119 个测试，全部通过**（`pytest -q` → `119 passed`）。
+共 **144 个测试，全部通过**（`pytest -q` → `144 passed`）。
 
 ---
 

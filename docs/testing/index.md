@@ -27,6 +27,7 @@
 |------|----------|----------|----------|
 | `glean/core.py` | ✅ | — | — |
 | `glean/serve.py` | ✅ | ✅ | — |
+| `glean/monitor.py` | ✅ | — | — |
 | `glean/watch.py` | ✅ | — | ✅ |
 | `glean/homeparse.py` | — | — | ✅ |
 | `glean/ccf.py` | ✅ | — | ✅ |
@@ -39,9 +40,12 @@
 | 数据文件格式 | — | ✅ | — |
 | 端到端工作流 | — | — | ✅ |
 
-> 全量测试数：**119 passed**（`pytest tests/ -q`）。
+> 全量测试数：**144 passed**（`pytest tests/ -q`）。
 > `ccf_catalog.py` 是生成物（数据模块），由 `scripts/gen_ccf_catalog.py` 产出，
 > 由 `test_ccf.py::test_sync_catalog_keeps_user_ticks` 间接覆盖，无独立测试。
+> `monitor.py` 是 `watch` / `ccf` 的共享内核，由 `tests/test_monitor.py` 独立覆盖
+> （含基线/差异/`--force`/逐条失败隔离/推送降级/审计字段等），因此两条线自己的测试
+> 不必重复这些语义。
 
 ## 测试原则
 

@@ -60,8 +60,9 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/core.py` | HTTP/XML、抓取、命中标注、digest 生成、反馈、下载、持久化 | CLI 参数、HTTP 路由 |
 | `glean/cli.py` | argparse 子命令 `fetch`/`daily`/`serve`/`watch`/`ccf`/`download`/`feedback`/`reanchor`；控制台输出 | 业务逻辑（全部委托 core / serve / watch / ccf） |
 | `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）、后台 detached 拉起、`ensure()` 复用已在线的实例；日志落 `logs/` | 业务逻辑、路由 |
-| `glean/watch.py` | 学者监控编排：名单解析/增删/启停、主页→DBLP→S2 解析、指纹 diff、事件与 digest | HTTP 细节（委托 homeparse / core.http_get） |
-| `glean/ccf.py` | 会议期刊监控编排：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源、指纹 diff、事件与 digest | HTTP 细节（委托 venueparse） |
+| `glean/monitor.py` | **监控内核（共享）**：`MonitorSpec`/`MonitorJob` 描述子系统，`run_monitor()` 实现「名单 → 抓取 → 指纹 diff → 基线 → digest → 推送 → 审计」；另含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of` | **任何网络请求**（抓取函数由调用方注入，故可离线测试） |
+| `glean/watch.py` | 学者监控：`watchlist.md` 解析/增删/启停、主页→DBLP→S2 解析、digest 文案；diff/基线/推送/审计委托 `monitor` | HTTP 细节（委托 homeparse / core.http_get） |
+| `glean/ccf.py` | 会议期刊监控：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源、digest 文案；diff/基线/推送/审计委托 `monitor` | HTTP 细节（委托 venueparse） |
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（生成物）：71 会议 + 22 期刊，含官网/领域/DBLP/ISSN | 网络（由 `scripts/gen_ccf_catalog.py` 生成） |
 | `glean/homeparse.py` | 个人主页启发式解析（stdlib `html.parser`），输出带 `kind` 与 `confidence` 的条目 | 网络（由调用方 fetch） |
 | `glean/venueparse.py` | 会议/期刊页启发式解析（`cfp`/`program`/`papers`）+ ccfddl RSS + Crossref 卷期 | 网络（由调用方 fetch） |
@@ -152,6 +153,34 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 - 抓取容错：单类别失败不影响整体（`[WARN]` 后继续）
 - 文本编码：CLI 强制 `utf-8`（`sys.stdout.reconfigure`）
 
+### 5.5 监控内核：一份引擎，两个子系统（`glean/monitor.py`）
+
+`watch`（按人）与 `ccf`（按会议/期刊）是同一机制的两份实例化。共性收敛在 `monitor.py`：
+
+```
+MonitorSpec  ← 静态身份：namespace / subject_field / state_key / digest_marker / item_noun / max_items
+MonitorJob   ← 注入点：entries / collect / prepare / accept / render_item + 四条路径
+run_monitor()← 唯一实现：基线 → diff → 分组 → digest → 推送 → 审计
+```
+
+关键约定：
+
+- **`subject_field` 统一「主语」概念**：新条目挂在 `researcher` 还是 `venue` 名下，由
+  `spec` 决定，推送摘要分组、事件日志、digest 小标题都读同一个字段。
+- **首次静默建基线**：`subjects.get(key) is None` 时只写指纹不推送，避免上线即刷屏；
+  `force=True` 才把首扫结果当作新条目。
+- **逐条失败隔离**：单个条目抛异常只进 `errors`，同轮其余条目照跑。
+- **审计在推送之后写**：事件行里的 `pushed_to` 才能如实记录每条最终落到了哪些通道。
+- **引擎不发网络请求**：抓取函数由调用方注入，因此 `tests/test_monitor.py` 可以完全离线
+  地验证基线/差异/幂等/降级等全部语义。
+- **路径在调用时解析**：`watch._job()` / `ccf._job()` 每次从模块全局读路径常量，这样
+  测试才能用 `monkeypatch.setattr` 把全部文件重定向到 `tmp_path`。
+
+**历史遗留与已修缺陷**：`watch._split_sections` 原本在「名单里没有 `## ` 小节标题」时返回
+空前言，导致下一次 `watch add` 会把手写的标题与说明整段抹掉；现已改为「前言截止到第一个
+`## `/`### ` 标题之前，找不到则整份文件都是前言」，并加了回归测试
+（`tests/test_watch.py::test_preamble_survives_a_list_without_section_headings`）。
+
 ---
 
 ## 6. 并发与一致性（**现状标注**）
@@ -225,4 +254,4 @@ pytest                        # 运行测试
 
 ---
 
-*本文档与代码同步审阅于 2026-09-13（见 [需求与现状审阅报告](../product/review.md)）。*
+*本文档与代码同步审阅于 2026-09-14（见 [需求与现状审阅报告](../product/review.md)）。*

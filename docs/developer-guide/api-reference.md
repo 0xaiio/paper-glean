@@ -56,6 +56,29 @@
         - start_background
         - ensure
 
+## 监控内核
+
+> `watch` 与 `ccf` 共用的「名单 → 抓取 → diff → 落盘 → 推送」引擎。
+> 本模块**不发任何网络请求**，抓取函数由调用方通过 `MonitorJob` 注入。
+
+::: glean.monitor
+    options:
+      members:
+        - MonitorSpec
+        - MonitorJob
+        - run_monitor
+        - slugify
+        - norm_title
+        - fingerprint
+        - kind_of
+        - year_of
+        - load_state
+        - save_state
+        - append_events
+        - load_events
+        - render_section
+        - upsert_digest
+
 ## 学者监控
 
 ::: glean.watch

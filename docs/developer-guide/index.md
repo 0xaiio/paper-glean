@@ -43,8 +43,9 @@ glean/
 ├── core.py          # 纯业务逻辑（共享）
 ├── cli.py           # CLI 包装器（fetch/daily/serve/watch/ccf/download/feedback/reanchor）
 ├── serve.py         # 本地 Web 服务保活（探测 / 后台拉起 / ensure）
-├── watch.py         # 学者监控（名单 / 解析编排 / 指纹 diff / 事件）
-├── ccf.py           # 会议期刊监控（勾选框名单 / 目录同步 / 三源编排 / 指纹 diff）
+├── monitor.py       # 监控内核（共享）：名单 diff / 基线 / 推送 / 审计 / digest 幂等
+├── watch.py         # 学者监控（watchlist.md / 主页→DBLP→S2 / digest 文案）
+├── ccf.py           # 会议期刊监控（勾选框名单 / 目录同步 / ccfddl→Crossref→主页）
 ├── ccf_catalog.py   # CCF-A 目录快照（71 会议 + 22 期刊，生成物，勿手改）
 ├── homeparse.py     # 个人主页启发式解析（stdlib html.parser，零依赖）
 ├── venueparse.py    # 会议/期刊页解析 + ccfddl RSS + Crossref 卷期（零依赖）
@@ -62,13 +63,20 @@ glean/
 
 ### 监控层
 
-监控层有**三条并行、互不干扰**的线，共用 `notify.py` 的推送框架：
+监控层有**三条并行、互不干扰**的线，共用 `notify.py` 的推送框架；后两条还共用
+`monitor.py` 的 diff / 基线 / 推送 / 审计内核：
 
 | 线 | 组织维度 | 来源 | 名单 | digest |
 |----|---------|------|------|--------|
 | `daily` | arXiv 类别 | arXiv API | 类别固定 | `arXiv-schedule.md` |
 | `watch` | 人 | 个人主页 → DBLP → S2 | `watchlist.md` | `WATCH-digest.md` |
 | `ccf` | 会议 / 期刊 | ccfddl RSS → 主页；期刊走 Crossref | `ccf.md`（勾选框） | `CCF-digest.md` |
+
+`watch` 与 `ccf` 在用户眼里是两个功能，在代码里是同一套机制的两份实例化：都以 Markdown
+做名单事实源，都按 `fingerprint` 与上次状态 diff 出「新」条目，都首次静默建基线，都落盘
+一份带幂等标记的 digest 并推送多通道。差别只有「抓什么」「主语叫什么」「写到哪个文件」，
+因此共性收敛在 `glean/monitor.py`（`MonitorSpec` 描述静态身份，`MonitorJob` 注入抓取与
+渲染函数，`run_monitor()` 是唯一实现）——修一次 diff / 基线 / 推送缺陷不再需要改两处。
 
 **按人（`watch`）**：
 

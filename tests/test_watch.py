@@ -49,18 +49,16 @@ def isolated(tmp_path, monkeypatch):
 # basics
 # ------------------------------------------------------------------
 
-def test_slugify():
-    assert watch.slugify("魏恒峰 Hengfeng Wei") == "魏恒峰-hengfeng-wei"
-    assert watch.slugify("  A.  Gotsman!! ") == "a-gotsman"
+def test_shared_primitives_are_reexported():
+    """`watch.slugify` / `watch.fingerprint` are documented public API.
 
+    They now live in `glean.monitor` (shared with the CCF monitor); their
+    behaviour is tested there. This only guards the re-export.
+    """
+    from glean import monitor
 
-def test_fingerprint_stable_and_distinct():
-    a = {"title": "VeriStrong: A Verified Protocol", "url": "https://x/a.pdf"}
-    b = {"title": "veristrong: a verified protocol", "url": "https://x/b.pdf"}
-    assert watch.fingerprint(a) == watch.fingerprint(a)
-    # same title but a materially different host -> different identity
-    assert watch.fingerprint(a) != watch.fingerprint(b)
-    assert watch.fingerprint({"title": "Totally Other"}) != watch.fingerprint(a)
+    assert watch.slugify is monitor.slugify
+    assert watch.fingerprint is monitor.fingerprint
 
 
 def test_load_watchlist_parses_sections(isolated):
@@ -114,6 +112,30 @@ def test_remove_forgets_seen_state(isolated):
 
     watch.remove_researcher("Temp Person")
     assert "temp-person" not in watch.load_state()["researchers"]
+
+
+def test_preamble_survives_a_list_without_section_headings(tmp_path, monkeypatch):
+    """A hand-written list that has no `## ` section must keep its title/prose.
+
+    Regression: the old `_split_sections` returned an empty preamble whenever no
+    `## ` heading existed, so the next `watch add` silently erased the header.
+    """
+    wl = tmp_path / "watchlist.md"
+    wl.write_text(
+        "# 我的监控名单\n\n> 手工整理，勿删。\n\n"
+        "### Alice\n- homepage: https://alice.example\n- enabled: true\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(watch, "WATCHLIST_MD", wl)
+    monkeypatch.setattr(watch, "WATCH_STATE", tmp_path / "watch_state.json")
+
+    watch.add_researcher("Bob", homepage="https://bob.example")
+
+    text = wl.read_text(encoding="utf-8")
+    assert "# 我的监控名单" in text
+    assert "> 手工整理，勿删。" in text
+    assert text.count("### Alice") == 1  # not duplicated into the preamble
+    assert [e["name"] for e in watch.load_watchlist()] == ["Alice", "Bob"]
 
 
 # ------------------------------------------------------------------

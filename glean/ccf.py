@@ -11,6 +11,13 @@ DBLP is deliberately **not** fetched: every dblp.org endpoint now answers with
 an anti-bot interstitial. DBLP URLs are still stored and shown as a human
 reference link (see :mod:`glean.venueparse`).
 
+Scope
+-----
+This module owns only the *venue-specific* parts: ``ccf.md``, the catalogue
+sync, the three sources, and the digest wording. The diff / baseline / push /
+audit mechanics are shared with the researcher monitor and live in
+:mod:`glean.monitor` — see :data:`_SPEC` for how this subsystem plugs in.
+
 State model
 -----------
 ``ccf.md`` (Markdown, checkbox list) is the source of truth for *which* venues
@@ -23,12 +30,11 @@ baseline silently instead of pushing its whole history (override with
 
 from __future__ import annotations
 
-import json
 import re
-import time
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Iterable
 
+from glean import monitor
 from glean.config import (
     CCF_DIGEST_MD,
     CCF_EVENTS,
@@ -37,13 +43,13 @@ from glean.config import (
     CCF_MD,
     CCF_STATE,
 )
+from glean.monitor import fingerprint, kind_of, slugify
 from glean.venueparse import (
     fetch_crossref_issues,
     fetch_rss,
     parse_ccfddl,
     parse_venue_page,
 )
-from glean.watch import fingerprint, slugify
 
 KIND_ICONS = {
     "cfp": "\U0001f4e2",  # 📢
@@ -72,12 +78,19 @@ _SECTIONS = (
     ("journal", "## 期刊", "<!-- 期刊没有截稿站收录，条目来自人工整理（见 glean/ccf_catalog.py）。 -->"),
 )
 
-_CCF_DIGEST_MARKER = "CCF"
+# 本子系统在共享引擎里的静态身份。
+_SPEC = monitor.MonitorSpec(
+    namespace="ccf",
+    subject_field="venue",
+    state_key="venues",
+    digest_marker="CCF",
+    item_noun="更新",
+    max_items=CCF_MAX_ITEMS,
+)
 
 
 def _kind_of(value: str | None) -> str:
-    v = (value or "").strip().lower()
-    return v if v in CCF_ITEM_KINDS else "other"
+    return kind_of(value, CCF_ITEM_KINDS)
 
 
 # ------------------------------------------------------------------
@@ -358,63 +371,27 @@ def collect_items(
 
 
 # ------------------------------------------------------------------
-# State + events
+# State · events · digest — delegated to the shared engine
 # ------------------------------------------------------------------
 
 def load_state() -> dict[str, Any]:
-    if not CCF_STATE.exists():
-        return {"version": 1, "venues": {}}
-    try:
-        return json.loads(CCF_STATE.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {"version": 1, "venues": {}}
+    """Read ``data/ccf_state.json`` (the already-seen fingerprints)."""
+    return monitor.load_state(CCF_STATE, _SPEC.state_key)
 
 
 def save_state(state: dict[str, Any]) -> None:
-    CCF_STATE.parent.mkdir(parents=True, exist_ok=True)
-    CCF_STATE.write_text(
-        json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    """Write ``data/ccf_state.json`` back to disk."""
+    monitor.save_state(CCF_STATE, state)
 
 
 def append_events(items: list[dict[str, Any]], pushed_to: list[str], run_id: str) -> None:
-    """Append one JSON line per new item to ccf_events.jsonl."""
-    if not items:
-        return
-    CCF_EVENTS.parent.mkdir(parents=True, exist_ok=True)
-    now = datetime.now(timezone.utc).isoformat()
-    with open(CCF_EVENTS, "a", encoding="utf-8") as fh:
-        for it in items:
-            fh.write(
-                json.dumps(
-                    {
-                        "time": now,
-                        "run_id": run_id,
-                        "key": it.get("key"),
-                        "venue": it.get("venue"),
-                        "item": {k: v for k, v in it.items() if k not in ("key", "venue")},
-                        "pushed_to": pushed_to,
-                    },
-                    ensure_ascii=False,
-                )
-                + "\n"
-            )
+    """Append one JSON line per new item to ``ccf_events.jsonl``."""
+    monitor.append_events(CCF_EVENTS, items, pushed_to, run_id, _SPEC.subject_field)
 
 
 def load_events(limit: int = 200) -> list[dict[str, Any]]:
     """Most recent CCF events, newest first."""
-    if not CCF_EVENTS.exists():
-        return []
-    out: list[dict[str, Any]] = []
-    for line in reversed(CCF_EVENTS.read_text(encoding="utf-8").splitlines()[-limit:]):
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            out.append(json.loads(line))
-        except json.JSONDecodeError:
-            continue
-    return out
+    return monitor.load_events(CCF_EVENTS, limit)
 
 
 # ------------------------------------------------------------------
@@ -439,40 +416,49 @@ def _item_line(item: dict[str, Any]) -> str:
 
 
 def render_section(day: str, grouped: dict[str, list[dict[str, Any]]]) -> str:
-    lines = [f"<!-- BEGIN {_CCF_DIGEST_MARKER} {day} -->", "", f"## {day}", ""]
-    if not grouped:
-        lines += ["_本次运行没有发现更新。_", ""]
-    for name, items in grouped.items():
-        lines.append(f"### {name}　`{len(items)} 条更新`")
-        lines.append("")
-        lines.extend("- " + _item_line(i) for i in items)
-        lines.append("")
-    lines.append(f"<!-- END {_CCF_DIGEST_MARKER} {day} -->")
-    return "\n".join(lines)
+    """Render one day's digest section wrapped in ``<!-- BEGIN CCF <day> -->``."""
+    return monitor.render_section(_SPEC, day, grouped, _item_line)
 
 
 def upsert_ccf_digest(day: str, section: str) -> None:
     """Insert/replace the day's section, newest first."""
-    content = CCF_DIGEST_MD.read_text(encoding="utf-8") if CCF_DIGEST_MD.exists() else CCF_DIGEST_HEADER
-    begin = f"<!-- BEGIN {_CCF_DIGEST_MARKER} {day} -->"
-    endm = f"<!-- END {_CCF_DIGEST_MARKER} {day} -->"
-    if begin in content and endm in content:
-        pre = content[: content.index(begin)]
-        post = content[content.index(endm) + len(endm) :].lstrip("\n")
-        content = pre + section + "\n" + post
-    elif f"<!-- BEGIN {_CCF_DIGEST_MARKER} " in content:
-        idx = content.index(f"<!-- BEGIN {_CCF_DIGEST_MARKER} ")
-        content = content[:idx] + section + "\n" + content[idx:]
-    else:
-        # Trailing newline matters: without it the *first* write differs from
-        # every later one, so an idempotent upsert would not be idempotent.
-        content = content.rstrip("\n") + "\n\n" + section + "\n"
-    CCF_DIGEST_MD.write_text(content, encoding="utf-8")
+    monitor.upsert_digest(
+        CCF_DIGEST_MD, CCF_DIGEST_HEADER, _SPEC.digest_marker, day, section
+    )
 
 
 # ------------------------------------------------------------------
 # Run
 # ------------------------------------------------------------------
+
+def _prepare() -> tuple[list[str], str]:
+    """Download the ccfddl RSS **once per run**, not once per venue."""
+    try:
+        return [], fetch_rss()
+    except Exception as exc:
+        return [f"ccfddl: {type(exc).__name__}: {exc}"], ""
+
+
+def _job() -> monitor.MonitorJob:
+    """Build the engine job from the *current* module globals.
+
+    Reading the globals here (rather than at import time) is what lets tests
+    redirect every path into ``tmp_path`` via ``monkeypatch.setattr``.
+    """
+    return monitor.MonitorJob(
+        spec=_SPEC,
+        entries=load_venues,
+        state_path=CCF_STATE,
+        events_path=CCF_EVENTS,
+        digest_path=CCF_DIGEST_MD,
+        digest_header=CCF_DIGEST_HEADER,
+        render_item=_item_line,
+        prepare=_prepare,
+        collect=lambda entry, use_network, rss_text: collect_items(
+            entry, use_network=use_network, rss_text=rss_text
+        ),
+    )
+
 
 def run(
     only: str | None = None,
@@ -490,95 +476,11 @@ def run(
     from glean.config import CCF_REQUEST_INTERVAL
 
     delay = CCF_REQUEST_INTERVAL if request_interval is None else request_interval
-    state = load_state()
-    venues = state.setdefault("venues", {})
-
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    day = datetime.now().strftime("%Y-%m-%d")
-
-    new_items: list[dict[str, Any]] = []
-    grouped: dict[str, list[dict[str, Any]]] = {}
-    baselined: list[str] = []
-    skipped: list[str] = []
-    errors: list[str] = []
-
-    # One RSS download per run — not one per venue.
-    rss_text = ""
-    if use_network:
-        try:
-            rss_text = fetch_rss()
-        except Exception as exc:
-            errors.append(f"ccfddl: {type(exc).__name__}: {exc}")
-
-    entries = [e for e in load_venues() if e.get("enabled", True)]
-    if only:
-        entries = [e for e in entries if e["key"] == slugify(only)]
-
-    for i, entry in enumerate(entries):
-        if i and delay:
-            time.sleep(delay)
-        key = entry["key"]
-        try:
-            items = collect_items(entry, use_network=use_network, rss_text=rss_text)
-        except Exception as exc:  # one broken site must not abort the run
-            errors.append(f"{entry['name']}: {type(exc).__name__}: {exc}")
-            continue
-
-        rec = venues.get(key)
-        if rec is None:
-            venues[key] = {
-                "name": entry["name"],
-                "baseline": True,
-                "last_checked": datetime.now(timezone.utc).isoformat(),
-                "fingerprints": [it["fingerprint"] for it in items][-CCF_MAX_ITEMS:],
-                "sources": sorted({it.get("source", "?") for it in items}),
-            }
-            baselined.append(f"{entry['name']}（{len(items)} 条基线）")
-            fresh = items if force else []
-        else:
-            seen = set(rec.get("fingerprints", []))
-            fresh = [it for it in items if it["fingerprint"] not in seen]
-            rec["last_checked"] = datetime.now(timezone.utc).isoformat()
-            rec["fingerprints"] = (
-                rec.get("fingerprints", []) + [it["fingerprint"] for it in fresh]
-            )[-CCF_MAX_ITEMS:]
-            rec["sources"] = sorted(
-                set(rec.get("sources", [])) | {it.get("source", "?") for it in fresh}
-            )
-            if not fresh:
-                skipped.append(entry["name"])
-
-        for it in fresh:
-            enriched = dict(it)
-            enriched["key"] = key
-            enriched["venue"] = entry["name"]
-            new_items.append(enriched)
-        if fresh:
-            grouped.setdefault(entry["name"], []).extend(fresh)
-
-    save_state(state)
-
-    pushed_to: list[str] = []
-    if new_items:
-        upsert_ccf_digest(day, render_section(day, grouped))
-        if push:
-            try:
-                from glean import notify
-
-                pushed_to = notify.push(new_items, day=day, namespace="ccf") or []
-            except Exception as exc:
-                errors.append(f"push: {type(exc).__name__}: {exc}")
-        append_events(new_items, pushed_to, run_id)
-    else:
-        upsert_ccf_digest(day, render_section(day, {}))
-
-    return {
-        "run_id": run_id,
-        "day": day,
-        "new_items": new_items,
-        "grouped": grouped,
-        "baselined": baselined,
-        "skipped": skipped,
-        "errors": errors,
-        "pushed_to": pushed_to,
-    }
+    return monitor.run_monitor(
+        _job(),
+        only=only,
+        use_network=use_network,
+        force=force,
+        push=push,
+        delay=delay,
+    )

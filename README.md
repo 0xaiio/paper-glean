@@ -92,7 +92,7 @@ python -X utf8 arxiv_daily.py ccf run                     # 首次建基线，�
 - **脚本层**：纯标准库 Python，负责抓取、去重、命中标记、下载
 - **Agent 层**：语义理解，填写推荐小节，解析新材料
 - **Web 层**：FastAPI + HTMX + Alpine.js，卡片式浏览与打分
-- **监控层**：`watch.py` 按人抓取 → `ccf.py` 按会议/期刊抓取 → `homeparse.py` / `venueparse.py` 解析 → `notify.py` 四通道推送
+- **监控层**：`monitor.py` 统一内核（名单 diff / 首次静默建基线 / 多通道推送 / 审计）→ `watch.py` 按人 · `ccf.py` 按会议期刊 → `homeparse.py` / `venueparse.py` 解析页面 → `notify.py` 四通道推送
 
 ---
 
@@ -100,7 +100,7 @@ python -X utf8 arxiv_daily.py ccf run                     # 首次建基线，�
 
 | 文件 | 说明 |
 |------|------|
-| `glean/` | **Python 包**：`core.py` 核心库 · `cli.py` CLI · `config.py` 配置 · `serve.py` 服务保活 · `watch.py` 学者监控 · `ccf.py` 会议/期刊监控 · `ccf_catalog.py` CCF-A 目录快照 · `homeparse.py` / `venueparse.py` 页面解析 · `notify.py` 推送 · `web/` FastAPI 视图层 · `templates/` Jinja2 模板 |
+| `glean/` | **Python 包**：`core.py` 核心库 · `cli.py` CLI · `config.py` 配置 · `serve.py` 服务保活 · `monitor.py` 监控内核（watch/ccf 共享：名单 diff / 基线 / 推送 / 审计） · `watch.py` 学者监控 · `ccf.py` 会议/期刊监控 · `ccf_catalog.py` CCF-A 目录快照 · `homeparse.py` / `venueparse.py` 页面解析 · `notify.py` 推送 · `web/` FastAPI 视图层 · `templates/` Jinja2 模板 |
 | arxiv_daily.py | 向后兼容薄包装 → `glean.cli:main` |
 | scripts/ | 定时基础设施：`run_daily.ps1` 任务体 · `register_task.ps1` 注册 Windows 计划任务 · `gen_ccf_catalog.py` 重新生成 CCF-A 目录 |
 | interests.md | 兴趣画像：兴趣点/扩展点条目 + keywords + weight |
@@ -116,7 +116,7 @@ python -X utf8 arxiv_daily.py ccf run                     # 首次建基线，�
 | watch_events.jsonl / ccf_events.jsonl | 推送审计日志（被 git 忽略） |
 | logs/ | 后台服务日志（`serve-<host>-<port>.log`，被 git 忽略） |
 | glean_static/ | 前端静态资源（CSS / Alpine.js） |
-| tests/ | pytest 测试（core / web / cli / serve / watch / ccf / notify / venueparse，共 119 项） |
+| tests/ | pytest 测试（core / web / cli / serve / monitor / watch / ccf / notify / venueparse，共 144 项） |
 | plan.md | Web 应用需求规格（M1 已实现，目标界面见 docs/design/） |
 | survey.md | 现有系统调研与自研/采购决策 |
 | docs/ | **项目文档（本文档体系）** |

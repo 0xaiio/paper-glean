@@ -31,6 +31,7 @@ pytest tests/ -v
 # 运行特定测试文件
 pytest tests/test_core.py -v
 pytest tests/test_web.py -v
+pytest tests/test_monitor.py -v
 pytest tests/test_watch.py -v
 pytest tests/test_ccf.py -v
 pytest tests/test_venueparse.py -v
@@ -52,9 +53,10 @@ paper-glean/
 │   ├── core.py         # 业务逻辑（共享）
 │   ├── cli.py          # CLI 入口
 │   ├── serve.py        # 本地 Web 服务保活
-│   ├── watch.py        # 学者监控编排
+│   ├── monitor.py      # 监控内核（共享）：diff / 基线 / 推送 / 审计 / digest 幂等
+│   ├── watch.py        # 学者监控（名单 + 三源 + digest 文案）
 │   ├── homeparse.py    # 个人主页启发式解析（零依赖）
-│   ├── ccf.py          # CCF 会议/期刊监控编排
+│   ├── ccf.py          # CCF 会议/期刊监控（名单 + 目录同步 + 三源）
 │   ├── ccf_catalog.py  # CCF-A 名录（生成物）
 │   ├── venueparse.py   # ccfddl RSS / 会议主页 / Crossref 解析
 │   ├── notify.py       # 推送通道（watch / ccf 双命名空间）
@@ -75,6 +77,7 @@ paper-glean/
 │   ├── test_core.py
 │   ├── test_web.py
 │   ├── test_serve.py
+│   ├── test_monitor.py
 │   ├── test_watch.py
 │   ├── test_ccf.py
 │   ├── test_venueparse.py
@@ -139,13 +142,24 @@ type:
 
 ### 4. 添加新的监控线
 
-监控线遵循统一的「编排模块 + 命名空间推送」范式（现有 `daily` / `watch` / `ccf` 三条）：
+监控线遵循统一的「`glean/monitor.py` 引擎 + 编排模块 + 命名空间推送」范式
+（现有 `watch` / `ccf` 两条；`daily` 是更早的独立实现，尚未迁移）：
 
-1. 新建 `glean/<line>.py`，实现 `load_*` / `run` / digest upsert 等编排函数
-2. 在 `glean/config.py` 中登记该线的路径与常量
-3. 在 `glean/notify.py` 的 `_NEW_PATHS` / `NS_LABEL` 中注册新命名空间（保证未读集合互相隔离）
+1. 在 `glean/config.py` 中登记该线的路径与常量
+2. 在 `glean/notify.py` 的 `_NEW_PATHS` / `NS_LABEL` 中注册新命名空间（保证未读集合互相隔离）
+3. 新建 `glean/<line>.py`，**只写这条线独有的部分**：
+   - 名单解析 / 增删 / 启停（对标 `load_watchlist` / `load_venues`）
+   - 采集函数 `collect_items()`（对标 watch / ccf）
+   - 一个 `MonitorSpec`（`namespace` / `subject_field` / `state_key` / `digest_marker` /
+     `item_noun` / `max_items`）
+   - 一个 `_job()`：从**模块全局**读路径常量并组装 `MonitorJob`
+   - digest 单行渲染 `_item_line()` 与两个薄包装 `render_section()` / `upsert_*_digest()`
+   - `run()` 一行转调 `monitor.run_monitor(...)`
 4. 在 `glean/cli.py` 中挂子命令，在 `glean/web/routes.py` 中挂 API 与页面
-5. 补测试：核心编排 `tests/test_<line>.py`，解析器单独成文件
+5. 补测试：新增 `tests/test_<line>.py`（隔离路径 + stub 抓取），引擎本身的语义由
+   `tests/test_monitor.py` 覆盖，**不要**在新线里重复测基线/差异/幂等
+
+> 判断标准：如果一段代码在两条监控线里长得一样，它就应该在 `monitor.py` 里，而不是被抄两遍。
 
 ## 文档更新
 

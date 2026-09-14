@@ -8,12 +8,40 @@
 
 | 测试函数 | 测试内容 | 状态 |
 |----------|----------|------|
-| `test_load_interest_entries` | 解析 interests.md | ✅ |
-| `test_match_keywords` | 关键词匹配逻辑 | ✅ |
-| `test_annotate_hits` | 命中标记生成 | ✅ |
-| `test_apply_feedback` | 反馈应用与权重更新 | ✅ |
-| `test_save_day_data` | JSON 文件原子写入 | ✅ |
-| `test_upsert_digest` | Markdown 章节更新 | ✅ |
+| `test_excerpt_short_text` / `test_excerpt_long_text` | 摘要截断（不超限、超限加 ` …`） | ✅ |
+| `test_sanitize_title` | 文件名清洗（去标点、`$` 等非法字符） | ✅ |
+| `test_match_keywords` | 关键词整词匹配逻辑 | ✅ |
+| `test_load_interest_entries` | 解析 interests.md 的条目结构 | ✅ |
+| `test_find_paper_existing` / `test_find_paper_nonexistent` | 按 id 查论文（命中 / 未命中） | ✅ |
+
+> 「键路径」测试（用 `tmp_path` 覆盖写盘路径）分别落在 `test_watch.py` / `test_ccf.py` /
+> `test_monitor.py`，`test_core.py` 只测纯函数与只读路径。
+
+### `tests/test_monitor.py`
+
+> `watch` 与 `ccf` 的共享内核。**不发网络请求**、不碰仓库文件（路径全部重定向到 `tmp_path`）。
+
+| 测试函数 | 测试内容 | 状态 |
+|----------|----------|------|
+| `test_slugify_keeps_cjk_and_folds_punctuation` / `test_slugify_falls_back_for_punctuation_only` | key 生成（保留中日韩字符；退化名字有稳定兜底） | ✅ |
+| `test_norm_title_is_alnum_lowercase_and_bounded` | 标题归一化（去符号、小写、截断 100） | ✅ |
+| `test_fingerprint_is_stable_and_host_sensitive` | 指纹稳定；同名不同宿主必不同 | ✅ |
+| `test_kind_of_clamps_unknown_values` | kind 白名单（未知一律 `other`） | ✅ |
+| `test_year_of_rejects_nonsense` | 年份解析（越界/非数字返回 `None`） | ✅ |
+| `test_load_state_tolerates_missing_and_corrupt` / `test_save_state_creates_parent_dirs` | 状态文件缺失/损坏容错；自动建父目录 | ✅ |
+| `test_append_events_hoists_the_subject_out_of_item` | 事件把主语提到顶层，且不重复进 `item` | ✅ |
+| `test_append_events_noop_for_empty_input` / `test_load_events_skips_corrupt_lines_and_is_newest_first` | 空输入不建文件；坏行跳过；最新在前 | ✅ |
+| `test_upsert_digest_is_idempotent_for_the_same_day` / `test_upsert_digest_puts_the_newest_day_first` | digest 幂等；新日期插在最前 | ✅ |
+| `test_render_section_says_nothing_was_found_when_empty` | 空结果也落一节「没发现」章节 | ✅ |
+| `test_first_run_baselines_silently_then_reports_only_the_delta` | 首轮静默建基线 → 次轮只报增量 | ✅ |
+| `test_force_pushes_the_whole_first_sighting` | `force=True` 把首扫当新条目 | ✅ |
+| `test_unknown_only_name_scans_nothing_without_touching_state` | `only` 匹配不到时不污染状态 | ✅ |
+| `test_one_broken_entry_does_not_abort_the_run` | 单条失败隔离，其余照跑 | ✅ |
+| `test_prepare_errors_are_collected_and_context_reaches_collect` | `prepare` 的错误进 `errors`，`context` 送达 `collect` | ✅ |
+| `test_accept_hook_filters_collected_items` | `accept` 清洗钩子生效 | ✅ |
+| `test_empty_run_still_writes_a_digest_section` | 无新条目也写 digest | ✅ |
+| `test_push_failure_is_recorded_not_raised` | 推送异常降级为 `errors`，审计仍落盘 | ✅ |
+| `test_collect_receives_the_network_flag` | `use_network` 原样透传给 `collect`（参数化） | ✅ |
 
 ### `tests/test_web.py`
 
@@ -51,11 +79,12 @@
 
 | 测试函数 | 测试内容 | 状态 |
 |----------|----------|------|
-| `test_slugify` / `test_fingerprint_stable_and_distinct` | key 与指纹生成 | ✅ |
+| `test_shared_primitives_are_reexported` | `watch.slugify`/`watch.fingerprint` 仍是公开 API（实现已移到 `glean.monitor`，行为测试亦在那里） | ✅ |
 | `test_load_watchlist_parses_sections` | 名单两节（监控中/已暂停）解析 | ✅ |
 | `test_add_then_remove_roundtrip` | 增删往返 + 重名拒绝 | ✅ |
 | `test_set_enabled_moves_between_sections` | 启停会同步移动条目所在小节 | ✅ |
 | `test_remove_forgets_seen_state` | 移除同时清除已见指纹 | ✅ |
+| `test_preamble_survives_a_list_without_section_headings` | 名单无 `## ` 小节时，前言（标题/说明）不被保存流程抹掉（回归） | ✅ |
 | `test_collect_prefers_homepage_and_merges_configured_fallbacks` | 主页优先 + 兜底合并 | ✅ |
 | `test_collect_falls_back_when_homepage_yields_nothing` | 主页无结果才回落 DBLP | ✅ |
 | `test_collect_dedups_by_title_across_sources` | 跨源按标题去重 | ✅ |
@@ -208,7 +237,7 @@ And    CCF 页面 NEW 徽标 +1（学者页面徽标不受影响）
 
 每次发布前必须验证：
 
-- [ ] `pytest tests/ -v` 全部通过（当前 119 项）
+- [ ] `pytest tests/ -v` 全部通过（当前 144 项）
 - [ ] CLI 八个子命令均可正常执行（fetch / download / feedback / reanchor / daily / serve / watch / ccf）
 - [ ] Web 应用可启动，五个页面可访问（/digest /profile /archive /watch /ccf）
 - [ ] `arxiv_daily.py daily --serve` 后 `curl --noproxy '*' http://127.0.0.1:8000/api/ping` 返回 200

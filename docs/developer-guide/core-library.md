@@ -4,11 +4,13 @@
 
 ## 模块职责
 
-`glean/core.py` 包含**全部**纯业务逻辑：抓取、命中标注、digest 生成、反馈闭环、下载与持久化。
-它被 `glean/cli.py`（CLI）与 `glean/web/routes.py`（Web）**共同调用**，因此两端行为完全一致
-（设计原则 3「CLI 永远是 fallback」的落地方式）。
+`glean/core.py` 包含 **arXiv 日报流水线**的全部纯业务逻辑：抓取、命中标注、digest 生成、
+反馈闭环、下载与持久化。它被 `glean/cli.py`（CLI）与 `glean/web/routes.py`（Web）**共同调用**，
+因此两端行为完全一致（设计原则 3「CLI 永远是 fallback」的落地方式）。
 
-> 分层与扩展点见 [系统设计](system-design.md)；文件 schema 见 [数据规范](data-schema.md)。
+> 监控线（`watch` / `ccf`）不走这里：它们共享的是
+> [监控内核 `glean/monitor.py`](system-design.md)。分层与扩展点见 [系统设计](system-design.md)；
+> 文件 schema 见 [数据规范](data-schema.md)。
 
 ## 函数索引（与代码一致）
 

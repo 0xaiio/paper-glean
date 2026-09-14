@@ -10,6 +10,13 @@ Source order (user-decided): **homepage -> DBLP -> Semantic Scholar**.
   used.
 * Semantic Scholar alone can also enrich an item with abstract/venue.
 
+Scope
+-----
+This module owns only the *researcher-specific* parts: ``watchlist.md``, the
+three sources, and the digest wording. The diff / baseline / push / audit
+mechanics are shared with the CCF venue monitor and live in
+:mod:`glean.monitor` — see :data:`_SPEC` for how this subsystem plugs in.
+
 State model
 -----------
 ``watchlist.md`` (Markdown) is the source of truth for *who* is watched.
@@ -21,15 +28,14 @@ silently instead of pushing their entire back catalogue (override with
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
-import time
 import urllib.parse
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Iterable
 
+from glean import monitor
 from glean.config import (
     WATCH_DIGEST_MD,
     WATCH_EVENTS,
@@ -42,6 +48,11 @@ from glean.config import (
 )
 from glean.core import http_get
 from glean.homeparse import parse_homepage
+
+# Shared with the CCF monitor. `fingerprint` is imported for re-export only
+# (`glean.watch.fingerprint` is documented public API; the engine applies it
+# internally now), the rest are used below.
+from glean.monitor import fingerprint, kind_of, norm_title, slugify, year_of
 
 KIND_ICONS = {
     "paper": "\U0001f4c4",  # 📄
@@ -63,46 +74,15 @@ WATCH_DIGEST_HEADER = """# 学者监控 · 新作推送
 
 """
 
-
-# ------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------
-
-def slugify(name: str) -> str:
-    """Stable key for a researcher: lower-cased, ascii-ish, dash separated."""
-    s = name.strip().lower()
-    s = re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "-", s)
-    return s.strip("-") or "researcher"
-
-
-def _norm_title(title: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "", (title or "").lower())[:100]
-
-
-def fingerprint(item: dict[str, Any]) -> str:
-    """Stable identity for an item, used for diffing across runs.
-
-    Title carries the identity; URL disambiguates same-title/different-host
-    cases (preprint vs published version) only when it is a real link.
-    """
-    basis = _norm_title(item.get("title", ""))
-    url = (item.get("url") or "").split("?")[0].rstrip("/").lower()
-    if url and not url.startswith(("http://www.", "https://www.")):
-        basis = basis + "|" + hashlib.sha1(url.encode("utf-8")).hexdigest()[:8]
-    return hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
-
-
-def _kind_of(value: str | None) -> str:
-    v = (value or "").strip().lower()
-    return v if v in WATCH_ITEM_KINDS else "other"
-
-
-def _year_of(value: Any) -> int | None:
-    try:
-        y = int(str(value).strip()[:4])
-    except (TypeError, ValueError):
-        return None
-    return y if 1900 <= y <= 2100 else None
+# 本子系统在共享引擎里的静态身份。
+_SPEC = monitor.MonitorSpec(
+    namespace="watch",
+    subject_field="researcher",
+    state_key="researchers",
+    digest_marker="WATCH",
+    item_noun="新作",
+    max_items=WATCH_MAX_ITEMS,
+)
 
 
 # ------------------------------------------------------------------
@@ -183,13 +163,23 @@ def _entry_block(entry: dict[str, Any], heading: str = "###") -> str:
     return "\n".join(lines)
 
 
-def _split_sections(text: str) -> tuple[str, str]:
-    """Return (preamble, body) — preamble is everything before the first '## '."""
+# A section heading ("## ") or an entry heading ("### ") marks where the
+# preamble ends and machine-rewritten content begins.
+_CONTENT_START_RE = re.compile(r"^#{2,3}\s")
+
+
+def _preamble(text: str) -> str:
+    """Return everything before the first ``## ``/``### `` heading.
+
+    The whole-file fallback matters: a hand-written ``watchlist.md`` that has no
+    ``## `` section at all still has a title and prose worth keeping. Treating
+    that case as "no preamble" would silently erase them on the next ``add``.
+    """
     lines = text.splitlines()
     for i, line in enumerate(lines):
-        if line.strip().startswith("## "):
-            return "\n".join(lines[:i]).rstrip() + "\n", ""
-    return "", text
+        if _CONTENT_START_RE.match(line.strip()):
+            return "\n".join(lines[:i]).rstrip() + "\n"
+    return text.rstrip() + "\n"
 
 
 def _write_watchlist(entries: Iterable[dict[str, Any]], preamble: str) -> None:
@@ -215,7 +205,7 @@ def _write_watchlist(entries: Iterable[dict[str, Any]], preamble: str) -> None:
 def _save_entries(entries: list[dict[str, Any]]) -> None:
     preamble = ""
     if WATCHLIST_MD.exists():
-        preamble, _ = _split_sections(WATCHLIST_MD.read_text(encoding="utf-8"))
+        preamble = _preamble(WATCHLIST_MD.read_text(encoding="utf-8"))
     _write_watchlist(entries, preamble)
 
 
@@ -309,7 +299,7 @@ def fetch_dblp(value: str, timeout: int = WATCH_TIMEOUT) -> list[dict[str, Any]]
                             "title": title.rstrip("."),
                             "url": ee or "",
                             "kind": "paper",
-                            "year": _year_of(year),
+                            "year": year_of(year),
                             "venue": "",
                             "authors": authors,
                             "abstract": "",
@@ -331,7 +321,7 @@ def fetch_dblp(value: str, timeout: int = WATCH_TIMEOUT) -> list[dict[str, Any]]
                         "title": (info.get("title") or "").rstrip("."),
                         "url": info.get("ee") or info.get("url") or "",
                         "kind": "paper",
-                        "year": _year_of(info.get("year")),
+                        "year": year_of(info.get("year")),
                         "venue": info.get("venue") or "",
                         "authors": [a.get("text", "") for a in authors if isinstance(a, dict)],
                         "abstract": "",
@@ -372,7 +362,7 @@ def fetch_s2(author_id: str, timeout: int = WATCH_TIMEOUT) -> list[dict[str, Any
                 "title": (p.get("title") or "").strip(),
                 "url": url_out,
                 "kind": "paper",
-                "year": _year_of(p.get("year")),
+                "year": year_of(p.get("year")),
                 "venue": p.get("venue") or "",
                 "authors": [a.get("name", "") for a in (p.get("authors") or [])],
                 "abstract": (p.get("abstract") or "")[:600],
@@ -384,7 +374,7 @@ def fetch_s2(author_id: str, timeout: int = WATCH_TIMEOUT) -> list[dict[str, Any
 
 
 def collect_items(entry: dict[str, Any], *, use_network: bool = True) -> list[dict[str, Any]]:
-    """Gather an researcher's works: homepage first, DBLP/S2 as fallback + merge.
+    """Gather a researcher's works: homepage first, DBLP/S2 as fallback + merge.
 
     Homepage items come first so they set the ordering and win title conflicts.
     Configured ``dblp``/``s2`` ids are merged in (deduped by normalised title).
@@ -405,82 +395,41 @@ def collect_items(entry: dict[str, Any], *, use_network: bool = True) -> list[di
     if not items:  # homepage unusable -> fallbacks become authoritative
         items = fallback
     elif fallback:  # homepage fine -> merge, homepage wins on conflicts
-        seen = {_norm_title(i["title"]) for i in items}
+        seen = {norm_title(i["title"]) for i in items}
         for f in fallback:
-            key = _norm_title(f["title"])
+            key = norm_title(f["title"])
             if key and key not in seen:
                 seen.add(key)
                 items.append(f)
 
     for it in items:
-        it["kind"] = _kind_of(it.get("kind"))
+        it["kind"] = kind_of(it.get("kind"), WATCH_ITEM_KINDS)
     return [i for i in items if i.get("title")]
 
 
 # ------------------------------------------------------------------
-# State + events
+# State · events · digest — delegated to the shared engine
 # ------------------------------------------------------------------
 
 def load_state() -> dict[str, Any]:
-    if not WATCH_STATE.exists():
-        return {"version": 1, "researchers": {}}
-    try:
-        return json.loads(WATCH_STATE.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {"version": 1, "researchers": {}}
+    """Read ``data/watch_state.json`` (the already-seen fingerprints)."""
+    return monitor.load_state(WATCH_STATE, _SPEC.state_key)
 
 
 def save_state(state: dict[str, Any]) -> None:
-    WATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
-    WATCH_STATE.write_text(
-        json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    """Write ``data/watch_state.json`` back to disk."""
+    monitor.save_state(WATCH_STATE, state)
 
 
 def append_events(items: list[dict[str, Any]], pushed_to: list[str], run_id: str) -> None:
-    """Append one JSON line per new item to watch_events.jsonl."""
-    if not items:
-        return
-    WATCH_EVENTS.parent.mkdir(parents=True, exist_ok=True)
-    now = datetime.now(timezone.utc).isoformat()
-    with open(WATCH_EVENTS, "a", encoding="utf-8") as fh:
-        for it in items:
-            fh.write(
-                json.dumps(
-                    {
-                        "time": now,
-                        "run_id": run_id,
-                        "key": it.get("key"),
-                        "researcher": it.get("researcher"),
-                        "item": {k: v for k, v in it.items() if k not in ("key", "researcher")},
-                        "pushed_to": pushed_to,
-                    },
-                    ensure_ascii=False,
-                )
-                + "\n"
-            )
+    """Append one JSON line per new item to ``watch_events.jsonl``."""
+    monitor.append_events(WATCH_EVENTS, items, pushed_to, run_id, _SPEC.subject_field)
 
 
 def load_events(limit: int = 200) -> list[dict[str, Any]]:
     """Most recent watch events, newest first."""
-    if not WATCH_EVENTS.exists():
-        return []
-    lines = WATCH_EVENTS.read_text(encoding="utf-8").splitlines()
-    out: list[dict[str, Any]] = []
-    for line in reversed(lines[-limit:]):
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            out.append(json.loads(line))
-        except json.JSONDecodeError:
-            continue
-    return out
+    return monitor.load_events(WATCH_EVENTS, limit)
 
-
-# ------------------------------------------------------------------
-# Digest
-# ------------------------------------------------------------------
 
 def _item_line(item: dict[str, Any]) -> str:
     icon = KIND_ICONS.get(item.get("kind", "other"), KIND_ICONS["other"])
@@ -502,40 +451,55 @@ def _item_line(item: dict[str, Any]) -> str:
 
 def render_section(day: str, grouped: dict[str, list[dict[str, Any]]]) -> str:
     """Render one day's digest section wrapped in idempotency markers."""
-    lines = [f"<!-- BEGIN WATCH {day} -->", "", f"## {day}", ""]
-    if not grouped:
-        lines += ["_本次运行没有发现新作。_", ""]
-    for name, items in grouped.items():
-        lines.append(f"### {name}　`{len(items)} 条新作`")
-        lines.append("")
-        lines.extend("- " + _item_line(i) for i in items)
-        lines.append("")
-    lines.append(f"<!-- END WATCH {day} -->")
-    return "\n".join(lines)
+    return monitor.render_section(_SPEC, day, grouped, _item_line)
 
 
 def upsert_watch_digest(day: str, section: str) -> None:
     """Insert/replace the day's section, newest first (same convention as core.upsert_digest)."""
-    if WATCH_DIGEST_MD.exists():
-        content = WATCH_DIGEST_MD.read_text(encoding="utf-8")
-    else:
-        content = WATCH_DIGEST_HEADER
-    begin, endm = f"<!-- BEGIN WATCH {day} -->", f"<!-- END WATCH {day} -->"
-    if begin in content and endm in content:
-        pre = content[: content.index(begin)]
-        post = content[content.index(endm) + len(endm) :].lstrip("\n")
-        content = pre + section + "\n" + post
-    elif "<!-- BEGIN WATCH " in content:
-        idx = content.index("<!-- BEGIN WATCH ")
-        content = content[:idx] + section + "\n" + content[idx:]
-    else:
-        content = content.rstrip("\n") + "\n\n" + section + "\n"
-    WATCH_DIGEST_MD.write_text(content, encoding="utf-8")
+    monitor.upsert_digest(
+        WATCH_DIGEST_MD, WATCH_DIGEST_HEADER, _SPEC.digest_marker, day, section
+    )
 
 
 # ------------------------------------------------------------------
 # Run
 # ------------------------------------------------------------------
+
+def _recent_items(
+    entry: dict[str, Any], items: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Drop homepage items older than ``WATCH_LOOKBACK_YEARS``.
+
+    Only applies when a homepage is configured: DBLP/S2 already return a
+    curated publication list, and cutting it by year would discard papers that
+    are old but still the researcher's real output.
+    """
+    if not entry.get("homepage"):
+        return items
+    cutoff = datetime.now().year - WATCH_LOOKBACK_YEARS
+    return [it for it in items if (it.get("year") or cutoff + 1) >= cutoff]
+
+
+def _job() -> monitor.MonitorJob:
+    """Build the engine job from the *current* module globals.
+
+    Reading the globals here (rather than at import time) is what lets tests
+    redirect every path into ``tmp_path`` via ``monkeypatch.setattr``.
+    """
+    return monitor.MonitorJob(
+        spec=_SPEC,
+        entries=load_watchlist,
+        state_path=WATCH_STATE,
+        events_path=WATCH_EVENTS,
+        digest_path=WATCH_DIGEST_MD,
+        digest_header=WATCH_DIGEST_HEADER,
+        render_item=_item_line,
+        collect=lambda entry, use_network, _ctx: collect_items(
+            entry, use_network=use_network
+        ),
+        accept=_recent_items,
+    )
+
 
 def run(
     only: str | None = None,
@@ -553,95 +517,11 @@ def run(
     from glean.config import WATCH_REQUEST_INTERVAL
 
     delay = WATCH_REQUEST_INTERVAL if request_interval is None else request_interval
-    state = load_state()
-    researchers = state.setdefault("researchers", {})
-
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    day = datetime.now().strftime("%Y-%m-%d")
-
-    new_items: list[dict[str, Any]] = []
-    grouped: dict[str, list[dict[str, Any]]] = {}
-    baselined: list[str] = []
-    skipped: list[str] = []
-    errors: list[str] = []
-
-    entries = [e for e in load_watchlist() if e.get("enabled", True)]
-    if only:
-        entries = [e for e in entries if e["key"] == slugify(only)]
-
-    for i, entry in enumerate(entries):
-        if i and delay:
-            time.sleep(delay)
-        key = entry["key"]
-        try:
-            items = collect_items(entry, use_network=use_network)
-        except Exception as exc:  # never let one bad page abort the whole run
-            errors.append(f"{entry['name']}: {type(exc).__name__}: {exc}")
-            continue
-
-        for it in items:
-            it["fingerprint"] = fingerprint(it)
-        # keep only recent items when seeding, to bound state growth
-        if entry.get("homepage"):
-            cutoff = datetime.now().year - WATCH_LOOKBACK_YEARS
-            items = [it for it in items if (it.get("year") or cutoff + 1) >= cutoff]
-
-        rec = researchers.get(key)
-        if rec is None:
-            researchers[key] = {
-                "name": entry["name"],
-                "baseline": True,
-                "last_checked": datetime.now(timezone.utc).isoformat(),
-                "fingerprints": [it["fingerprint"] for it in items][-WATCH_MAX_ITEMS:],
-                "sources": sorted({it.get("source", "?") for it in items}),
-            }
-            baselined.append(f"{entry['name']}（{len(items)} 条基线）")
-            if not force:
-                continue
-            fresh = items
-        else:
-            seen = set(rec.get("fingerprints", []))
-            fresh = [it for it in items if it["fingerprint"] not in seen]
-            rec["last_checked"] = datetime.now(timezone.utc).isoformat()
-            rec["fingerprints"] = (
-                rec.get("fingerprints", []) + [it["fingerprint"] for it in fresh]
-            )[-WATCH_MAX_ITEMS:]
-            rec["sources"] = sorted(set(rec.get("sources", [])) | {it.get("source", "?") for it in fresh})
-            if not fresh:
-                skipped.append(entry["name"])
-
-        for it in fresh:
-            enriched = dict(it)
-            enriched["key"] = key
-            enriched["researcher"] = entry["name"]
-            new_items.append(enriched)
-        if fresh:
-            grouped.setdefault(entry["name"], []).extend(fresh)
-
-    save_state(state)
-
-    pushed_to: list[str] = []
-    if new_items:
-        upsert_watch_digest(day, render_section(day, grouped))
-        if push:
-            try:
-                from glean import notify
-
-                pushed_to = notify.push(new_items, day=day) or []
-            except Exception as exc:
-                errors.append(f"push: {type(exc).__name__}: {exc}")
-        # log after pushing so the audit trail records where each item landed
-        append_events(new_items, pushed_to, run_id)
-    else:
-        upsert_watch_digest(day, render_section(day, {}))
-
-    return {
-        "run_id": run_id,
-        "day": day,
-        "new_items": new_items,
-        "grouped": grouped,
-        "baselined": baselined,
-        "skipped": skipped,
-        "errors": errors,
-        "pushed_to": pushed_to,
-    }
+    return monitor.run_monitor(
+        _job(),
+        only=only,
+        use_network=use_network,
+        force=force,
+        push=push,
+        delay=delay,
+    )
