@@ -8,6 +8,7 @@
     options:
       members:
         - http_get
+        - http_get_text
         - parse_xml
         - fetch_category
         - fetch_all

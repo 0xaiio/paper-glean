@@ -60,6 +60,49 @@ def _run_fetch(hours: int, cap: int, date: str | None) -> tuple[str, int, str]:
     return day, len(papers), str(data_file)
 
 
+# ``kind`` → 人类可读标签。两条监控线的词表不同，其余输出格式完全相同。
+_WATCH_KIND_LABELS = {
+    "paper": "论文",
+    "video": "视频",
+    "report": "技术报告",
+    "talk": "报告/演讲",
+    "other": "其它",
+}
+_CCF_KIND_LABELS = {
+    "cfp": "CFP",
+    "program": "Program",
+    "papers": "接收论文",
+    "other": "其它",
+}
+
+
+def _report_monitor_run(
+    res: dict, *, noun: str, digest_name: str, kind_labels: dict[str, str]
+) -> None:
+    """Print one monitor run.
+
+    ``watch`` 与 ``ccf`` 的这份输出原本各写一遍，只差三个措辞（新作/更新、
+    digest 文件名、kind 词表），因此收敛到这里；``res`` 的形状由
+    ``monitor.run_monitor`` 保证一致。
+    """
+    for b in res["baselined"]:
+        print(f"[BASE] {b} — 已建立基线，本次不推送（加 --force 可强制推送）")
+    for name, items in res["grouped"].items():
+        print(f"[NEW] {name}: {len(items)} 条{noun}")
+        for it in items:
+            label = kind_labels.get(it.get("kind"), "其它")
+            extra = f"  截稿 {it['deadline']}" if it.get("deadline") else ""
+            flag = " ⚠️低置信" if (it.get("confidence") or 1.0) < 0.6 else ""
+            print(f"      · [{label}] {it['title'][:80]}{extra}{flag}")
+    if not res["grouped"] and not res["baselined"]:
+        print(f"[OK] 没有{noun}")
+    for err in res["errors"]:
+        print(f"[WARN] {err}")
+    if res["new_items"]:
+        print(f"[OK] 共 {len(res['new_items'])} 条{noun} -> {digest_name} (run {res['run_id']})")
+        print(f"[OK] 推送通道: {', '.join(res['pushed_to']) or '无（仅落盘 digest）'}")
+
+
 def cmd_fetch(args: argparse.Namespace) -> None:
     """Fetch papers and update digest."""
     day, n, data_file = _run_fetch(args.hours, args.cap, args.date)
@@ -153,22 +196,9 @@ def cmd_watch_list(args: argparse.Namespace) -> None:
 def cmd_watch_run(args: argparse.Namespace) -> None:
     """Scan every enabled researcher and push what is new."""
     res = run_watch(only=args.only, force=args.force, push=not args.no_push)
-    for b in res["baselined"]:
-        print(f"[BASE] {b} — 已建立基线，本次不推送（加 --force 可强制推送）")
-    for name, items in res["grouped"].items():
-        print(f"[NEW] {name}: {len(items)} 条新作")
-        for it in items:
-            kind = {"paper": "论文", "video": "视频", "report": "技术报告",
-                    "talk": "报告/演讲", "other": "其它"}.get(it.get("kind"), "其它")
-            flag = " ⚠️低置信" if (it.get("confidence") or 1.0) < 0.6 else ""
-            print(f"      · [{kind}] {it['title'][:80]}{flag}")
-    if not res["grouped"] and not res["baselined"]:
-        print("[OK] 没有新作")
-    for err in res["errors"]:
-        print(f"[WARN] {err}")
-    if res["new_items"]:
-        print(f"[OK] 共 {len(res['new_items'])} 条新作 -> WATCH-digest.md (run {res['run_id']})")
-        print(f"[OK] 推送通道: {', '.join(res['pushed_to']) or '无（仅落盘 digest）'}")
+    _report_monitor_run(
+        res, noun="新作", digest_name="WATCH-digest.md", kind_labels=_WATCH_KIND_LABELS
+    )
 
 
 def cmd_watch_ack(args: argparse.Namespace) -> None:
@@ -259,23 +289,9 @@ def cmd_ccf_remove(args: argparse.Namespace) -> None:
 def cmd_ccf_run(args: argparse.Namespace) -> None:
     """Scan every ticked venue and push what is new."""
     res = run_ccf(only=args.only, force=args.force, push=not args.no_push)
-    for b in res["baselined"]:
-        print(f"[BASE] {b} — 已建立基线，本次不推送（加 --force 可强制推送）")
-    for name, items in res["grouped"].items():
-        print(f"[NEW] {name}: {len(items)} 条更新")
-        for it in items:
-            label = {"cfp": "CFP", "program": "Program", "papers": "接收论文",
-                     "other": "其它"}.get(it.get("kind"), "其它")
-            flag = " ⚠️低置信" if (it.get("confidence") or 1.0) < 0.6 else ""
-            extra = f"  截稿 {it['deadline']}" if it.get("deadline") else ""
-            print(f"      · [{label}] {it['title'][:80]}{extra}{flag}")
-    if not res["grouped"] and not res["baselined"]:
-        print("[OK] 没有更新")
-    for err in res["errors"]:
-        print(f"[WARN] {err}")
-    if res["new_items"]:
-        print(f"[OK] 共 {len(res['new_items'])} 条更新 -> CCF-digest.md (run {res['run_id']})")
-        print(f"[OK] 推送通道: {', '.join(res['pushed_to']) or '无（仅落盘 digest）'}")
+    _report_monitor_run(
+        res, noun="更新", digest_name="CCF-digest.md", kind_labels=_CCF_KIND_LABELS
+    )
 
 
 def cmd_ccf_ack(args: argparse.Namespace) -> None:
@@ -340,50 +356,35 @@ def cmd_reanchor(args: argparse.Namespace) -> None:
         print(f"[OK] {day}: +{n_anchor} 锚点, +{n_link} 跳转链接")
 
 
-def main() -> None:
-    """Main CLI entry point."""
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+# ------------------------------------------------------------------
+# Command tree
+#
+# One builder per domain, so a subcommand's arguments live next to the
+# function that consumes them. ``main()`` only wires the pieces together.
+# ------------------------------------------------------------------
 
-    ap = argparse.ArgumentParser(description="arXiv daily digest & downloader")
-    sub = ap.add_subparsers(dest="cmd", required=True)
+def _add_window_args(p: argparse.ArgumentParser) -> None:
+    """The ``--hours/--cap/--date`` window triple (``fetch`` / ``daily``)."""
+    p.add_argument("--hours", type=int, default=24, help="抓取时间窗口(小时), 默认 24")
+    p.add_argument("--cap", type=int, default=DEFAULT_CAP, help="digest 中每类别最多列出的论文数")
+    p.add_argument("--date", help="覆盖章节日期 YYYYMMDD(默认今天)")
 
-    f = sub.add_parser("fetch", help="抓取过去 N 小时新增论文并更新 digest")
-    f.add_argument("--hours", type=int, default=24)
-    f.add_argument("--cap", type=int, default=DEFAULT_CAP, help="digest 中每类别最多列出的论文数")
-    f.add_argument("--date", help="覆盖章节日期 YYYYMMDD(默认今天)")
-    f.set_defaults(func=cmd_fetch)
 
-    d = sub.add_parser("download", help="按 id 下载 PDF 到 arXiv/ 并按规则命名")
-    d.add_argument("ids", nargs="+", help="arXiv id, 例 2507.12345")
-    d.set_defaults(func=cmd_download)
+def _add_run_args(p: argparse.ArgumentParser) -> None:
+    """The ``--only/--force/--no-push`` triple shared by both monitor scans."""
+    p.add_argument("--only", help="只扫描指定姓名/key")
+    p.add_argument("--force", action="store_true", help="首次运行也推送(默认只建基线)")
+    p.add_argument("--no-push", action="store_true", help="只落盘 digest，不推送")
 
-    fb = sub.add_parser("feedback", help="人工调整推荐指数并更新兴趣画像权重")
-    fb.add_argument("id", help="arXiv id, 例 2507.12345")
-    fb.add_argument("--stars", type=int, help="★ 推荐指数 0-5")
-    fb.add_argument("--curiosity", type=int, help="🧐 推荐指数 0-5")
-    fb.set_defaults(func=cmd_feedback)
 
-    ra = sub.add_parser("reanchor", help="为指定日期章节补齐锚点与推荐表跳转链接")
-    ra.add_argument("--date", help="YYYYMMDD(默认今天)")
-    ra.set_defaults(func=cmd_reanchor)
+def _add_web_args(p: argparse.ArgumentParser) -> None:
+    """``--host/--port`` for the local web app."""
+    p.add_argument("--host", default=DEFAULT_HOST, help=f"默认 {DEFAULT_HOST}")
+    p.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"默认 {DEFAULT_PORT}")
 
-    dl = sub.add_parser("daily", help="每日流水线: fetch -> digest -> (可选)确保本地 Web 服务在线")
-    dl.add_argument("--hours", type=int, default=24, help="抓取时间窗口(小时), 默认 24")
-    dl.add_argument("--cap", type=int, default=DEFAULT_CAP, help="digest 中每类别最多列出的论文数")
-    dl.add_argument("--date", help="覆盖章节日期 YYYYMMDD(默认今天)")
-    dl.add_argument("--serve", action="store_true", help="结束后确保本地 Web 服务在线(不在线则后台拉起)")
-    dl.add_argument("--host", default=DEFAULT_HOST, help=f"Web 服务地址, 默认 {DEFAULT_HOST}")
-    dl.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"Web 服务端口, 默认 {DEFAULT_PORT}")
-    dl.set_defaults(func=cmd_daily)
 
-    sv = sub.add_parser("serve", help="启动本地 Web 应用(前台)")
-    sv.add_argument("--host", default=DEFAULT_HOST, help=f"默认 {DEFAULT_HOST}")
-    sv.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"默认 {DEFAULT_PORT}")
-    sv.add_argument("--reload", action="store_true", help="开发模式: 代码变更自动重载")
-    sv.set_defaults(func=cmd_serve)
-
+def _build_watch(sub: argparse._SubParsersAction) -> None:
+    """``watch`` subtree — researcher monitoring (名单见 watchlist.md)."""
     w = sub.add_parser("watch", help="学者监控与推送(名单见 watchlist.md)")
     wsub = w.add_subparsers(dest="watch_cmd", required=True)
 
@@ -399,22 +400,20 @@ def main() -> None:
     wr.add_argument("name")
     wr.set_defaults(func=cmd_watch_remove)
 
-    we = wsub.add_parser("enable", help="启用监控对象")
-    we.add_argument("name")
-    we.set_defaults(func=cmd_watch_toggle, enable=True)
-
-    wd = wsub.add_parser("disable", help="暂停监控对象(保留条目与历史)")
-    wd.add_argument("name")
-    wd.set_defaults(func=cmd_watch_toggle, enable=False)
+    for name, enable, help_text in (
+        ("enable", True, "启用监控对象"),
+        ("disable", False, "暂停监控对象(保留条目与历史)"),
+    ):
+        p = wsub.add_parser(name, help=help_text)
+        p.add_argument("name")
+        p.set_defaults(func=cmd_watch_toggle, enable=enable)
 
     wl = wsub.add_parser("list", help="列出监控名单")
     wl.add_argument("--all", action="store_true", help="同时显示已暂停的条目")
     wl.set_defaults(func=cmd_watch_list)
 
     wu = wsub.add_parser("run", help="扫描全部启用对象并推送新作")
-    wu.add_argument("--only", help="只扫描指定姓名/key")
-    wu.add_argument("--force", action="store_true", help="首次运行也推送(默认只建基线)")
-    wu.add_argument("--no-push", action="store_true", help="只落盘 digest，不推送")
+    _add_run_args(wu)
     wu.set_defaults(func=cmd_watch_run)
 
     wk = wsub.add_parser("ack", help="清除 Web 端的 NEW 徽标(标记已读)")
@@ -424,6 +423,9 @@ def main() -> None:
     wt.add_argument("--send", action="store_true", help="实际发送一条自检消息")
     wt.set_defaults(func=cmd_watch_push_test)
 
+
+def _build_ccf(sub: argparse._SubParsersAction) -> None:
+    """``ccf`` subtree — CCF-A venue monitoring (名单见 ccf.md)."""
     c = sub.add_parser("ccf", help="CCF-A 会议/期刊监控与推送(名单见 ccf.md)")
     csub = c.add_subparsers(dest="ccf_cmd", required=True)
 
@@ -432,15 +434,14 @@ def main() -> None:
     cl.add_argument("--area", help="只显示某领域(支持子串，如 DB / 数据库)")
     cl.set_defaults(func=cmd_ccf_list)
 
-    ce = csub.add_parser("enable", help="勾选(订阅)会议/期刊")
-    ce.add_argument("name", nargs="?", help="名称; 与 --area 二选一")
-    ce.add_argument("--area", help="批量勾选整个领域")
-    ce.set_defaults(func=cmd_ccf_toggle, enable=True)
-
-    cd = csub.add_parser("disable", help="取消勾选(暂停)会议/期刊")
-    cd.add_argument("name", nargs="?", help="名称; 与 --area 二选一")
-    cd.add_argument("--area", help="批量取消勾选整个领域")
-    cd.set_defaults(func=cmd_ccf_toggle, enable=False)
+    for name, enable, help_text, area_help in (
+        ("enable", True, "勾选(订阅)会议/期刊", "批量勾选整个领域"),
+        ("disable", False, "取消勾选(暂停)会议/期刊", "批量取消勾选整个领域"),
+    ):
+        p = csub.add_parser(name, help=help_text)
+        p.add_argument("name", nargs="?", help="名称; 与 --area 二选一")
+        p.add_argument("--area", help=area_help)
+        p.set_defaults(func=cmd_ccf_toggle, enable=enable)
 
     ca = csub.add_parser("add", help="添加目录未覆盖的会议/期刊")
     ca.add_argument("name")
@@ -458,9 +459,7 @@ def main() -> None:
     cr.set_defaults(func=cmd_ccf_remove)
 
     cu = csub.add_parser("run", help="扫描全部勾选条目并推送新 CFP / Program / 接收论文")
-    cu.add_argument("--only", help="只扫描指定名称")
-    cu.add_argument("--force", action="store_true", help="首次运行也推送(默认只建基线)")
-    cu.add_argument("--no-push", action="store_true", help="只落盘 digest，不推送")
+    _add_run_args(cu)
     cu.set_defaults(func=cmd_ccf_run)
 
     ck = csub.add_parser("ack", help="清除 Web 端 CCF 的 NEW 徽标")
@@ -470,7 +469,57 @@ def main() -> None:
     cf.add_argument("--new-disabled", action="store_true", help="新增条目默认不勾选")
     cf.set_defaults(func=cmd_ccf_refresh)
 
-    args = ap.parse_args()
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the whole command tree.
+
+    Kept separate from :func:`main` so tests can walk the tree (every leaf must
+    carry a ``func``) without spawning a subprocess.
+    """
+    ap = argparse.ArgumentParser(description="arXiv daily digest & downloader")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    f = sub.add_parser("fetch", help="抓取过去 N 小时新增论文并更新 digest")
+    _add_window_args(f)
+    f.set_defaults(func=cmd_fetch)
+
+    d = sub.add_parser("download", help="按 id 下载 PDF 到 arXiv/ 并按规则命名")
+    d.add_argument("ids", nargs="+", help="arXiv id, 例 2507.12345")
+    d.set_defaults(func=cmd_download)
+
+    fb = sub.add_parser("feedback", help="人工调整推荐指数并更新兴趣画像权重")
+    fb.add_argument("id", help="arXiv id, 例 2507.12345")
+    fb.add_argument("--stars", type=int, help="★ 推荐指数 0-5")
+    fb.add_argument("--curiosity", type=int, help="🧐 推荐指数 0-5")
+    fb.set_defaults(func=cmd_feedback)
+
+    ra = sub.add_parser("reanchor", help="为指定日期章节补齐锚点与推荐表跳转链接")
+    ra.add_argument("--date", help="YYYYMMDD(默认今天)")
+    ra.set_defaults(func=cmd_reanchor)
+
+    dl = sub.add_parser("daily", help="每日流水线: fetch -> digest -> (可选)确保本地 Web 服务在线")
+    _add_window_args(dl)
+    dl.add_argument("--serve", action="store_true", help="结束后确保本地 Web 服务在线(不在线则后台拉起)")
+    _add_web_args(dl)
+    dl.set_defaults(func=cmd_daily)
+
+    sv = sub.add_parser("serve", help="启动本地 Web 应用(前台)")
+    _add_web_args(sv)
+    sv.add_argument("--reload", action="store_true", help="开发模式: 代码变更自动重载")
+    sv.set_defaults(func=cmd_serve)
+
+    _build_watch(sub)
+    _build_ccf(sub)
+    return ap
+
+
+def main() -> None:
+    """Main CLI entry point."""
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+    args = build_parser().parse_args()
     args.func(args)
 
 

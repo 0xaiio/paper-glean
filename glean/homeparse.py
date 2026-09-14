@@ -31,7 +31,8 @@ import re
 import urllib.parse
 from html.parser import HTMLParser
 
-from glean.config import UA, WATCH_TIMEOUT
+from glean.config import WATCH_TIMEOUT
+from glean.core import http_get_text
 
 # --- classification tables -------------------------------------------------
 
@@ -112,17 +113,13 @@ class _AnchorParser(HTMLParser):
 
 
 def fetch_html(url: str, timeout: int = WATCH_TIMEOUT) -> str:
-    """Download ``url`` and return decoded text (never raises on bad charset)."""
-    from urllib.request import Request, urlopen
+    """Download ``url`` and return decoded text (never raises on bad charset).
 
-    req = Request(url, headers={"User-Agent": UA})
-    with urlopen(req, timeout=timeout) as resp:
-        raw = resp.read()
-        charset = resp.headers.get_content_charset() or "utf-8"
-    try:
-        return raw.decode(charset, errors="replace")
-    except LookupError:
-        return raw.decode("utf-8", errors="replace")
+    Delegates to :func:`glean.core.http_get_text` so homepage / venue scraping
+    shares one request path (User-Agent, timeout, charset fallback) with the
+    rest of the project instead of keeping a second copy of ``urlopen``.
+    """
+    return http_get_text(url, timeout=timeout)
 
 
 def _classify(href: str, text: str) -> tuple[str, float]:

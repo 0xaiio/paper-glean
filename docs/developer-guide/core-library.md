@@ -16,7 +16,8 @@
 
 | 函数 | 签名 | 说明 |
 |------|------|------|
-| `http_get` | `(url, timeout=60) -> bytes` | 带 UA 的 HTTP GET |
+| `http_get` | `(url, timeout=60) -> bytes` | 带 UA 的 HTTP GET（二进制） |
+| `http_get_text` | `(url, timeout=60) -> str` | 带 UA 的 HTTP GET + 按 `Content-Type` charset 解码，坏 charset 降级 UTF-8 |
 | `parse_xml` | `(data) -> Element` | 解析 Atom XML；**拒绝含 DTD/ENTITY 的响应** |
 | `fetch_category` | `(cat, start_utc, end_utc, max_results=500) -> list[dict]` | 单类别时间窗查询 |
 | `fetch_all` | `(hours) -> (papers, start, end)` | 遍历类别 + 跨类别去重（**纯函数，无落盘副作用**） |
@@ -40,6 +41,20 @@
 | `list_available_days` | `() -> list[str]` | 枚举可用日期（倒序，只含 `YYYYMMDD`） |
 
 ---
+
+## HTTP
+
+出站请求只有**一个入口**：`_http_request(url)` 构造带项目 User-Agent 的 `Request`，
+`http_get` / `http_get_text` 都基于它。**不要在别处直接 `urlopen`** ——
+`homeparse.fetch_html` 已于 2026-09-14 退化为 `http_get_text` 的一行委托
+（`scripts/` 下的一次性生成脚本除外）。策略集中一处，才可能一次性改掉
+UA、超时与 charset 兜底。
+
+| 函数 | 用途 |
+|------|------|
+| `_http_request` | 私有；唯一的 `Request` 构造点（User-Agent 策略住在这里） |
+| `http_get` | 二进制响应：PDF、Atom XML、JSON |
+| `http_get_text` | 文本响应：charset 取自 `Content-Type`，缺失或非法则降级 UTF-8，**不抛异常** |
 
 ## 抓取
 

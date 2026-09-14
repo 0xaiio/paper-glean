@@ -184,7 +184,7 @@ DBLP 现在对 **所有** 端点（HTML 与 API）返回 Anubis「Making sure yo
 > **两条监控线互不干扰**：`watch ack` 不会清掉 CCF 的未读，`ccf ack` 也不会清掉学者的未读
 > —— 它们各自写 `data/watch_new.json` 与 `data/ccf_new.json`。
 
-webhook 的配置与载荷格式见 [学者监控 · 配置 webhook](watching.md#配置-webhook)。
+webhook 的配置与载荷格式见 [学者监控 · 配置 webhook](watching.md#webhook)。
 `generic` 载荷多两个 CCF 专有字段：`namespace: "ccf"` 与每条 item 的 `venue` / `deadline`。
 
 ### 自检

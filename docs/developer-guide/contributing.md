@@ -7,7 +7,7 @@
 ### 克隆仓库
 
 ```powershell
-git clone <repository-url>
+git clone https://github.com/0xaiio/paper-glean.git
 cd paper-glean
 ```
 
@@ -42,7 +42,8 @@ pytest tests/ --cov=glean --cov-report=html
 ```
 
 > 测试通过 `monkeypatch` 将路径常量重定向到 `tmp_path`，**不会改动仓库内的真实文件**。
-> `test_cli.py` 只断言 `--help` 与只读子命令（子进程无法 monkeypatch）。
+> `test_cli.py` 分两类：子进程只断言 `--help` 与只读子命令（子进程无法 monkeypatch），
+> 命令树的不变量则在**进程内**遍历 `build_parser()` 验证。
 
 ## 项目结构
 
@@ -89,7 +90,8 @@ paper-glean/
 ├── data/               # 论文数据
 ├── ccf.md              # CCF 会议/期刊监控勾选清单
 ├── CCF-digest.md       # CCF 抓取结果沉淀（按日章节）
-├── docs/               # 文档
+├── docs/               # 文档（MkDocs 的 docs_dir）
+├── mkdocs.yml          # MkDocs 配置（**仓库根**，勿放回 docs/ 下）
 └── glean_static/       # Web 静态资源
 ```
 
@@ -132,9 +134,18 @@ type:
 
 ### 2. 添加 CLI 命令
 
-1. 在 `glean/cli.py` 中添加子命令解析
-2. 调用 `glean/core.py` 中的函数
-3. 在 `tests/test_cli.py` 中添加测试
+`cli.py` 的命令树是**构造出来的**，不是一堵 argparse 墙：
+
+1. 命令参数属于哪个域，就写进哪个构造器（`_build_watch()` / `_build_ccf()`，
+   或直接写在 `build_parser()` 里）；`main()` 只有 `build_parser().parse_args()`
+   与 `args.func(args)` 两行，不要把参数定义塞回去
+2. 复用的参数组用 `_add_window_args()` / `_add_run_args()` / `_add_web_args()`，
+   **不要**为新命令再抄一份 `--host/--port`
+3. **每个叶子子命令必须 `set_defaults(func=...)`** —— 漏了只有在真正执行时才炸；
+   `test_cli.py` 会遍历命令树守住这条
+4. 调用 `glean/core.py` 中的函数
+5. 在 `tests/test_cli.py` 中添加测试（若命令面变化，同时更新
+   `test_command_surface_is_exactly_the_documented_one` 里的 22 个叶子）
 
 ### 3. 添加 Web 功能
 
@@ -143,13 +154,15 @@ type:
 3. 如需新模板，在 `glean/templates/`（与 `glean/web/` 平级）中添加
 4. 在 `tests/test_web.py` 中添加测试
 
-三条「不要抄第二遍」的纪律（对应本轮重构消掉的重复）：
+几条「不要抄第二遍」的纪律（对应本轮重构消掉的重复）：
 
 | 重复源 | 唯一出处 |
 |--------|----------|
 | 论文筛选的六个查询参数（`day` / `category` / `search` / `show_*`） | `models.PaperFilters` + `routes.Filters`（`Depends()` 注入），过滤逻辑只在 `_filter_papers` |
 | 导航项（桌面/移动两份版式） | `base.html` 顶部的 `nav_items` 列表 |
 | `hx-include` 的六项选择器 | `digest.html` 顶部的 `hx_include` 变量 |
+| 出站 HTTP 请求（User-Agent / 超时 / charset 兜底） | `core._http_request()` → `http_get()` / `http_get_text()`；`homeparse.fetch_html` 只是委托，**别再写一份 `urlopen`** |
+| 监控扫描的 `--only/--force/--no-push` | `cli._add_run_args()`（`watch run` 与 `ccf run` 共用） |
 
 「查表或 404」「跑一次监控并汇总结果」分别走 `_require_paper` / `_require_entry`
 与 `_run_summary`，不要在路由里各写一遍。
@@ -185,6 +198,12 @@ type:
 - 架构变更 → 更新 `docs/developer-guide/index.md`
 - 测试变更 → 更新 `docs/testing/index.md` 与 `docs/testing/test-plan.md`
 - 新功能 → 更新 `docs/product/features.md` 与 `plan.md`
+
+!!! warning "新增文档页必须登记 nav"
+    配置在**仓库根**的 `mkdocs.yml`（`docs_dir: docs` / `site_dir: site`）。
+    新增 `docs/**/*.md` 后**必须**加进 `mkdocs.yml` 的 `nav`，否则 CI 的
+    `mkdocs build --strict` 会把「未登记的文件」判为警告并直接失败。
+    本地自查：在仓库根执行 `mkdocs build --strict`（不是 `cd docs`）。
 
 ## 发布流程
 

@@ -97,8 +97,7 @@ python -m glean.web
 # 安装文档依赖
 pip install -e ".[docs]"
 
-# 启动本地文档服务器
-cd docs
+# 启动本地文档服务器（在仓库根执行，配置为 mkdocs.yml）
 mkdocs serve
 # → 打开 http://127.0.0.1:8000
 ```

@@ -32,7 +32,6 @@ web = [
     "uvicorn[standard]>=0.24.0",
     "jinja2>=3.1.0",
     "python-multipart>=0.0.6",
-    "filelock>=3.13.0",
 ]
 dev = [
     "pytest>=7.4.0",
@@ -50,8 +49,8 @@ docs = [
 arxiv-daily = "glean.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/user/paper-glean"
-Repository = "https://github.com/user/paper-glean"
+Homepage = "https://github.com/0xaiio/paper-glean"
+Repository = "https://github.com/0xaiio/paper-glean"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -59,7 +58,7 @@ include = ["glean*"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-glean = ["templates/*.html"]
+glean = ["templates/*.html", "templates/partials/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

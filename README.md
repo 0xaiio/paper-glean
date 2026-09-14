@@ -116,11 +116,12 @@ python -X utf8 arxiv_daily.py ccf run                     # 首次建基线，�
 | watch_events.jsonl / ccf_events.jsonl | 推送审计日志（被 git 忽略） |
 | logs/ | 后台服务日志（`serve-<host>-<port>.log`，被 git 忽略） |
 | glean_static/ | 前端静态资源（CSS / Alpine.js） |
-| tests/ | pytest 测试（core / web / cli / serve / monitor / watch / ccf / notify / venueparse，共 153 项） |
+| tests/ | pytest 测试（core / web / cli / serve / monitor / watch / ccf / notify / venueparse，共 160 项） |
 | plan.md | Web 应用需求规格（M1 已实现，目标界面见 docs/design/） |
 | survey.md | 现有系统调研与自研/采购决策 |
 | docs/ | **项目文档（本文档体系）** |
-| site/ | MkDocs 构建产物（`cd docs && mkdocs build`） |
+| mkdocs.yml | MkDocs 配置（**仓库根**；`docs_dir: docs` / `site_dir: site`） |
+| site/ | MkDocs 构建产物（在仓库根执行 `mkdocs build`） |
 
 ---
 

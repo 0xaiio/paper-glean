@@ -38,11 +38,36 @@ from glean.config import (
 # HTTP / XML utilities
 # ------------------------------------------------------------------
 
+def _http_request(url: str) -> urllib.request.Request:
+    """Build a GET request carrying the project User-Agent.
+
+    The single place the UA policy lives: every outbound request in this
+    project goes through here (arXiv, DBLP, Semantic Scholar, researcher
+    homepages, venue pages).
+    """
+    return urllib.request.Request(url, headers={"User-Agent": UA})
+
+
 def http_get(url: str, timeout: int = 60) -> bytes:
-    """Perform an HTTP GET request and return response body."""
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
+    """Perform an HTTP GET request and return the raw response body."""
+    with urllib.request.urlopen(_http_request(url), timeout=timeout) as resp:
         return resp.read()
+
+
+def http_get_text(url: str, timeout: int = 60) -> str:
+    """Perform an HTTP GET request and return decoded text.
+
+    The charset comes from the response ``Content-Type`` header and falls back
+    to UTF-8. Decoding is lossy rather than fatal: a missing or bogus charset
+    must never abort a scan.
+    """
+    with urllib.request.urlopen(_http_request(url), timeout=timeout) as resp:
+        body = resp.read()
+        charset = resp.headers.get_content_charset() or "utf-8"
+    try:
+        return body.decode(charset, errors="replace")
+    except LookupError:
+        return body.decode("utf-8", errors="replace")
 
 
 def parse_xml(data: bytes) -> ET.Element:

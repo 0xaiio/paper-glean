@@ -41,7 +41,8 @@ jobs:
       
       - name: Build docs
         run: |
-          cd docs
+          # Config lives at the repo root (mkdocs.yml) with docs_dir: docs,
+          # site_dir: site — so do NOT cd into docs/ to build.
           mkdocs build --strict
       
       - name: Deploy to GitHub Pages

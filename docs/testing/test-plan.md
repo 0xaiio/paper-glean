@@ -16,6 +16,12 @@
 | `test_list_available_days_ignores_monitor_state` | **回归**：只认 `YYYYMMDD` 日文件，不把 `data/` 里的监控状态文件当日期 | ✅ |
 | `test_list_available_days_is_empty_without_data_dir` | `data/` 不存在时返回 `[]` | ✅ |
 | `test_find_paper_skips_monitor_state_files` | 查找时不因状态文件（无 `papers` 键）出错 | ✅ |
+| `test_http_helpers_share_one_request_factory` | **HTTP 入口收敛**：`http_get` 与 `http_get_text` 用同一个 `_http_request` 造请求（UA 一致），超时默认值不被改掉 | ✅ |
+| `test_http_get_text_honours_content_type_charset` | charset 取自响应 `Content-Type`（用 gb18030 响应验证，不靠默认 UTF-8 蒙对） | ✅ |
+| `test_http_get_text_degrades_instead_of_raising_on_bad_charset` | 未知 charset / 无 `Content-Type` 时降级 UTF-8，**不抛异常**（否则一次抓取会打断整个扫描） | ✅ |
+| `test_homeparse_fetch_html_delegates_to_core` | `homeparse.fetch_html` 确实委托 `core.http_get_text`（并透传 timeout），**不允许再长出第二份 `urlopen`** | ✅ |
+
+> HTTP 四个用例用假响应替换 `urllib.request.urlopen`，**零网络**、不依赖任何外部站点。
 
 > 「键路径」测试（用 `tmp_path` 覆盖写盘路径）分别落在 `test_watch.py` / `test_ccf.py` /
 > `test_monitor.py`，`test_core.py` 只测纯函数与只读路径（日期枚举三个用例也把
@@ -250,8 +256,10 @@ And    CCF 页面 NEW 徽标 +1（学者页面徽标不受影响）
 
 每次发布前必须验证：
 
-- [ ] `pytest tests/ -v` 全部通过（当前 153 项）
+- [ ] `pytest tests/ -v` 全部通过（当前 160 项）
 - [ ] CLI 八个子命令均可正常执行（fetch / download / feedback / reanchor / daily / serve / watch / ccf）
+- [ ] 命令树无「叶子无 `func`」的漏挂（由 `test_every_leaf_command_is_wired_to_a_handler` 在进程内保证）
+- [ ] `mkdocs build --strict` 在仓库根执行、**0 警告**
 - [ ] Web 应用可启动，五个页面可访问（/digest /profile /archive /watch /ccf）
 - [ ] `/digest` 默认日期是最新**有论文**的一天（不得出现 `watch_state` 之类假日期）
 - [ ] 卡片「Why recommended」在有命中时列出条目标题与权重

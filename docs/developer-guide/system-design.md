@@ -84,7 +84,8 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 
 | 函数 | 签名 | 说明 |
 |------|------|------|
-| `http_get` | `(url, timeout=60) -> bytes` | 带 UA 的 GET |
+| `http_get` | `(url, timeout=60) -> bytes` | 带 UA 的 GET（二进制；PDF、Atom XML、JSON 一律用它） |
+| `http_get_text` | `(url, timeout=60) -> str` | 带 UA 的 GET，并按响应 `Content-Type` 的 charset 解码；charset 缺失或非法一律降级 UTF-8，**不抛异常**（主页 / venue 页抓取走这条） |
 | `parse_xml` | `(data: bytes) -> ET.Element` | **拒绝含 `<!DOCTYPE>`/`<!ENTITY>` 的 XML**（防注入） |
 | `fetch_category` | `(cat, start_utc, end_utc, max_results=500) -> list[dict]` | 单类别时间窗查询，归一化字段 |
 | `fetch_all` | `(hours) -> (papers, start, end)` | 遍历类别、**按 id 跨类别去重**、逐类别间隔 3s（API 礼仪） |
@@ -189,12 +190,11 @@ run_monitor()← 唯一实现：基线 → diff → 分组 → digest → 推送
 | 项 | 设计意图（ADR-002） | 代码现状 |
 |----|-------------------|---------|
 | 原子写入 | 写临时文件 + `os.replace()` | ❌ **未实现**，直接 `Path.write_text` |
-| 并发写保护 | 文件锁 | ❌ **未实现**；`pyproject.toml` 声明了 `filelock` 但从未 import |
+| 并发写保护 | 文件锁 | ❌ **未实现**；原先声明却从未 import 的 `filelock` 依赖已**于 2026-09-14 从 `pyproject.toml` 移除** |
 
 **判断**：单用户本地场景下风险低（Web 与 CLI 同时写 `interests.md` 才会冲突），
-但**文档不应描述未实现的机制**——本表已如实标注。落实路径：在 `core.py` 的
-`set_entry_weights` / `upsert_digest` / `apply_feedback` 处引入 `FileLock`，
-或将未用依赖从 `pyproject.toml` 移除。
+但**文档不应描述未实现的机制**——本表已如实标注。若日后要落实，路径是在 `core.py` 的
+`set_entry_weights` / `upsert_digest` / `apply_feedback` 处引入 `FileLock` 并重新声明依赖。
 
 ---
 
@@ -235,7 +235,7 @@ class SourceAdapter(Protocol):
 | 维度 | 要求 |
 |------|------|
 | 离线 | 核心功能完全离线（抓取需网络，其余不需要） |
-| 依赖 | CLI 纯标准库；Web 额外需 fastapi/uvicorn/jinja2/python-multipart（+ 预留 filelock） |
+| 依赖 | CLI 纯标准库；Web 额外需 fastapi/uvicorn/jinja2/python-multipart（原先声明却从未使用的 `filelock` 已于 2026-09-14 移除） |
 | 性能 | 单日 ≤500 篇内存过滤足够快；数百篇卡片流需虚拟滚动（M1 未实现） |
 | 安全 | XML 防注入、%PDF 校验、无外传用户数据 |
 | 可移植 | Python ≥3.10；Windows/macOS/Linux 均可（路径经 `pathlib`） |

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import email.message
 import json
 
 import pytest
@@ -114,3 +115,107 @@ def test_find_paper_skips_monitor_state_files(isolated_data_dir):
     """The state files carry no ``papers`` key; searching must not choke on them."""
     assert find_paper("2607.25916") == ({"id": "2607.25916"}, "20260729")
     assert find_paper("nope") == (None, None)
+
+
+# ------------------------------------------------------------------
+# One HTTP entry point, one User-Agent policy
+# ------------------------------------------------------------------
+
+class _FakeResponse:
+    """Just enough of ``http.client.HTTPResponse`` for the two helpers."""
+
+    def __init__(self, body: bytes, content_type: str | None = None) -> None:
+        self._body = body
+        self.headers = email.message.Message()
+        if content_type is not None:
+            self.headers["Content-Type"] = content_type
+
+    def read(self) -> bytes:
+        return self._body
+
+    def __enter__(self) -> _FakeResponse:
+        return self
+
+    def __exit__(self, *exc: object) -> bool:
+        return False
+
+
+@pytest.fixture
+def http_stub(monkeypatch):
+    """Capture outbound requests instead of hitting the network.
+
+    Returns ``(calls, replies)``; the test queues one reply per expected call.
+    """
+    from glean import core
+
+    calls: list[tuple[object, int | None]] = []
+    replies: list[_FakeResponse] = []
+
+    def fake_urlopen(req, timeout=None):
+        calls.append((req, timeout))
+        return replies.pop(0)
+
+    monkeypatch.setattr(core.urllib.request, "urlopen", fake_urlopen)
+    return calls, replies
+
+
+def test_http_helpers_share_one_request_factory(http_stub):
+    """``http_get`` / ``http_get_text`` must not drift into two UA policies.
+
+    Both arXiv / DBLP / Semantic Scholar and the homepage+venue scrapers used to
+    build their own ``Request``; they now share ``_http_request``.
+    """
+    from glean import core
+
+    calls, replies = http_stub
+    replies.append(_FakeResponse(b"%PDF-1.4"))
+    replies.append(_FakeResponse(b"<html/>", "text/html; charset=utf-8"))
+
+    core.http_get("https://example.org/paper.pdf", timeout=5)
+    core.http_get_text("https://example.org/home")
+
+    assert [req.full_url for req, _ in calls] == [
+        "https://example.org/paper.pdf",
+        "https://example.org/home",
+    ]
+    assert [req.get_header("User-agent") for req, _ in calls] == [core.UA, core.UA]
+    assert [timeout for _, timeout in calls] == [5, 60]  # default timeout kept
+
+
+def test_http_get_text_honours_content_type_charset(http_stub):
+    from glean import core
+
+    _, replies = http_stub
+    replies.append(
+        _FakeResponse("数据库与形式化验证".encode("gb18030"), "text/html; charset=gb18030")
+    )
+
+    assert core.http_get_text("https://example.org/gbk") == "数据库与形式化验证"
+
+
+def test_http_get_text_degrades_instead_of_raising_on_bad_charset(http_stub):
+    """An unknown or absent charset must fall back to UTF-8, not abort a scan."""
+    from glean import core
+
+    _, replies = http_stub
+    replies.append(_FakeResponse("bogus — ok".encode(), "text/html; charset=no-such-codec"))
+    replies.append(_FakeResponse("plain — ok".encode()))
+
+    assert core.http_get_text("https://example.org/a") == "bogus — ok"
+    assert core.http_get_text("https://example.org/b") == "plain — ok"
+
+
+def test_homeparse_fetch_html_delegates_to_core(monkeypatch):
+    """Homepage scraping shares the core request path — no second ``urlopen``."""
+    from glean import homeparse
+
+    seen: list[tuple[str, int]] = []
+
+    def fake_get_text(url, timeout=60):
+        seen.append((url, timeout))
+        return "<html>hi</html>"
+
+    monkeypatch.setattr(homeparse, "http_get_text", fake_get_text)
+
+    assert homeparse.fetch_html("https://example.org/", timeout=7) == "<html>hi</html>"
+    assert seen == [("https://example.org/", 7)]

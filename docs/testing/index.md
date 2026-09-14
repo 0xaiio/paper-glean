@@ -34,13 +34,13 @@
 | `glean/ccf_catalog.py` | — | — | — |
 | `glean/venueparse.py` | ✅ | — | ✅ |
 | `glean/notify.py` | ✅ | — | ✅ |
-| `glean/cli.py` | — | ✅ | ✅ |
+| `glean/cli.py` | ✅ | ✅ | ✅ |
 | `glean/web/routes.py` | — | ✅ | ✅ |
 | `glean/web/models.py` | ✅ | — | — |
 | 数据文件格式 | — | ✅ | — |
 | 端到端工作流 | — | — | ✅ |
 
-> 全量测试数：**153 passed**（`pytest tests/ -q`）。
+> 全量测试数：**160 passed**（`pytest tests/ -q`）。
 > `ccf_catalog.py` 是生成物（数据模块），由 `scripts/gen_ccf_catalog.py` 产出，
 > 由 `test_ccf.py::test_sync_catalog_keeps_user_ticks` 间接覆盖，无独立测试。
 > `monitor.py` 是 `watch` / `ccf` 的共享内核，由 `tests/test_monitor.py` 独立覆盖

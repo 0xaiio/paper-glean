@@ -1,9 +1,9 @@
 site_name: Paper-Glean 文档
-site_url: https://user.github.io/paper-glean/
-repo_url: https://github.com/user/paper-glean
+site_url: https://0xaiio.github.io/paper-glean/
+repo_url: https://github.com/0xaiio/paper-glean
 repo_name: paper-glean
-docs_dir: .
-site_dir: ../site
+docs_dir: docs
+site_dir: site
 
 theme:
   name: material
