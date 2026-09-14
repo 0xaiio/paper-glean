@@ -76,6 +76,19 @@ def test_api_interests(client):
     assert isinstance(data, list)
 
 
+def test_default_theme_is_light(client):
+    """Default theme is LIGHT — only an explicit stored 'true' turns dark on.
+
+    Guards the design decision: `darkMode` must be opt-in. The old expression
+    `!== 'false'` evaluated to True when localStorage was unset, i.e. dark-by-default.
+    """
+    html = client.get("/digest").text
+    assert "localStorage.getItem('darkMode') === 'true'" in html
+    assert "localStorage.getItem('darkMode') !== 'false'" not in html
+    # Pre-paint script: dark users must not see a light flash before Alpine (defer) boots.
+    assert "document.documentElement.classList.add('dark')" in html
+
+
 def test_htmx_paper_list(client):
     response = client.get("/htmx/paper-list")
     assert response.status_code == 200

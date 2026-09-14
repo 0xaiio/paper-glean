@@ -1,8 +1,8 @@
 # Paper-Glean（摘星 StarDigest） · 设计系统与设计令牌
 
 > 产出：设计系统专家（彩格调）｜阶段：Phase2｜版本：**v1.1**
-> 用途：为高保真原型（Phase3）提供**可直接消费的设计令牌**。所有令牌以 **CSS 自定义属性**给出，含 **Dark（默认）/ Light 两套**主题。
-> 输入契约：`docs/design/requirements-brief.md`；现状线索：`glean/templates/*`、`glean_static/css/app.css`（primary `#3b82f6`、slate 灰阶、默认暗色）。
+> 用途：为高保真原型（Phase3）提供**可直接消费的设计令牌**。所有令牌以 **CSS 自定义属性**给出，含 **Light（默认）/ Dark 两套**主题。
+> 输入契约：`docs/design/requirements-brief.md`；现状线索：`glean/templates/*`、`glean_static/css/app.css`（primary `#3b82f6`、slate 灰阶、默认亮色）。
 > 本文件不含 HTML 原型，不改动任何项目源码。
 >
 > **v1.1 勘误（响应 Phase4 审查）**：① `--text-tertiary` 原 `#6E7684` 在暗色实际的 3.9/3.6:1 **未达 AA**，提亮为 `#8B94A3`（5.9/5.4:1）；Light 侧同步 `#6B7280→#5F6773`（surface-2 上 4.35→5.14:1）。② 新增 `--accent-fill #2563EB` 专用于**白字实心按钮**（白字 5.17:1），原 `--accent #3B82F6`（白字仅 3.68:1）退为**链接/选中/焦点/描边**专用，消除 §2.1 与 §4 的自相矛盾。
@@ -34,7 +34,7 @@
 ## 1. Visual Theme（视觉主题）
 
 - **Philosophy**：`工具先于装饰` —— 这是一个「每天要用、边看边打分」的工作台，界面的唯一职责是让信息**更快被扫读、更少被误读**。
-- **Direction**：`data-dense · utilitarian · dark-first · keyboard-native · restrained`
+- **Direction**：`data-dense · utilitarian · light-first · keyboard-native · restrained`
 - **Personality**：`学术 · 精确 · 克制 · 可信`
 - **Reference**：Linear（结构/密度）、Tech Utility（等宽承载数据）、Modern Minimal（留白与秩序）
 - **视觉基调**：近黑冷调画布 + 卡片微浮层级；**1px 描边**承担主要层级线索，阴影退居其次；品牌蓝仅用于 CTA / 链接 / 选中 / 焦点；语义色仅承载状态，绝不装饰。
@@ -43,7 +43,7 @@
 
 ## 2. Color Palette（调色板）
 
-> 色值策略：**Dark 为默认**（`data-theme="dark"` 或 `.dark`），Light 为可切换。品牌上下文锁定「蓝 + 中性灰」，不引入第二品牌色。所有文本/背景组合均通过 **WCAG AA**（正文 ≥4.5:1，大字/次要 ≥3:1）。
+> 色值策略：**Light 为默认**（不带 `.dark` 类），Dark 为可切换（`.dark`）。品牌上下文锁定「蓝 + 中性灰」，不引入第二品牌色。所有文本/背景组合均通过 **WCAG AA**（正文 ≥4.5:1，大字/次要 ≥3:1）。
 
 ### 2.1 品牌色（Brand / Accent）
 
@@ -420,7 +420,7 @@
 ## 9. Agent Prompt Guide（Agent 生成指南）
 
 ### Key Instructions（给 prototype-builder 的 10 条硬约束）
-1. **默认暗色**：`<html data-theme="dark">`；首帧即暗色，无「先亮后暗」闪烁。
+1. **默认亮色**：`<html>` 不带 `.dark`；仅当 `localStorage.darkMode === 'true'` 时由首帧内联脚本预置 `.dark`（无「先亮后暗」闪烁）。
 2. **★/🧐 双通道强制分离**：★ 一律 `--star-*`，🧐 一律 `--expand-*`；**扩展蓝用 sky，不用品牌 azure**。
 3. **命中 vs 我的评分分层**：命中 = 顶部**实心** pill（★ amber / 🧐 sky）；我的评分 = 底部 **5 格 pips 分段控件** + 左侧「我 ★/我 🧐」标签。两者形态、位置、颜色用法都不同，**不得混用**。
 4. **选中态用 §4 Selected 三段式**（左条 + 底纹 + inset 描边），不要用无效的 `ring`。

@@ -1,9 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN" x-data="{ darkMode: localStorage.getItem('darkMode') !== 'false' }" :class="{ 'dark': darkMode }">
+<html lang="zh-CN" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Paper-Glean{% endblock %}</title>
+    <script>
+        /* 默认亮色：只有显式存过 'true' 才进暗色。
+           在首帧前同步应用，避免 Alpine（defer 加载）接管前的「先亮后暗」闪烁。 */
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

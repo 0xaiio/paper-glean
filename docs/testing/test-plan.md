@@ -23,6 +23,7 @@
 | `test_api_papers` | GET /api/papers 返回 JSON | ✅ |
 | `test_api_ping` | GET /api/ping 存活探测返回 service/version/time | ✅ |
 | `test_api_interests` | GET /api/interests 返回画像 | ✅ |
+| `test_default_theme_is_light` | 主题默认亮色（防回归：不得退回 `!== 'false'`）+ 首帧防闪脚本在位 | ✅ |
 | `test_htmx_paper_list` | GET /htmx/paper-list 返回片段 | ✅ |
 | `test_watch_page` | GET /watch 页面渲染 | ✅ |
 | `test_api_watch_researchers` | GET /api/watch/researchers 返回名单 | ✅ |
@@ -207,7 +208,7 @@ And    CCF 页面 NEW 徽标 +1（学者页面徽标不受影响）
 
 每次发布前必须验证：
 
-- [ ] `pytest tests/ -v` 全部通过（当前 118 项）
+- [ ] `pytest tests/ -v` 全部通过（当前 119 项）
 - [ ] CLI 八个子命令均可正常执行（fetch / download / feedback / reanchor / daily / serve / watch / ccf）
 - [ ] Web 应用可启动，五个页面可访问（/digest /profile /archive /watch /ccf）
 - [ ] `arxiv_daily.py daily --serve` 后 `curl --noproxy '*' http://127.0.0.1:8000/api/ping` 返回 200
@@ -215,3 +216,4 @@ And    CCF 页面 NEW 徽标 +1（学者页面徽标不受影响）
 - [ ] 反馈打分后文件正确更新
 - [ ] 幂等：重复 fetch / watch run / ccf run 不产生重复数据
 - [ ] `ccf list` 与 `watch list` 只读、不改动仓库文件
+- [ ] 未设 `localStorage.darkMode` 时首屏为**亮色**；设为 `'true'` 后刷新仍为暗色且无「先亮后暗」闪烁
