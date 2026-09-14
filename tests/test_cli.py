@@ -22,6 +22,7 @@ def test_cli_help():
     assert "daily" in result.stdout
     assert "serve" in result.stdout
     assert "watch" in result.stdout
+    assert "ccf" in result.stdout
 
 
 def test_cli_watch_help():
@@ -49,6 +50,33 @@ def test_cli_watch_list_is_read_only():
     )
     assert result.returncode == 0
     assert "魏恒峰" in result.stdout
+
+
+def test_cli_ccf_help():
+    """The CCF sub-command group exposes the full venue-management surface."""
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "ccf", "--help"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    for sub in ("add", "remove", "enable", "disable", "list", "run", "ack", "refresh"):
+        assert sub in result.stdout
+
+
+def test_cli_ccf_list_is_read_only():
+    """`ccf list` reads the repo ccf.md and must not mutate anything."""
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "ccf", "list"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    assert "SIGMOD" in result.stdout
 
 
 def test_cli_daily_help():

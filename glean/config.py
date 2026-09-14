@@ -29,6 +29,21 @@ WATCH_TIMEOUT = 30  # seconds, per HTTP request
 WATCH_REQUEST_INTERVAL = 1.5  # politeness delay between researchers
 WATCH_ITEM_KINDS = ("paper", "video", "report", "talk", "other")
 
+# --- CCF venue monitoring (CCF-A conferences & journals) ------------------
+# Parallel to the researcher watchlist, but for venues: ccf.md is the source of
+# truth for *which* venues are checked and CCF-digest.md the human-readable log.
+CCF_MD = REPO_DIR / "ccf.md"
+CCF_DIGEST_MD = REPO_DIR / "CCF-digest.md"
+CCF_STATE = DATA_DIR / "ccf_state.json"
+CCF_EVENTS = REPO_DIR / "ccf_events.jsonl"
+CCF_NEW = DATA_DIR / "ccf_new.json"
+
+CCFDDL_RSS = "https://ccfddl.com/conference/deadlines_en.xml"
+CCF_ITEM_KINDS = ("cfp", "program", "papers", "other")
+CCF_MAX_ITEMS = 200  # per-venue cap on items kept for diffing
+CCF_TIMEOUT = 20  # seconds, per HTTP request
+CCF_REQUEST_INTERVAL = 1.5  # politeness delay between venues
+
 
 # PDF storage directory (configurable via environment variable)
 ARXIV_DIR = Path(os.environ.get("ARXIV_DIR", Path.home() / "papers"))

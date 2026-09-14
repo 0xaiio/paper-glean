@@ -58,6 +58,21 @@ class FilterState(BaseModel):
     show_other: bool = False
 
 
+class CcfVenue(BaseModel):
+    """One monitored CCF venue (mirrors a ccf.md entry)."""
+
+    key: str
+    name: str
+    kind: str = "conference"
+    full: str = ""
+    area: str = ""
+    homepage: str = ""
+    dblp: str = ""
+    ccf: str = "A"
+    issn: str = ""
+    enabled: bool = True
+
+
 class WatchResearcher(BaseModel):
     """One monitored researcher (mirrors a watchlist.md entry)."""
 

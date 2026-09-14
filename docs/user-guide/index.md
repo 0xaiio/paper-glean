@@ -62,6 +62,7 @@ PDF 将保存到 `$ARXIV_DIR`（默认 `~/papers`，可用环境变量覆盖）�
 - 详细了解 CLI 命令：[CLI 参考](cli.md)
 - 让它每天自动跑：[定时运行](scheduling.md)
 - 盯住特定学者的新作：[学者监控与推送](watching.md)
+- 盯住 CCF-A 会议/期刊的 CFP / Program / 接收论文列表：[CCF 会议期刊监控](ccf-watching.md)
 - 了解 Web 界面操作：[Web 应用](web-app.md)
 - 配置你的研究兴趣：[兴趣画像](interest-profile.md)
 - 理解反馈机制：[反馈与权重演化](feedback.md)

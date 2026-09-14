@@ -22,7 +22,8 @@ def create_app() -> FastAPI:
     )
 
     # Template global: how many unread monitored items (nav badge).
-    templates.env.globals["watch_new_count"] = lambda: len(notify.load_new())
+    templates.env.globals["watch_new_count"] = lambda: len(notify.load_new("watch"))
+    templates.env.globals["ccf_new_count"] = lambda: len(notify.load_new("ccf"))
 
     # Static files
     static_dir = Path(__file__).resolve().parent.parent.parent / "glean_static"

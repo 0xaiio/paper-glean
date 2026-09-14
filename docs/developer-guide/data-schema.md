@@ -219,3 +219,124 @@
   （`_待 agent 分析填写_`）。重复 `fetch` 时，脚本检测到旧推荐块非占位符，
   会**将 agent 已填写内容原样回填**，因此不会被覆盖。
 - `reanchor` 为分类清单补齐 `<a id=…>` 锚点、为推荐表补 `· [📄](#…)` 跳转链接。
+
+---
+
+## 监控线数据文件（watch / ccf）
+
+`daily` 之外的监控线（学者 `watch`、会议期刊 `ccf`）共用一套同名结构，仅前缀不同。
+「新」的定义 = 指纹**首次出现**：`*_state.json` 存所有已见指纹，`*_new.json` 存未读。
+两条线的未读集合**互相隔离**，`ack` 一条线不会清空另一条。
+
+### 概览
+
+| 文件 | 格式 | 用途 | 读写方式 |
+|------|------|------|----------|
+| `watchlist.md` / `ccf.md` | Markdown | 监控名单（勾选/启停即订阅） | 读写 |
+| `data/watch_state.json` / `data/ccf_state.json` | JSON | 已见指纹（决定「新」） | 读写 |
+| `data/watch_new.json` / `data/ccf_new.json` | JSON | 未读新条目（Web NEW 徽标数据源） | 读写 |
+| `data/watch_events.jsonl` / `data/ccf_events.jsonl` | JSON Lines | 推送事件审计，append-only | 追加 |
+| `WATCH-digest.md` / `CCF-digest.md` | Markdown | 人读沉淀（按日章节） | 读写 |
+
+### `ccf.md` 勾选清单格式
+
+```markdown
+# CCF-A 会议 / 期刊监控名单
+
+## 会议
+
+- [x] **SIGMOD** — ACM SIGMOD Conference
+  - area: 数据库/数据挖掘/内容检索
+  - homepage: https://sigmod.org
+  - ccf: A
+
+## 期刊
+
+- [x] **TODS** — ACM Transactions on Database Systems
+  - area: 数据库/数据挖掘/内容检索
+  - homepage: https://dl.acm.org/journal/tods
+  - issn: 0362-5915
+  - ccf: A
+```
+
+### 解析规则（`ccf.py::_parse_ccf_md`）
+
+- `##` 行按子串判定分节：含「期刊」→ `journal`，否则 `conference`。
+- 条目行 `- [x] 名称 — 全称`：`[x]` = 勾选（监控），`[ ]` = 取消（不发起网络请求）；
+  `—` 或 ` - ` 之后为全称，缺省时用名称兜底。
+- **字段行必须缩进**（`raw[:1]` 为空格/制表符），形如 `  - field: value`；
+  仅识别 `area` / `homepage` / `dblp` / `ccf` / `full` / `name` / `issn` 七个字段。
+  写回时由 `_write_ccf_md` 统一渲染为「2 空格缩进」。
+- `homepage` 是唯一硬性必填字段（无主页无从扫描）；`add_venue` 会 strip 后校验，
+  纯空白等同于缺失 → 抛 `ValueError`（Web 层映射为 409）。
+
+> `watchlist.md` 结构同构（分「监控中 / 已暂停」两节），见
+> [学者监控与推送](../user-guide/watching.md)。
+
+### `data/ccf_state.json`（学者版同构）
+
+```json
+{
+  "version": 1,
+  "venues": {
+    "sigmod": {
+      "fingerprints": ["cfp|sigmod 2027|https://...", "papers|accepted papers|https://..."],
+      "sources": ["ccfddl", "homepage"],
+      "last_checked": "2026-09-14T02:11:05+00:00"
+    }
+  }
+}
+```
+
+- `venues.<key>.fingerprints`：该 venue 已见条目的指纹全集（`fingerprint(title, url)`），
+  仅保留最近 `CCF_MAX_ITEMS`（200）条。
+- `sources`：该 venue 曾命中的来源（`ccfddl` / `homepage` / `crossref`）。
+- 首次运行某 venue 只**建基线**（写入全部指纹、不推送）；
+  可用 `ccf run --force` 覆盖为「首次即推」。
+- 删除该文件里的某个 key = 让该条目下次重新建基线（用于主页改版后误报清屏）。
+
+### `data/ccf_new.json`（未读）
+
+```json
+{
+  "updated": "2026-09-14T02:11:05+00:00",
+  "day": "20260914",
+  "items": [
+    {
+      "title": "SIGMOD 2027 CFP",
+      "url": "https://sigmod.org/2027/",
+      "kind": "cfp",
+      "venue": "SIGMOD",
+      "source": "ccfddl",
+      "confidence": 0.95,
+      "deadline": "2026-10-15",
+      "fingerprint": "cfp|sigmod 2027 cfp|https://sigmod.org/2027/"
+    }
+  ]
+}
+```
+
+- `load_new(namespace)` / `ack_all(namespace)` 读写此文件（`namespace` ∈ `watch` / `ccf`）；
+  传未知命名空间会被拒绝。写文件时按 `(fingerprint, key)` 去重。
+- `kind` ∈ `cfp` / `program` / `papers` / `other`（图标 📢 / 📅 / 📄 / 🔗）。
+- `venue` 为 venue 名（学者线同位置字段为 `researcher`）。
+
+### `data/ccf_events.jsonl`（事件审计）
+
+每行一个 JSON 对象，append-only，每条未见过条目**只记一次**：
+
+```json
+{"time": "2026-09-14T02:11:05+00:00", "run_id": "20260914T021105Z", "key": "sigmod", "venue": "SIGMOD", "item": {"title": "SIGMOD 2027 CFP", "kind": "cfp", "url": "https://sigmod.org/2027/", "source": "ccfddl", "fingerprint": "cfp|..."}, "pushed_to": ["file", "desktop"]}
+```
+
+- `run_id` 形如 `YYYYMMDDTHHMMSSZ`（UTC）；`item` 为去掉 `key`/`venue` 后的原始条目；
+  `pushed_to` 列出实际生效的推送通道。
+
+> `ccf_events.jsonl` 与 `watch_events.jsonl` 均在 `.gitignore` 中（本地审计，不入库）。
+
+### `CCF-digest.md`（人读沉淀）
+
+每次 `ccf run` 只追加**新发现**，每个日期一个章节，由
+`<!-- BEGIN CCF YYYYMMDD -->` / `<!-- END CCF YYYYMMDD -->` 包裹；
+`upsert_ccf_digest` 幂等（重复运行同一日不产生差异）。学者线用
+`<!-- BEGIN WATCH YYYYMMDD -->` 标记，结构同构。

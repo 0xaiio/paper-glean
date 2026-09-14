@@ -529,7 +529,7 @@ def upsert_watch_digest(day: str, section: str) -> None:
         idx = content.index("<!-- BEGIN WATCH ")
         content = content[:idx] + section + "\n" + content[idx:]
     else:
-        content = content.rstrip("\n") + "\n\n" + section
+        content = content.rstrip("\n") + "\n\n" + section + "\n"
     WATCH_DIGEST_MD.write_text(content, encoding="utf-8")
 
 

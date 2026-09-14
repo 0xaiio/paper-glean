@@ -29,6 +29,9 @@
 | `glean/serve.py` | ✅ | ✅ | — |
 | `glean/watch.py` | ✅ | — | ✅ |
 | `glean/homeparse.py` | — | — | ✅ |
+| `glean/ccf.py` | ✅ | — | ✅ |
+| `glean/ccf_catalog.py` | — | — | — |
+| `glean/venueparse.py` | ✅ | — | ✅ |
 | `glean/notify.py` | ✅ | — | ✅ |
 | `glean/cli.py` | — | ✅ | ✅ |
 | `glean/web/routes.py` | — | ✅ | ✅ |
@@ -36,15 +39,23 @@
 | 数据文件格式 | — | ✅ | — |
 | 端到端工作流 | — | — | ✅ |
 
+> 全量测试数：**118 passed**（`pytest tests/ -q`）。
+> `ccf_catalog.py` 是生成物（数据模块），由 `scripts/gen_ccf_catalog.py` 产出，
+> 由 `test_ccf.py::test_sync_catalog_keeps_user_ticks` 间接覆盖，无独立测试。
+
 ## 测试原则
 
 1. **核心逻辑优先**：`glean/core.py` 是纯函数，最易测试，覆盖度最高
 2. **IO 边界测试**：文件读写、HTTP 请求使用 mock
-3. **幂等性验证**：`fetch` 重复执行应产生相同结果
+3. **幂等性验证**：`fetch` / `run` 重复执行应产生相同结果
 4. **兼容性验证**：早期数据文件格式应能正确解析
+5. **路径隔离**：涉及写盘的测试用 `monkeypatch` 把配置常量重定向到 `tmp_path`，绝不触碰仓库真实文件
+6. **零网络**：解析类测试一律喂内联样本字符串（RSS / HTML / JSON），不发真实请求
 
 ## 已知限制
 
 - 未覆盖 arXiv API 实际调用（依赖外部服务）
 - 未覆盖 PDF 下载（依赖外部服务 + 文件系统）
+- 未覆盖 ccfddl / Crossref 真实网络请求（解析逻辑用内联样本覆盖；端到端靠手工 `ccf run`）
 - 未覆盖 agent 层（非确定性，需人工验证）
+- DBLP 自 2026-09 起对爬虫返回 Anubis 人机验证页，`dblp` 字段降级为人工参考链接，不再抓取

@@ -86,6 +86,43 @@
         - fetch_html
         - parse_homepage
 
+## 会议期刊监控
+
+::: glean.ccf
+    options:
+      members:
+        - load_venues
+        - add_venue
+        - remove_venue
+        - set_enabled
+        - set_enabled_area
+        - sync_catalog
+        - collect_items
+        - load_state
+        - save_state
+        - append_events
+        - load_events
+        - render_section
+        - upsert_ccf_digest
+        - run
+
+## 会议期刊页解析
+
+::: glean.venueparse
+    options:
+      members:
+        - parse_venue_page
+        - fetch_rss
+        - parse_ccfddl
+        - fetch_crossref_issues
+
+## CCF-A 目录
+
+::: glean.ccf_catalog
+    options:
+      members:
+        - catalog
+
 ## 推送
 
 ::: glean.notify

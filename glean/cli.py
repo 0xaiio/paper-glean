@@ -24,9 +24,19 @@ from glean.core import (
     apply_feedback,
     find_paper,
 )
+from glean.ccf import (
+    add_venue,
+    load_venues,
+    remove_venue,
+    run as run_ccf,
+    set_enabled as set_venue_enabled,
+    set_enabled_area,
+    sync_catalog,
+)
 from glean.serve import DEFAULT_HOST, DEFAULT_PORT, base_url, ensure, log_path
 from glean.watch import (
     add_researcher,
+    load_events as load_watch_events,
     load_watchlist,
     remove_researcher,
     run as run_watch,
@@ -188,6 +198,98 @@ def cmd_watch_push_test(args: argparse.Namespace) -> None:
         notify.ack_all()
 
 
+def cmd_ccf_list(args: argparse.Namespace) -> None:
+    """Show the CCF venue list."""
+    entries = load_venues()
+    if not entries:
+        print("[INFO] 名单为空; 先运行 `ccf refresh` 从目录生成")
+        return
+    for e in entries:
+        if not args.all and not e.get("enabled", True):
+            continue
+        if args.area and args.area.lower() not in (e.get("area") or "").lower():
+            continue
+        mark = "[x]" if e.get("enabled", True) else "[ ]"
+        kind = "期刊" if e.get("kind") == "journal" else "会议"
+        print(f"{mark} {e['name']:12s} {kind}  {e.get('area', '')}")
+    on = sum(1 for e in entries if e.get("enabled", True))
+    print(f"[INFO] 共 {len(entries)} 个条目，其中 {on} 个已勾选")
+
+
+def cmd_ccf_toggle(args: argparse.Namespace) -> None:
+    """Tick / untick venues — by name, or in bulk by area."""
+    if args.area:
+        touched = set_enabled_area(args.area, args.enable)
+        if not touched:
+            print(f"[ERR] 没有匹配领域「{args.area}」的条目")
+            return
+        verb = "已勾选" if args.enable else "已取消勾选"
+        print(f"[OK] {verb} {len(touched)} 个条目: {', '.join(sorted(touched))}")
+        return
+    if set_venue_enabled(args.name, args.enable):
+        print(f"[OK] {'已勾选' if args.enable else '已取消勾选'}: {args.name}")
+    else:
+        print(f"[ERR] 未找到: {args.name}")
+
+
+def cmd_ccf_add(args: argparse.Namespace) -> None:
+    """Add a venue that the built-in catalogue does not cover."""
+    try:
+        entry = add_venue(
+            args.name,
+            kind="journal" if args.journal else "conference",
+            full=args.full or "",
+            area=args.area or "",
+            homepage=args.homepage,
+            dblp=args.dblp or "",
+            ccf=args.ccf,
+            issn=args.issn or "",
+        )
+    except ValueError as exc:
+        print(f"[ERR] {exc}")
+        return
+    print(f"[OK] 已添加: {entry['name']} (key={entry['key']}, {'期刊' if args.journal else '会议'})")
+
+
+def cmd_ccf_remove(args: argparse.Namespace) -> None:
+    """Remove a venue and forget its seen-state."""
+    print(f"[OK] 已移除: {args.name}" if remove_venue(args.name) else f"[ERR] 未找到: {args.name}")
+
+
+def cmd_ccf_run(args: argparse.Namespace) -> None:
+    """Scan every ticked venue and push what is new."""
+    res = run_ccf(only=args.only, force=args.force, push=not args.no_push)
+    for b in res["baselined"]:
+        print(f"[BASE] {b} — 已建立基线，本次不推送（加 --force 可强制推送）")
+    for name, items in res["grouped"].items():
+        print(f"[NEW] {name}: {len(items)} 条更新")
+        for it in items:
+            label = {"cfp": "CFP", "program": "Program", "papers": "接收论文",
+                     "other": "其它"}.get(it.get("kind"), "其它")
+            flag = " ⚠️低置信" if (it.get("confidence") or 1.0) < 0.6 else ""
+            extra = f"  截稿 {it['deadline']}" if it.get("deadline") else ""
+            print(f"      · [{label}] {it['title'][:80]}{extra}{flag}")
+    if not res["grouped"] and not res["baselined"]:
+        print("[OK] 没有更新")
+    for err in res["errors"]:
+        print(f"[WARN] {err}")
+    if res["new_items"]:
+        print(f"[OK] 共 {len(res['new_items'])} 条更新 -> CCF-digest.md (run {res['run_id']})")
+        print(f"[OK] 推送通道: {', '.join(res['pushed_to']) or '无（仅落盘 digest）'}")
+
+
+def cmd_ccf_ack(args: argparse.Namespace) -> None:
+    """Clear the Web UI's CCF NEW badges."""
+    print(f"[OK] 已标记 {notify.ack_all('ccf')} 条更新为已读")
+
+
+def cmd_ccf_refresh(args: argparse.Namespace) -> None:
+    """Re-merge the built-in catalogue into ccf.md (keeps your ticks)."""
+    added, updated = sync_catalog(default_enabled=not args.new_disabled)
+    print(f"[OK] 目录同步: 新增 {added} 个条目，更新 {updated} 个字段")
+    print("[NEXT] 运行 `ccf list` 查看，用 `ccf disable --area <领域>` 批量取消勾选")
+
+
 def cmd_download(args: argparse.Namespace) -> None:
     """Download papers by ID."""
     for pid in args.ids:
@@ -321,6 +423,52 @@ def main() -> None:
     wt = wsub.add_parser("push-test", help="检查推送通道并可选发一条自检")
     wt.add_argument("--send", action="store_true", help="实际发送一条自检消息")
     wt.set_defaults(func=cmd_watch_push_test)
+
+    c = sub.add_parser("ccf", help="CCF-A 会议/期刊监控与推送(名单见 ccf.md)")
+    csub = c.add_subparsers(dest="ccf_cmd", required=True)
+
+    cl = csub.add_parser("list", help="列出会议/期刊勾选状态")
+    cl.add_argument("--all", action="store_true", help="同时显示未勾选的条目")
+    cl.add_argument("--area", help="只显示某领域(支持子串，如 DB / 数据库)")
+    cl.set_defaults(func=cmd_ccf_list)
+
+    ce = csub.add_parser("enable", help="勾选(订阅)会议/期刊")
+    ce.add_argument("name", nargs="?", help="名称; 与 --area 二选一")
+    ce.add_argument("--area", help="批量勾选整个领域")
+    ce.set_defaults(func=cmd_ccf_toggle, enable=True)
+
+    cd = csub.add_parser("disable", help="取消勾选(暂停)会议/期刊")
+    cd.add_argument("name", nargs="?", help="名称; 与 --area 二选一")
+    cd.add_argument("--area", help="批量取消勾选整个领域")
+    cd.set_defaults(func=cmd_ccf_toggle, enable=False)
+
+    ca = csub.add_parser("add", help="添加目录未覆盖的会议/期刊")
+    ca.add_argument("name")
+    ca.add_argument("--homepage", required=True, help="会议/期刊主页(监控的唯一依据)")
+    ca.add_argument("--journal", action="store_true", help="声明为期刊(默认是会议)")
+    ca.add_argument("--full", help="全称")
+    ca.add_argument("--area", help="领域")
+    ca.add_argument("--dblp", help="DBLP 索引地址(仅作参考链接)")
+    ca.add_argument("--issn", help="ISSN(期刊经 Crossref 监控新卷期时需要)")
+    ca.add_argument("--ccf", default="A", help="CCF 等级, 默认 A")
+    ca.set_defaults(func=cmd_ccf_add)
+
+    cr = csub.add_parser("remove", help="移除条目(同时清除其已见状态)")
+    cr.add_argument("name")
+    cr.set_defaults(func=cmd_ccf_remove)
+
+    cu = csub.add_parser("run", help="扫描全部勾选条目并推送新 CFP / Program / 接收论文")
+    cu.add_argument("--only", help="只扫描指定名称")
+    cu.add_argument("--force", action="store_true", help="首次运行也推送(默认只建基线)")
+    cu.add_argument("--no-push", action="store_true", help="只落盘 digest，不推送")
+    cu.set_defaults(func=cmd_ccf_run)
+
+    ck = csub.add_parser("ack", help="清除 Web 端 CCF 的 NEW 徽标")
+    ck.set_defaults(func=cmd_ccf_ack)
+
+    cf = csub.add_parser("refresh", help="把内置 CCF-A 目录并入 ccf.md(保留你的勾选)")
+    cf.add_argument("--new-disabled", action="store_true", help="新增条目默认不勾选")
+    cf.set_defaults(func=cmd_ccf_refresh)
 
     args = ap.parse_args()
     args.func(args)

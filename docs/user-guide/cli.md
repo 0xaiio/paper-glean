@@ -14,6 +14,7 @@ arxiv-daily <command> [options]
 | `daily` | 每日流水线：fetch → digest →（可选）确保本地 Web 服务在线 |
 | `serve` | 启动本地 Web 应用（前台） |
 | `watch` | 学者监控与推送（子命令见下，详见 [学者监控与推送](watching.md)） |
+| `ccf` | CCF-A 会议/期刊监控与推送（子命令见下，详见 [CCF 会议期刊监控](ccf-watching.md)） |
 | `download` | 按 ID 下载 PDF |
 | `feedback` | 人工调整推荐指数 |
 | `reanchor` | 补齐 digest 锚点与跳转链接 |
@@ -170,6 +171,52 @@ python -X utf8 arxiv_daily.py watch run --no-push
 - **解析顺序**：个人主页 → DBLP → Semantic Scholar；显式配置了 `dblp`/`s2` 时会并行合并去重。
 - **首次建基线**：新加入的对象第一次运行只记录「已见」，**不推送**历史成果（除非 `--force`）。
 - **fail-soft**：单个对象抓取失败只记录 `[WARN]`，不影响其余；推送通道失败同理。
+
+---
+
+## ccf — CCF-A 会议 / 期刊监控与推送
+
+按**会议 / 期刊**跟踪 CFP / Program / 接收论文列表。名单是 `ccf.md`（勾选框）。
+完整说明见 [CCF 会议期刊监控](ccf-watching.md)。
+
+```powershell
+python -X utf8 arxiv_daily.py ccf <action> [options]
+```
+
+| action | 说明 | 主要参数 |
+|--------|------|---------|
+| `list` | 列出勾选状态 | `--all`（含未勾选） `--area <领域>` |
+| `enable` / `disable` | 勾选 / 取消勾选 | `<名称>` 或 `--area <领域>`（批量） |
+| `add` | 添加目录未覆盖的条目 | `<名称>` `--homepage` `--journal` `--full` `--area` `--dblp` `--issn` `--ccf` |
+| `remove` | 移除条目（同时清除其已见状态） | `<名称>` |
+| `run` | 扫描并推送新动态 | `--only` `--force` `--no-push` |
+| `ack` | 清除 Web 端 CCF 的 NEW 徽标 | — |
+| `refresh` | 把内置 CCF-A 目录并入 `ccf.md`（**保留你的勾选**） | `--new-disabled`（新增条目默认不勾选） |
+
+### 示例
+
+```powershell
+# 看数据库领域的勾选状态
+python -X utf8 arxiv_daily.py ccf list --area DB
+
+# 批量订阅 / 退订整个领域（名单有 90+ 条，批量是刚需）
+python -X utf8 arxiv_daily.py ccf disable --area "形式化方法"
+
+# 添加目录未收录的会议（必须给主页 —— 监控的唯一依据）
+python -X utf8 arxiv_daily.py ccf add ICDT --homepage https://icdt2027.org/ --area "数据库"
+
+# 扫描（首次建基线不推送；之后只推新 CFP / Program / 接收论文列表）
+python -X utf8 arxiv_daily.py ccf run
+python -X utf8 arxiv_daily.py ccf run --only SIGMOD
+```
+
+### 行为说明
+
+- **解析顺序**：会议 = ccfddl 截稿 RSS → 会议主页；期刊 = Crossref（按 ISSN 取卷期）→ 期刊主页。
+- **DBLP 不做抓取**：2026-09 起 DBLP 全部端点都有反爬拦截页，`dblp` 字段仅作人工参考链接。
+- **首次建基线**：新条目第一次运行只记录「已见」，**不推送**历史 CFP（除非 `--force`）。
+- **勾选即订阅**：`[ ]` 的条目**不会发起任何网络请求**；`refresh` 不会改动你的勾选状态。
+- **fail-soft**：单个站点抓取失败只记录 `[WARN]`，不影响其余。
 
 ---
 

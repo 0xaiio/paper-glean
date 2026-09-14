@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}CCF 监控 · Paper-Glean{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold">CCF-A 会议 / 期刊监控</h1>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        跟踪 <a class="text-primary hover:underline" href="/static/../ccf.md">ccf.md</a>
+        中勾选的 CCF-A 会议与期刊主页，发布<strong>新 CFP / 新 Program / 新接收论文列表</strong>即推送。
+        解析顺序：<strong>ccfddl.com 截稿 RSS → 会议主页</strong>（DBLP 仅供人工查阅，不做抓取）。
+    </p>
+</div>
+
+<!-- Push channels -->
+<div class="mb-6 flex flex-wrap items-center gap-2 text-xs">
+    <span class="text-gray-500">推送通道：</span>
+    {% for name, on in channels.items() %}
+    <span class="px-2 py-1 rounded {% if on %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200{% else %}bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %}">
+        {{ '●' if on else '○' }} {{ name }}
+    </span>
+    {% endfor %}
+    <span class="text-gray-400">（webhook 需设置环境变量 PAPER_GLEAN_WEBHOOK_URL）</span>
+</div>
+
+<!-- New items -->
+<section class="mb-8">
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold">
+            新动态
+            {% if new_items %}
+            <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-red-500 text-white">{{ new_items|length }} NEW</span>
+            {% endif %}
+        </h2>
+        {% if new_items %}
+        <button class="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                hx-post="/api/ccf/ack" hx-swap="none"
+                onclick="setTimeout(()=>location.reload(), 300)">
+            全部标记已读
+        </button>
+        {% endif %}
+    </div>
+
+    {% if new_items %}
+    <ul class="space-y-2">
+        {% for it in new_items %}
+        <li class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <div class="flex items-start gap-3">
+                <span class="text-xl leading-none mt-0.5">
+                    {% if it.kind == 'cfp' %}📢
+                    {% elif it.kind == 'program' %}📅
+                    {% elif it.kind == 'papers' %}📄
+                    {% else %}🔗{% endif %}
+                </span>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-1.5 py-0.5 text-[11px] rounded bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200">NEW</span>
+                        {% if it.url %}
+                        <a href="{{ it.url }}" target="_blank" rel="noopener"
+                           class="font-medium hover:text-primary hover:underline">{{ it.title }}</a>
+                        {% else %}
+                        <span class="font-medium">{{ it.title }}</span>
+                        {% endif %}
+                        {% if it.confidence and it.confidence < 0.6 %}
+                        <span class="text-[11px] text-amber-600">⚠️ 低置信</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <span class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700">
+                            {% if it.kind == 'cfp' %}征稿 CFP
+                            {% elif it.kind == 'program' %}日程 Program
+                            {% elif it.kind == 'papers' %}接收论文
+                            {% else %}其它{% endif %}
+                        </span>
+                        {{ it.venue }}
+                        {% if it.year %} · {{ it.year }}{% endif %}
+                        {% if it.deadline %} · 截稿 {{ it.deadline }}{% endif %}
+                        · 来源 {{ it.source }}
+                    </div>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-gray-500 dark:text-gray-400 p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+        暂无未读动态。运行 <code class="px-1 rounded bg-gray-100 dark:bg-gray-700">arxiv_daily.py ccf run</code> 触发一次扫描。
+    </p>
+    {% endif %}
+</section>
+
+<!-- Venue list -->
+<section class="mb-8">
+    {% set on_n = venues|selectattr('enabled')|list|length %}
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold">监控名单（{{ on_n }} / {{ venues|length }} 已勾选）</h2>
+        <button class="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                hx-post="/api/ccf/refresh" hx-swap="none"
+                onclick="setTimeout(()=>location.reload(), 800)">
+            同步内置目录
+        </button>
+    </div>
+
+    {% set areas = [] %}
+    {% for v in venues %}{% if v.area and v.area not in areas %}{% set _ = areas.append(v.area) %}{% endif %}{% endfor %}
+    {% if areas %}
+    <div class="mb-4 flex flex-wrap gap-2 text-xs">
+        <span class="text-gray-500 self-center">按领域批量：</span>
+        {% for a in areas %}
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-300 dark:border-gray-600">
+            <span class="max-w-[16rem] truncate">{{ a }}</span>
+            <button class="text-green-600 hover:underline"
+                    hx-post="/api/ccf/venues/toggle-area" hx-vals='{"area": "{{ a }}", "enabled": true}'
+                    hx-swap="none" onclick="setTimeout(()=>location.reload(), 300)">全选</button>
+            <button class="text-gray-500 hover:underline"
+                    hx-post="/api/ccf/venues/toggle-area" hx-vals='{"area": "{{ a }}", "enabled": false}'
+                    hx-swap="none" onclick="setTimeout(()=>location.reload(), 300)">全不选</button>
+        </span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form class="mb-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 grid gap-3 sm:grid-cols-2"
+          hx-post="/api/ccf/venues"
+          hx-on::after-request="if(event.detail.successful){ this.reset(); location.reload(); }">
+        <div>
+            <label class="block text-xs text-gray-500 mb-1">名称 *</label>
+            <input name="name" required placeholder="ICDT"
+                   class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
+        </div>
+        <div>
+            <label class="block text-xs text-gray-500 mb-1">主页 *</label>
+            <input name="homepage" required placeholder="https://example.org/2027"
+                   class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
+        </div>
+        <div>
+            <label class="block text-xs text-gray-500 mb-1">类型</label>
+            <select name="kind" class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
+                <option value="conference">会议</option>
+                <option value="journal">期刊</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs text-gray-500 mb-1">领域</label>
+            <input name="area" placeholder="数据库/数据挖掘/内容检索 (DB)"
+                   class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
+        </div>
+        <div class="sm:col-span-2">
+            <label class="block text-xs text-gray-500 mb-1">全称</label>
+            <input name="full" placeholder="International Conference on Database Theory"
+                   class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
+        </div>
+        <div class="sm:col-span-2">
+            <button type="submit"
+                    class="px-3 py-1.5 text-sm rounded bg-primary text-white hover:opacity-90">添加监控对象</button>
+        </div>
+    </form>
+
+    <ul class="space-y-1">
+        {% for v in venues %}
+        <li class="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <button class="w-4 h-4 shrink-0 rounded border border-gray-400 flex items-center justify-center text-[10px] leading-none
+                                   {% if v.enabled %}bg-primary border-primary text-white{% endif %}"
+                            title="{{ '取消勾选' if v.enabled else '勾选' }}"
+                            hx-post="/api/ccf/venues/{{ v.key }}/toggle?enabled={{ 'false' if v.enabled else 'true' }}"
+                            hx-swap="none"
+                            onclick="setTimeout(()=>location.reload(), 300)">
+                        {{ '✓' if v.enabled else '' }}
+                    </button>
+                    <span class="font-medium">{{ v.name }}</span>
+                    <span class="px-1.5 py-0.5 text-[10px] rounded
+                                 {% if v.kind == 'journal' %}bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200{% else %}bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200{% endif %}">
+                        {{ '期刊' if v.kind == 'journal' else '会议' }}
+                    </span>
+                    {% if not v.enabled %}<span class="text-xs text-gray-500">未勾选</span>{% endif %}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                    {% if v.full %}{{ v.full }} · {% endif %}{{ v.area }}
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 text-xs">
+                {% if v.homepage %}
+                <a href="{{ v.homepage }}" target="_blank" rel="noopener"
+                   class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">主页</a>
+                {% endif %}
+                {% if v.dblp %}
+                <a href="{{ v.dblp }}" target="_blank" rel="noopener"
+                   class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">DBLP</a>
+                {% endif %}
+                <button class="px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
+                        hx-delete="/api/ccf/venues/{{ v.key }}"
+                        hx-swap="none"
+                        hx-confirm="移除「{{ v.name }}」？其已见状态也会一并清除。"
+                        onclick="setTimeout(()=>location.reload(), 300)">移除</button>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+
+<!-- Push history -->
+<section>
+    <h2 class="text-lg font-semibold mb-3">推送历史</h2>
+    {% if events %}
+    <ul class="text-sm space-y-1">
+        {% for ev in events %}
+        <li class="flex gap-2 text-gray-600 dark:text-gray-400">
+            <span class="text-gray-400 shrink-0">{{ ev.time[:16].replace('T', ' ') }}</span>
+            <span class="shrink-0">{{ ev.venue }}</span>
+            <span class="truncate">{{ ev.item.title }}</span>
+            {% if ev.pushed_to %}<span class="text-gray-400 shrink-0">→ {{ ev.pushed_to|join(',') }}</span>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-gray-500">还没有推送记录。</p>
+    {% endif %}
+</section>
+{% endblock %}

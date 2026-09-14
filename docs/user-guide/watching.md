@@ -127,7 +127,7 @@ python -X utf8 arxiv_daily.py watch list --all
 | 通道 | 默认 | 落点 | 开关 |
 |------|------|------|------|
 | `file` | ✅ 常开 | `WATCH-digest.md` + `data/watch_new.json`（Web 的 NEW 徽标数据源） | — |
-| Web 高亮 | ✅ 常开 | `/watch` 页面新条目打 `NEW` 红标，导航「监控」显示未读计数 | 页面上「全部标记已读」或 `watch ack` |
+| Web 高亮 | ✅ 常开 | `/watch` 页面新条目打 `NEW` 红标，导航「学者」显示未读计数（与「CCF」计数互相独立） | 页面上「全部标记已读」或 `watch ack` |
 | `desktop` | ✅ Windows 开 | 系统气泡通知 | `PAPER_GLEAN_DESKTOP=0` 关闭 |
 | `webhook` | ❌ 关 | POST JSON 到自定义 URL | 设 `PAPER_GLEAN_WEBHOOK_URL` |
 

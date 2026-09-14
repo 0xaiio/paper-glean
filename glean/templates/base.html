@@ -48,8 +48,13 @@
                         </a>
                         <a href="/watch" class="px-3 py-2 rounded-md text-sm font-medium {% if request.url.path == '/watch' %}bg-gray-100 dark:bg-gray-700{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
                             {% set new_n = watch_new_count() %}
-                            监控
+                            学者
                             {% if new_n %}<span class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-500 text-white">{{ new_n }}</span>{% endif %}
+                        </a>
+                        <a href="/ccf" class="px-3 py-2 rounded-md text-sm font-medium {% if request.url.path == '/ccf' %}bg-gray-100 dark:bg-gray-700{% else %}hover:bg-gray-100 dark:hover:bg-gray-700{% endif %}">
+                            {% set ccf_n = ccf_new_count() %}
+                            CCF
+                            {% if ccf_n %}<span class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-500 text-white">{{ ccf_n }}</span>{% endif %}
                         </a>
                     </div>
                 </div>
@@ -70,7 +75,8 @@
             <a href="/digest" class="px-3 py-2 text-sm {% if request.url.path == '/digest' %}text-primary font-medium{% endif %}">Digest</a>
             <a href="/profile" class="px-3 py-2 text-sm {% if request.url.path == '/profile' %}text-primary font-medium{% endif %}">Profile</a>
             <a href="/archive" class="px-3 py-2 text-sm {% if request.url.path == '/archive' %}text-primary font-medium{% endif %}">Archive</a>
-            <a href="/watch" class="px-3 py-2 text-sm {% if request.url.path == '/watch' %}text-primary font-medium{% endif %}">监控</a>
+            <a href="/watch" class="px-3 py-2 text-sm {% if request.url.path == '/watch' %}text-primary font-medium{% endif %}">学者</a>
+            <a href="/ccf" class="px-3 py-2 text-sm {% if request.url.path == '/ccf' %}text-primary font-medium{% endif %}">CCF</a>
         </div>
     </div>
 

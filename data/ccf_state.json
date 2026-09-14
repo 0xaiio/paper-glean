@@ -1,0 +1,2348 @@
+{
+  "version": 1,
+  "venues": {
+    "sigmod": {
+      "name": "SIGMOD",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:54.959815+00:00",
+      "fingerprints": [
+        "f5d63e96c0c00a42",
+        "130a993ecffecf54",
+        "70321469008fd565",
+        "e1b2b31ce8b70896",
+        "68dd943bc4f7e0a3",
+        "57ab0273ff3d05e1",
+        "d1005e4d20345438",
+        "4f1bee476a5049d2",
+        "3ebe432cf7ad6d7f",
+        "715d0d6426dc23b2",
+        "3140f95fa62badd1",
+        "60462c1d6bf0a289",
+        "6c66fb997d1983f4",
+        "8ef9133d815ae025",
+        "e66559ed9c3bdaf9",
+        "eda29f2c39ed262f",
+        "1860c63ec4069d6c",
+        "ad17d561eca4ed8c",
+        "1eebc079eb65c8cf",
+        "586d729f93570de0",
+        "b9ddcab593426c48",
+        "9d1982f9a4c9c251",
+        "76db20171d665362",
+        "d3e3b18ddb268ccd",
+        "677cb4b7ef6fe0c8",
+        "8795c542030084e2",
+        "e2b60dec07db6f51",
+        "f64e214c6599a848",
+        "2e433539049fe404"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "aaai": {
+      "name": "AAAI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:27.081826+00:00",
+      "fingerprints": [
+        "2c842d358d3cef58",
+        "4b140368f31c68b5",
+        "8ee260a6a2d8a21b",
+        "c3d44e816989916d",
+        "135de7f2bead94f6",
+        "29706d65d2a8ff00",
+        "58bf99990978645b",
+        "5a94ed28e29eba29",
+        "e2af8481eff42064",
+        "a12f72774b2c2f91",
+        "22b4c66681ab0d1b",
+        "86e0c54e07d8b549",
+        "3782576ae17c2b1f",
+        "596b79529f2cca93",
+        "ca425dd0933daaef",
+        "daa0111eab593f75",
+        "e0866e1ba5d0f46e",
+        "f63301e057459d7d",
+        "1c9ecd269d370068",
+        "2b682dc063dbc7e4",
+        "3535db88643f9424",
+        "3dd2c2590af86d39",
+        "d95e19a827d2d13c",
+        "7157fec736088dbf",
+        "0b7ffc0a017037e0",
+        "4be429a92e625eb3",
+        "61536d86856d061b",
+        "61fdde48f2cdd900",
+        "0fbb1298df5c542f",
+        "a75e16d1d896dddd",
+        "5b24198bb5f803f4"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "acl": {
+      "name": "ACL",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:29.476053+00:00",
+      "fingerprints": [
+        "3a113356dfb87a8c",
+        "e54b62bec4f3573d",
+        "6e71efc37fa88d58",
+        "984172b42464dc84",
+        "4686df3a3fd589fa",
+        "85118ed38641c2c0",
+        "426930beb1a1024e",
+        "6e4456e5eebe09b1",
+        "065ca2ec2682888a",
+        "052a8e5b17f3a168",
+        "81e305ee952d05b8"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "acm-mm": {
+      "name": "ACM MM",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:32.850463+00:00",
+      "fingerprints": [
+        "2ca5373d9c3103c3",
+        "1106a92433789a65",
+        "5ea372987756de2b",
+        "bc2503ddb3054e7b"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "acm-siggraph": {
+      "name": "ACM SIGGRAPH",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:37.992070+00:00",
+      "fingerprints": [
+        "4c84f73c69e138de",
+        "2e76cc50e78c55cc",
+        "5886d4ff086c3de7",
+        "b2a1aacf46524374",
+        "bc111977c3952d2e",
+        "4ace7392d129d959",
+        "46213525fbdc0510",
+        "96eb580212d66c75",
+        "e171302122130c5f",
+        "f2e4375d128b8630",
+        "57667ed1a9627e70",
+        "02a29599141a0c24",
+        "25dd06960829e277",
+        "cc5257b1de04e975",
+        "fdce7250fd5b2a3b",
+        "71fe7e0858f5022f",
+        "7923db7405e2a908",
+        "645e5660a0a0b1e4",
+        "2d30666b52d0ba6c",
+        "472f49ba1fcc023d",
+        "40264165d434e0f5",
+        "36cd0c4d8ba6e362",
+        "faf13397a99fedb2",
+        "67e5ce8d7639ae61",
+        "ca713809ab7f268c",
+        "667d284ea0fedcae",
+        "5c5ac56e26a13ba5",
+        "4c24609baea6ccf9",
+        "4f080d01b4dc119f",
+        "70e8f8f50f02f69e",
+        "3f9123e54c50ac3a",
+        "d55cf119c954aa33"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ase": {
+      "name": "ASE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:42.253230+00:00",
+      "fingerprints": [
+        "b799b7c1747512f2",
+        "063aaff33ef769c0",
+        "0a5928d5a99cd2d0",
+        "28ce25fa3f2529d6",
+        "0cef836d9eea606b",
+        "8544427254e29052",
+        "b41db69c8a396212",
+        "4b9f96bf8e3fdbfd",
+        "633f06a06f84a36a",
+        "7eac6d16b29bc077",
+        "9f66afed2e2a23e4",
+        "4d5a1948ed46970f",
+        "4bb2d99f7f2bbe59",
+        "546a2a68478e2e89",
+        "2cdd5f55e6b832d3",
+        "751e8f9bfdb8b182",
+        "fe5ed5b6a8f5a02b",
+        "aa6198d45dfe21fb",
+        "ae8bfabf49001cd6",
+        "b69ae4fd75efe6fe",
+        "eb98d14c161c4890",
+        "760222f6fa6a0c95",
+        "a1e3d62c50660282",
+        "8856cc996a8792e1",
+        "aaa1a9b71cb63133",
+        "10c01d080dc6dadb",
+        "1c6d03b56aad39af",
+        "bb5ce22f415802d4",
+        "d6ae426be7b4bc5c",
+        "6d9039e98838ebc5",
+        "748c71d44fd913ad",
+        "2b6795912511aaf8",
+        "e8b167c48b4dbe57",
+        "dbba96850571fdf1",
+        "172dafb91ad1aee0",
+        "ae1ef2ef76a98881",
+        "9a613a1862b78f3d",
+        "a3cbe7e1a7c88271",
+        "46d65adf9d6132a7",
+        "0a729a7658408b3d",
+        "e388735d3a33b137",
+        "6dfccf5930816fdc",
+        "8d634ae19465974a",
+        "3c648eb70d2c987d",
+        "67b06b33c9d51d6e",
+        "6c2f01443578112f",
+        "aea5fd562603ae5f",
+        "fd93aed8c5f72b3a",
+        "84267d40800d03be",
+        "eba81c34be7aff19",
+        "26c502d1a0c3af5e",
+        "e059e38859ff6c74",
+        "e2fca4ef81460d03",
+        "acd442ef83df6b99",
+        "34e634b1aeaf2d1a",
+        "32034b10de4a16ba",
+        "e827b3ba8951bc32",
+        "23e0831a63c4804f",
+        "6f96e58636b1a768"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "asplos": {
+      "name": "ASPLOS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:46.328181+00:00",
+      "fingerprints": [
+        "4fa5ad67f19b53c5",
+        "32e6e3b3f62420b2",
+        "8052abaec890504d",
+        "0bec4ae72567188b",
+        "26837818a549bf86",
+        "c6528cf78d1b8d42",
+        "97eab1b5261b4f7e",
+        "e9be70ea14951e8d",
+        "e8acbeb532858a8e",
+        "e19390069397f805",
+        "e0ba54b518a2f0df",
+        "c4c7f5aa3984557d",
+        "ab6bcf14588e5cfa",
+        "497e2ae9c29e506d",
+        "a0b4c1bbf586b50d",
+        "ddbeee8005506261",
+        "50084f40f485cb2d",
+        "8151325dcdbae9e0"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "cav": {
+      "name": "CAV",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:48.777633+00:00",
+      "fingerprints": [
+        "24ed7858c201a3d0",
+        "0b4421247a1aba6a",
+        "a06a921ccbcdd183",
+        "ad1a08b0ee5528cf",
+        "4bf09f5d64bf1487",
+        "866df8f8dab9e76a",
+        "b6f127adb336b14c",
+        "087c160e7c0da8a3",
+        "77d168d29d846289",
+        "6bd2d1fdda641f53",
+        "235b7b1ee4fe9584",
+        "52e3abc7439c6a1b",
+        "76c0bd6477273c95",
+        "e9f4ac8cecac1faa",
+        "73a3a7393cf0ef36"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ccs": {
+      "name": "CCS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:52.002322+00:00",
+      "fingerprints": [
+        "004576016ea216b6",
+        "70858e733a491c32",
+        "6633ca0bb3d3db0a",
+        "cd43ae84bb7919cd",
+        "0ef9a992b16f66f4"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "chi": {
+      "name": "CHI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:55.402860+00:00",
+      "fingerprints": [
+        "5c480e2a392a8cb3",
+        "5e63a4dd91f89e43",
+        "59fa720c6fe8f4f5",
+        "5ddcdf89502b8dd8",
+        "04cac1eac6675507",
+        "7172d7d2c028d943",
+        "f301a545924826b6"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "crypto": {
+      "name": "CRYPTO",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:28:58.280738+00:00",
+      "fingerprints": [
+        "bb7f2d2d225d1769",
+        "2f3097c1dfdcadfe",
+        "131888c03b60b81b",
+        "bbc4b7d2e3422c74",
+        "1d581ac66be9b9a8",
+        "3eb43869e598eefd",
+        "f4b3142f68150611",
+        "fc10bfd908368c62",
+        "6c39d776cdf0654e",
+        "e8b27fee6d4952bb",
+        "378627fb31a24421"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "cscw": {
+      "name": "CSCW",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:01.252632+00:00",
+      "fingerprints": [
+        "5aec9fdf0b370f33",
+        "34c56e2f09dc718c",
+        "730e50e0c3c404d4",
+        "5d9e281823c60156",
+        "1153d3ce3369a37f",
+        "3bb88c732d2b3e6a",
+        "389787bfa3064b33",
+        "024e16de32e6ee6b",
+        "f766e96aa4069309",
+        "19de932f9dbb20d5",
+        "ade35caaa20b1ee8",
+        "bc03d8111e3bdac4",
+        "81299accd5399c38",
+        "1097e7745df5b002"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "cvpr": {
+      "name": "CVPR",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:04.607341+00:00",
+      "fingerprints": [
+        "aa92594b553b4d99",
+        "f75bafc1f21156e3",
+        "681c5f230efe1748",
+        "2723f94f1e25bc67",
+        "ddfbd8345f0da409",
+        "f3e71570dd18ec41",
+        "ee0d88c780548d35",
+        "1b1b04100b44d4c7",
+        "40b10c56b21d83a4",
+        "d4f3d9d33a878385"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "dac": {
+      "name": "DAC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:08.282998+00:00",
+      "fingerprints": [
+        "b38592ec25346df7",
+        "69fcccd85a8616e6",
+        "8fb22ba976349564",
+        "efce88dca45ddfe4",
+        "690c652c3ee63649",
+        "5d9f836754446165",
+        "d579b5474beffc58",
+        "0b46d648b7f5ca5a",
+        "b785b393dc0191fe",
+        "a89df586ab7660dc",
+        "336e509b4685f363",
+        "fbc09bdd13d6f393",
+        "26be051d10ecc168",
+        "03d0932627375998",
+        "b366ee86bba538ad",
+        "5a80bf5aecdfb1fe",
+        "70f1ff549ef3bcca",
+        "47685289d49da1fb",
+        "5836dfbded9dbd88",
+        "b05891fd3d32f0aa"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "date": {
+      "name": "DATE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:11.438843+00:00",
+      "fingerprints": [
+        "ef6f7730019cfdd6",
+        "a08db69ecd6c6766",
+        "dc7d8e622f694691",
+        "34b639fca0c2409d",
+        "81cc59bfc54069d8",
+        "94ba384c92863f5d",
+        "ab6bcf14588e5cfa",
+        "cfd938ea6e44c568",
+        "ad1bac1f2c341958",
+        "8b77267d9398d854",
+        "b76eaac550f5adf6",
+        "048bbfe7f985ab83",
+        "65969f507c7753fe",
+        "28d1a57ca870199d",
+        "f0c41855c7105b29",
+        "d21549f70944163a",
+        "7294be4935e50264",
+        "a6d35b6ee156ff61"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "disc": {
+      "name": "DISC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:16.115604+00:00",
+      "fingerprints": [
+        "85b7ec3b1a8c4403",
+        "3faf1559b9d40070"
+      ],
+      "sources": [
+        "homepage"
+      ]
+    },
+    "eccv": {
+      "name": "ECCV",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:20.337874+00:00",
+      "fingerprints": [
+        "f442bd74d6da63c9",
+        "e04a19bafdbdb7af",
+        "89f12ee8ff14e366",
+        "4a1b0fa02f44556d",
+        "eb02d882001021ee",
+        "34c119ad949868af",
+        "d5111e5d897dc5ad",
+        "98cc3ee5b9019b30",
+        "2c346d6e74027585",
+        "18a4214968f1f454",
+        "4c41c1981ecf14c3",
+        "14c35b01f919fa7b",
+        "09a20f8b0dfcefff",
+        "d698908f59139edd",
+        "26766c7462d376d1"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "emnlp": {
+      "name": "EMNLP",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:23.405732+00:00",
+      "fingerprints": [
+        "ffcb7e0570f66b48",
+        "c543dabf63ed088b",
+        "09de151da49c8b93",
+        "6f3594471363eb5b",
+        "0abbacbb8f11c8a4",
+        "8509af4a46dcdb8b",
+        "0097ee427f80cae0",
+        "7f595b0437cb6c44",
+        "6105829d5b333ae4",
+        "70e1cae81417e209",
+        "e8d2f19dbbd1db00",
+        "acdb4f73a15ec7fb",
+        "faedfd539cf36e2c",
+        "89184718adf1e888",
+        "4c1ce558faac42f4",
+        "b1698cf437717c49",
+        "4d281e5c87978974",
+        "5e92f4e6331a796a",
+        "c11fd9f3ff2ddabe",
+        "62ee2b12f661b6fd",
+        "2020bd72efce9299",
+        "496cb4c695f94dbf",
+        "2acdcb7a8862e086",
+        "45f7eabdf095cb4f",
+        "5a0597f267dca961",
+        "2481c8b70c2dc5a0",
+        "86878eebe0b90613",
+        "f06c3e5eb18c2d39",
+        "b3786f120382f714",
+        "737188c895707312",
+        "9fc2e688a2996a6c",
+        "f0ca6f743b904631",
+        "47728d4441bf7d01",
+        "ca74a4b94f7ab293",
+        "292b36f974382326",
+        "bf33afa3aef771ed",
+        "e4799756fd2aa853",
+        "07557b4ad4188ba9",
+        "d82a0d5a11ea2ad8",
+        "1db86a844c0544e6",
+        "06dbb4e06d5d2511",
+        "abee9ee14c9316fc",
+        "0c9b195f2ddecdd9",
+        "76ba136d5948b81e",
+        "acb7948bd4565f2f",
+        "108cba6d30205657",
+        "32e5fd34607d71a8",
+        "b1d0feb6ebbef15e",
+        "e049daf5448e3725",
+        "e6fed506701e2401",
+        "03cb91efe053bb64",
+        "e584cb429f9843d5",
+        "866d2587bdcb38fa",
+        "995542f6bd45ba52",
+        "75c41e51878b9c5f",
+        "44afeb33ca72998a",
+        "c09d45b30f8cc5d6",
+        "c95cc12db1d58fd4",
+        "873dbcd7f03a97cf"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "eurocrypt": {
+      "name": "EUROCRYPT",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:26.183444+00:00",
+      "fingerprints": [
+        "224ca1704ebc7c3e",
+        "46b1bba2cf9d3eaa",
+        "f9951bc666466424",
+        "a29ebaf9605af978",
+        "2b07de906a57818e",
+        "8b4c011c5d0d4f5a"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "eurosys": {
+      "name": "EuroSys",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:38.127327+00:00",
+      "fingerprints": [
+        "2ea9fd0930c92496",
+        "d4b93620bba95c8f",
+        "d6209567f74e9126",
+        "70a3ab7cccd9cf3c",
+        "c5340b07100c7953",
+        "d55066ec1cdfcbae",
+        "32434fa0c7521bfe",
+        "5b32e665586c4a6c",
+        "f2a472b9bc780d51",
+        "4311262acb686484",
+        "a00cc7f7899b8b17",
+        "f778ab2150f1c1b1",
+        "1c5c5a213cabcc2b",
+        "94e1748cdb6fce53"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "fast": {
+      "name": "FAST",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:42.135875+00:00",
+      "fingerprints": [
+        "c67a2ca8d2f812e0",
+        "3f5fe8cafbc5de96",
+        "5aa193f7f5835baa",
+        "35372b51d00cf545",
+        "da3c1522ce5beb62",
+        "47eb2e978ccc7c3c",
+        "d6857486514dfb81",
+        "ab6bcf14588e5cfa",
+        "24408fe913bd3cce"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "fm": {
+      "name": "FM",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:45.004584+00:00",
+      "fingerprints": [
+        "d15314c540dc8f11",
+        "f80832203011f7d9",
+        "f3083a4340d93c03",
+        "490f03a077be8b2a",
+        "1d56ffe0a2e4670b",
+        "1a9ed167631e9c64",
+        "2303395601285d1c",
+        "8d600e0da74d8193",
+        "abbf94653c3ca46a",
+        "87378179924eced9",
+        "5b86a363ac3c9a9f",
+        "d2f383efac9bf8a0",
+        "908fc48b5f884a53",
+        "a05211ba612f7e6f",
+        "09112e07447a0060"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "focs": {
+      "name": "FOCS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:47.228761+00:00",
+      "fingerprints": [
+        "e05732a6af7d8e53",
+        "e657b761a26ad1ca",
+        "00e127a43a78f4ac",
+        "b4ae6114351f0a4d"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "fse": {
+      "name": "FSE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:49.835250+00:00",
+      "fingerprints": [
+        "b820f67a26776070",
+        "867c3a45c17158be",
+        "6f24091f13338535",
+        "c75a730e1dd89bfc",
+        "e8d4df5bf5ecf0e1",
+        "6a70a34da0467070",
+        "b47766133b17e6b8",
+        "13676266d53bb700",
+        "613f148822273d28",
+        "8f24bcaf88fd7b6a",
+        "eaad330950166fb1",
+        "60868898fa7d8291",
+        "f8027df5cd1041bf",
+        "c48e63376c83cda6",
+        "c56d956c5906020e",
+        "f0e40e901688b75e",
+        "dbc66e6134c2e5d3",
+        "035041a2b0c29673"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "hpca": {
+      "name": "HPCA",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:52.338294+00:00",
+      "fingerprints": [
+        "6cfe837411063d12",
+        "6cf73d7ac939d7ee",
+        "2585ea4b5b6012de",
+        "66804dc23f7157a9",
+        "319369ed11ca4530",
+        "c9d57b6fe61415eb",
+        "c158d822a041ff42",
+        "825ee3e028a00627",
+        "df55492df6708466",
+        "07e14476ee2f840c",
+        "279f87769b9b15b3",
+        "9e1a6fa6fa9bb6b5",
+        "f304309ed035c373",
+        "a1cc9893bc32f8d8"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "hpdc": {
+      "name": "HPDC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:29:55.357993+00:00",
+      "fingerprints": [
+        "4132b6e4953a5e01",
+        "1e97bff76d67c2dd",
+        "21cd7443869753f7",
+        "41246a1f3e19420d",
+        "7ea838594182bd52",
+        "7c8b5acc9b8be3db",
+        "db738ece4e761f60",
+        "d4e7c97e179f74cb",
+        "bbff8dfee0846347",
+        "371ea6a87233e85b",
+        "d49bdc9bea55ebb4",
+        "2a092d278e4348f2"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "iccad": {
+      "name": "ICCAD",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:02.135695+00:00",
+      "fingerprints": [
+        "6f146f0eea213b0d",
+        "9fcd80ba119463fd",
+        "263e6251a86960dd",
+        "373807ea2bcbc9b3",
+        "8e43a62ba9e8c409",
+        "54051657bd561f49",
+        "e4150ff23eeb5627",
+        "857a8ea045f721c5",
+        "379f1b2613e3f5be",
+        "565e9c0849195b3f",
+        "8a455f8b89f52a8b",
+        "8e67bf4331fb1b40",
+        "97ad10da75a49387",
+        "21860feaf90d7aac",
+        "3ea33c95eba24e07",
+        "026ecbfc6c6520f9",
+        "3292904e3019c073",
+        "2114309cc75be313",
+        "046e9fd14600fded",
+        "41c1ad5a0f8c83df",
+        "34163829e36da1d6",
+        "5f8e84a7c4dc7779"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "iccv": {
+      "name": "ICCV",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:05.846091+00:00",
+      "fingerprints": [
+        "c6f379455f96744f",
+        "f3db106e2f03d44a",
+        "43a0c5adbbc6b7d8",
+        "4ad693738770b488",
+        "a90029362b603f5b",
+        "3ecf14c82660efb3",
+        "6b26831ca2c5fc4c",
+        "2dc10b9440f8a0ea",
+        "d335ad709d086a2d",
+        "0ae46cedab1b7dc8",
+        "2240ba9db2bd60dd",
+        "265a16d77d09cc20",
+        "ab5f7765a57caaa5",
+        "c2db93bc344464fb",
+        "3767da703a200c86",
+        "fecff5ce4ab34154",
+        "462cdacb11b78b3e",
+        "3b4cac3a6473781b",
+        "2f9dbecd0b798ab1",
+        "dbcb0d049911a397"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "icde": {
+      "name": "ICDE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:07.885178+00:00",
+      "fingerprints": [
+        "97aa631f21a8c09a",
+        "517097b8822ef5a7",
+        "8d93858b0779c025",
+        "aef6cf0b92c7fe6c",
+        "07324cbbb379880d",
+        "2ef6afa525121b89",
+        "8a020f8dccd1f9e4",
+        "97eb20c330b0c6e4",
+        "b83f9e5fe807778f",
+        "78548d2ad3021e60"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "icfp": {
+      "name": "ICFP",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:10.438912+00:00",
+      "fingerprints": [
+        "0c88f9e8ca4633c4",
+        "9653dbae48161d26",
+        "77ae686409242913",
+        "cccd7c82bf65f248",
+        "664517f7ad98c45c",
+        "2dad60071d1c590d",
+        "9fb989d1287a1d8a",
+        "c47da04c0599bec8",
+        "d5f47b9ca23a94e6",
+        "5131483713bd8f94"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "iclr": {
+      "name": "ICLR",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:12.918623+00:00",
+      "fingerprints": [
+        "d2ec68ec563dc692",
+        "cc6e238291e332ac",
+        "e38d23acdd9e4b5a",
+        "b662fde2588aa805",
+        "2f41809eb105a9b1",
+        "af30fc47544df2b7"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "icml": {
+      "name": "ICML",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:15.255873+00:00",
+      "fingerprints": [
+        "d8b56095ba6756a0",
+        "3f98a9c4c6c76dea",
+        "52fc0b61393dc523",
+        "dfd20ed167f62636"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "icse": {
+      "name": "ICSE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:18.590274+00:00",
+      "fingerprints": [
+        "b1cf9e0b4d42b1ec",
+        "f76ce85d04b2d441",
+        "dc640bf975daee3c",
+        "9b6b05d2d146c609",
+        "7ac67257d2bdc989",
+        "a4d7afa2d05f5613",
+        "59dade194c327d44",
+        "87ccdc23ba3c27f6",
+        "be21e0f988b7ed72",
+        "b6560506ced191dd",
+        "d29cf92a2b110e75",
+        "3d14a629ac8272da",
+        "151023ea8cd0ed97",
+        "04735dd29316c565",
+        "c31040db935dbb3d",
+        "7e2701ef69f50d54",
+        "9fde058084e61901",
+        "80a00d1b794b6c5b",
+        "a42c66174c8c17bc",
+        "c266e541d22f8d79",
+        "de4741708f8b1b60",
+        "d0b0a2e8a2de7ef0",
+        "3540646040e542f8",
+        "bb9b503c14403806",
+        "320c1b8a300d329a",
+        "8c3d71defb65bcf4",
+        "39d1cff3d74a045b",
+        "e0934d32e2b6e50b",
+        "fc8d7d2a8d5b4d0d",
+        "c4483af703077d8d",
+        "643636445358cc3d",
+        "a1cb8ea7c4b986e1",
+        "a3af8f1fd3241278",
+        "4c6337bee6d2c336",
+        "e7c316e66289b469",
+        "7ca203f3d9d47f82",
+        "ea7a2809ceaee83a",
+        "41e297ae251e66bb",
+        "7a1a30e58726e60d",
+        "f82d4083d20c523d",
+        "3bc6b71650097232",
+        "3317aa094e63e547",
+        "bbfbf5eb0052c4fa",
+        "458f08bd929d5763",
+        "01e343824abb77bd",
+        "3ff0981dbaf9121e",
+        "8e3eb5cd08b87bc4",
+        "c76247d27b3b2f83",
+        "7a265bdbb9689620",
+        "8eb0a17273bae3a7",
+        "65f7a9169136e1a8",
+        "da4e076f5b8e8de0",
+        "2fda6df0ad604b44",
+        "1efe4504498ac7e2",
+        "a87142166d6c9f97",
+        "3f37b7e174d3856b",
+        "2d64e48dd6d443cc",
+        "2e9590858acb624a",
+        "7740d7b1449e6086",
+        "6fd0545ab447ef7e",
+        "0ab983bc9bac7a43",
+        "c2a9226e2902d2e3",
+        "85c4ff633b165a74",
+        "d32eac8c7eec22b9",
+        "b1b4adf68ffeaca9",
+        "ce0c5c20c3be175a",
+        "6c20039764093511",
+        "ad6e9b57d46f3b88",
+        "d88610db13473d07",
+        "c7467b4739998658",
+        "71f793409b0f1216",
+        "bb53e04a0e937f52",
+        "0a301150507915e8",
+        "1777a2b0851c629f",
+        "4907f9ee2f3dc184",
+        "5330cc68df2d8ac1",
+        "d3c54912644ce0d5",
+        "230f8cd675ce5e14",
+        "f302c26cedbb04ca",
+        "83fb27c736b1e7ca",
+        "c1552101f7c9f806",
+        "d01eddb2eace59b9",
+        "7ed2c0dcbacfe305",
+        "309f3edbea0ba192",
+        "6fae1abde11c6122",
+        "33cff16b3d16c5d1",
+        "0a227c6ea0931a1e",
+        "3bdcaafdb4d0c2a3",
+        "6dba2f04160c2f36",
+        "6bbb889e3893bd82",
+        "cc56669320bb60fa",
+        "883892ea760e8b93",
+        "6aff6efafd4d68a2",
+        "1ff9a34a120fb7ce",
+        "d73fe038a3e5cc9d",
+        "abdeecffcb216718",
+        "e7f127dbf29d4860",
+        "58423794ca6c013a",
+        "0c278119c3a7f077",
+        "acdd2ad5600a37cb",
+        "c6356b3c18fbd6a8",
+        "f116790f527fed66",
+        "d1fcf160b9ca226f",
+        "70fc857c8dd8aba9",
+        "2f71acfbccfb100a",
+        "1fd4ad4e16d91839",
+        "21bd640aa4ace718",
+        "7823be816d2231f3",
+        "7394aab1eb563773",
+        "ab98ef6e24b23a44"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ieee-vis": {
+      "name": "IEEE VIS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:23.046717+00:00",
+      "fingerprints": [
+        "8a3142182847f3a3",
+        "6de7f81469236c4c",
+        "a64676b513f1760a",
+        "3c547bd0ec769350",
+        "1ca045dc6444c474",
+        "a3b99cd3353f82d8",
+        "181ea6f3ceeb46b3",
+        "1380b47465b431f3",
+        "8ff24756f55e0dd4",
+        "8dd286a166d46620",
+        "2b61ac9ea1fa1805",
+        "befd146cd8c00243",
+        "d7cde1567f9e2adc",
+        "a81730917fe5dbd8",
+        "d22b251202130da1",
+        "3f7441a68f739029",
+        "1e0c9d34eeecf790",
+        "71022c4ba41193d4",
+        "fb1c253d00ae7c41",
+        "7003765b854dcf84",
+        "8454d2ccf278fe39",
+        "771328e4891dee95",
+        "1aa4d4b473f9880b",
+        "2e363d9839a2eb4a",
+        "91edcee9f6946fed"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ieee-vr": {
+      "name": "IEEE VR",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:25.841015+00:00",
+      "fingerprints": [
+        "b3e7770ecb00f4bf",
+        "dfbbd89284c304de",
+        "d3564a2fe3f11528",
+        "c2f850ede3fd4d0e",
+        "a25d30b8b3b142fa",
+        "3077162f15f48bcd",
+        "75d9d1618583c617",
+        "5cf02d681652ee7a",
+        "0a935f52f198bb62"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ijcai": {
+      "name": "IJCAI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:28.746914+00:00",
+      "fingerprints": [
+        "82c39511194ee3a7",
+        "f3db4d07ab0e74b4",
+        "3c26f0f7f9a620af",
+        "d142533d1ed11ac7",
+        "d243d8c0186632bd",
+        "b5559b49a440fda0",
+        "08ae2a15878dc140",
+        "4b395b6c02ff5706",
+        "2d53168b16a567ef"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "infocom": {
+      "name": "INFOCOM",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:37.306452+00:00",
+      "fingerprints": [
+        "1476edeff12f2585",
+        "0bf728aa477386fe",
+        "ad6de14c1d2246de",
+        "15010a4a7f43162c",
+        "50107ffdd1aff55d",
+        "11ea1cc433b55052",
+        "85deb80be2e9b2f4",
+        "2f34e24db51c702e",
+        "fbc0d2b704deef5d",
+        "c1a40029564ca822",
+        "8f5edd9ec125f55a",
+        "df51422c516d99ed",
+        "3a27d7abe0ec97c6"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ipdps": {
+      "name": "IPDPS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:39.609839+00:00",
+      "fingerprints": [
+        "3a4e4edbac0b4b24",
+        "55c031cf2693830d",
+        "862631bf1248103f",
+        "6509e9dfdfefdee0",
+        "da5a60819b1a0ae4",
+        "5a70bd1c0c5d1d2d",
+        "ab6bcf14588e5cfa",
+        "a0b4c1bbf586b50d",
+        "c7a6af73ce3a9c3b",
+        "f2719f319095de24",
+        "6e832b7300d0096e",
+        "a715d6df366ae670"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "isca": {
+      "name": "ISCA",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:42.555105+00:00",
+      "fingerprints": [
+        "39f0cb0a4cd3ba03",
+        "1392ffa603f388a7",
+        "54ffb14ea48b2ca7",
+        "c94305128abcbc0b",
+        "d75841ef0f64f7b7",
+        "be40306a05867d33",
+        "23fd91be337b7eb5",
+        "a8c19c91e63839e6",
+        "df2cd0002824a285",
+        "b386d5cc9c2f11f5",
+        "70d665ff9f90f43f",
+        "bd192337b3c24e56",
+        "1753c988e8d11689",
+        "d7ce5862c0fd93fb",
+        "13df67a0729668f0",
+        "de711eab3648a65e",
+        "63546f729a314dbe"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "issta": {
+      "name": "ISSTA",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:45.115463+00:00",
+      "fingerprints": [
+        "a205c3a39b727c21",
+        "4f42dfa34ea7f195",
+        "6cf34618c1ead5b6",
+        "9d7b1dec1c13e77b",
+        "87a92c59717483b4",
+        "a46a0bd7ee88d277",
+        "b837c1d4a81f195d"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "lics": {
+      "name": "LICS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:48.657413+00:00",
+      "fingerprints": [
+        "b187c8a90958a391",
+        "39555ebd4332e075",
+        "7c7b265f4996038a",
+        "05539b1b324cfe24",
+        "06d83adb98b52e83",
+        "d243d8c0186632bd",
+        "47cb3a753a98237e",
+        "81d19d65a8f32015",
+        "6bec0426c75bf43c"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "micro": {
+      "name": "MICRO",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:51.752848+00:00",
+      "fingerprints": [
+        "dcbccecaa0ff24b7",
+        "936137f63524e1b8",
+        "1221bf9896925b23",
+        "24b138ffa2807129",
+        "18fe97d0065dc253",
+        "e580f8814aea57b0",
+        "ef8eec43370747a3",
+        "caff4fdf7cec8c0b",
+        "c2a9c33cf75f8463",
+        "7fe1d1e37ef9dbb1",
+        "8787fa10a6720cc1",
+        "6292f52e619709c4",
+        "5079c7ea941b0aba",
+        "443f01322e53247c",
+        "48f9fd298a6592d9"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "mobicom": {
+      "name": "MobiCom",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:54.961732+00:00",
+      "fingerprints": [
+        "d545d684718c16b6",
+        "3cf1214130b181d7",
+        "7d4a628b4b930120",
+        "13129815256b6351",
+        "2182d12b39edea1b",
+        "91edb0ec561c19a1",
+        "cf4567b7e29d5b19",
+        "332b18e96909c9ed",
+        "8bfba4a9dbe487fa",
+        "8a53ca52e30bbe4b",
+        "ab6bcf14588e5cfa"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "naacl": {
+      "name": "NAACL",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:30:57.634873+00:00",
+      "fingerprints": [
+        "0df0aab61d1b516b",
+        "113e630fe85766e9",
+        "09de151da49c8b93",
+        "6f3594471363eb5b",
+        "8c5f17f47f1ab364",
+        "77fb6ca9d5b73136",
+        "c0c67152e9b75c62",
+        "78f6cc4ba6bb6334",
+        "70b4fdecd59f3872",
+        "6e5733734a19a07b",
+        "6a9c323e6c59d83e",
+        "78b351ca6c822339",
+        "424173cc6926c4c9",
+        "d84239e29e687817",
+        "f024895590326775",
+        "4cf5f038808cbea6",
+        "c64e636d16d1da48",
+        "183d10078300934b",
+        "83f7bd00cbf6792b",
+        "430a04f57982583c",
+        "6b918fc1a04ceed3",
+        "f7a20ad31a508e34",
+        "774d391db1def07b",
+        "7f9949e9c7ba2031",
+        "281f153e8f3fd75d",
+        "061e11a8d187f0e8",
+        "fd28908cca352df3",
+        "c59e4570d6076e46",
+        "504fd880a9075790",
+        "d51fb32bd172bbe8",
+        "42873c468c99f58b",
+        "f6c2f0399d6771aa",
+        "3b1625a66accf2d1",
+        "8f845e12d01b51e4",
+        "38418c1926bf6611",
+        "58c21a8eb38f746e",
+        "41bf663d9c33fd07",
+        "75b304edf9bf77f4",
+        "d2f867edd597ddc3",
+        "cad42ef03a00eab4",
+        "370eba81d967f23c",
+        "ffe191929b7f72f7",
+        "5d1403c332616f8f",
+        "cc63e4971f4d8552",
+        "2bbd3aa3b92f4b8c",
+        "8129f05ce2170974",
+        "b9b801f47310506c",
+        "289b38c7d9acb5f0",
+        "d85201793897802e",
+        "a3c08fef3e301023",
+        "8826e7d483ae07b6",
+        "ae41a9eb9d804900",
+        "6de04f865e241c76",
+        "7d5d72c62424f85b",
+        "17564998448d5e6f",
+        "b6713b0d905c79c3",
+        "a1851b1f6dcb7369",
+        "7acb539db7d35291",
+        "837c48b4d2fe55f0",
+        "13afe2d32a510c3d"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ndss": {
+      "name": "NDSS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:00.672299+00:00",
+      "fingerprints": [
+        "10da4d98769bfc0f",
+        "d4845a37b47b989b",
+        "d6bc76087cf773f6",
+        "37222210ff8db815",
+        "2a387d492fbe8e59",
+        "a0f59c43d03929ea",
+        "d20aa92a720fc382",
+        "8d687a4cecf0eb6d",
+        "8e9437cc18eec309",
+        "8729316a873bb7df",
+        "1478c95823689f78",
+        "165b2ef0dd046cc4",
+        "81d9aeea0e1a408d",
+        "4c2a29e25ea4ec9c",
+        "7e41d092859de08c"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "neurips": {
+      "name": "NeurIPS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:03.112354+00:00",
+      "fingerprints": [
+        "e2602cd46a8e66a6",
+        "8f6b1250a4554497",
+        "053c5e7e5a088a3e",
+        "d92713e7d1557b3e"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "nsdi": {
+      "name": "NSDI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:05.844880+00:00",
+      "fingerprints": [
+        "6660c0f003f3f1f7",
+        "f1081e8d082b04e1",
+        "8e663d8351622324",
+        "70cc519043656f85",
+        "1ea3c9b546e51003",
+        "0c5ef1c3e9f8fd79",
+        "d6857486514dfb81",
+        "ab6bcf14588e5cfa",
+        "779e718b6b913305"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "oopsla": {
+      "name": "OOPSLA",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:09.208779+00:00",
+      "fingerprints": [
+        "40151a50a9b515f4",
+        "cda60b1209546483",
+        "a8db58f0e287f18e",
+        "e572ec03f7eaaa0c",
+        "f78d521ef3c2d288",
+        "01109f6ae9e2fb9e",
+        "c5e4221e4f372c68",
+        "fe0f4e43e43865b1",
+        "abd23e3b2723cc32",
+        "dde3fab9e9c2aa6e",
+        "02447cd3d9269f35",
+        "1b9b390cae7653ce",
+        "cd4037f4e4aac62b",
+        "a12a89969ce7672f",
+        "d68967780555931c",
+        "0b44ad4b6f995a08",
+        "e12bc08155fcad31",
+        "1d3b217c8a2ebcc8",
+        "a34d2d6e7b5b8583",
+        "317c28cd7c44fe6f",
+        "5abb83428d308037",
+        "844559e3242f226f",
+        "a7475e0ebfedcafb",
+        "ce95809450b2ab0a",
+        "78cf5ff0cd497b6d",
+        "d85a83f9f4a635b4",
+        "f25a2c5b12e58fe0",
+        "d1a7098e38cf4919",
+        "fe0813879bc57b86",
+        "7031ba27d53af56b",
+        "5d060aa6aae5fbe4",
+        "bc6fdcb4f9cf2afa",
+        "5defdbcaa5e380c6",
+        "e5614d3ce85a505e",
+        "bc5064e603c10253",
+        "a3937d53a8b15a08",
+        "88925c411a69d13b",
+        "fad87458c232921f",
+        "831de4006c2061cb",
+        "1c4ddc6389536ce9",
+        "98d1d4265384cdd2",
+        "98263136163fe01c",
+        "5f3cdbd404e25245",
+        "f49cf02e499e912f",
+        "28067baca4a521f6",
+        "3ad7f5d7557d7689"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "osdi": {
+      "name": "OSDI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:12.073666+00:00",
+      "fingerprints": [
+        "d67c3d6e8737a67d",
+        "1c6fa848f85c6f27",
+        "9d3cde0af44b32c9",
+        "77b48d7ff384f5df",
+        "1b3e4f284a9deab5",
+        "12b1d47313c8a41a",
+        "d6857486514dfb81",
+        "ab6bcf14588e5cfa",
+        "4562a071ec870356"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "pldi": {
+      "name": "PLDI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:15.391576+00:00",
+      "fingerprints": [
+        "865fca60fed8e051",
+        "dc3617c8d14e006f",
+        "fe90e535a89fe637",
+        "7d1c177ae0759559",
+        "480579ea9991b44e",
+        "32d7648ca4cc5c80"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "podc": {
+      "name": "PODC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:19.283937+00:00",
+      "fingerprints": [
+        "df5fd609512274f9",
+        "500e78f17545708c",
+        "a6854cbba034c156",
+        "d62a798eb312aa29",
+        "b2d7d29ce036f7d2",
+        "a0b4c1bbf586b50d",
+        "1ac423fc02548c37",
+        "9e2f1451d5dd96de",
+        "ab6bcf14588e5cfa",
+        "2410493b571cc77b",
+        "8b64a22ad95eedcf",
+        "51b6cb253fc406fc",
+        "6ec0b1ba2f1d0937",
+        "11e9ba26c91a2db7",
+        "0154c0dabe7145db"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "pods": {
+      "name": "PODS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:21.988471+00:00",
+      "fingerprints": [
+        "d77b3a5f230b0bbf",
+        "4a6dc9abf94302c5",
+        "2f6218f91f727351",
+        "93168f16a6e09293"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "popl": {
+      "name": "POPL",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:25.330464+00:00",
+      "fingerprints": [
+        "e1d82048df90e32f",
+        "164451c73aab3c76",
+        "24115f7939552cbd",
+        "8da88bb50228affb",
+        "55d0f57e8f276448",
+        "ec767802383af4f2",
+        "434d6db3d529795b",
+        "b7771e1b2a7cf7c6",
+        "64ad017617d60a83",
+        "f1aa7bbf890ea6bf",
+        "14d7ef76da6583c8",
+        "b24b50570bac17b0",
+        "57da63fea7eb62e5",
+        "c06b53c2e6448459",
+        "6363d1cd4a73216b",
+        "65e3cb7f6d2a4d34",
+        "7345347bd136eea5",
+        "ccf36fd3759d3e3d",
+        "cf2630c1a0ae2125",
+        "831286747588c5c2",
+        "37f24d8b515e0e95",
+        "e5baf1879c4f7101",
+        "80df52bcffa7fd85",
+        "0edc825e10ede191",
+        "4d10df0f6514bf3a",
+        "b81410e0ea8586f5",
+        "381274bffc09c5ad",
+        "2fbb123f8ee16ea2",
+        "21fdb4ea0aecd4b7",
+        "cd2658e0c4a5602a",
+        "e8537b834e74a93d",
+        "a9deec1d89c43a39",
+        "c4d036329b1b44ab",
+        "dc1fa0b0391744cc",
+        "f53638e276486cde",
+        "c37f0d734ec2a68a",
+        "ebeab65ebb47e92e"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "ppopp": {
+      "name": "PPoPP",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:28.912526+00:00",
+      "fingerprints": [
+        "96620b1eaec566cb",
+        "ae50146710ee49e4",
+        "17e1bc8161b3c269",
+        "4a525b1c550828ee",
+        "c158d822a041ff42",
+        "f304309ed035c373",
+        "a1cc9893bc32f8d8",
+        "279f87769b9b15b3",
+        "9e1a6fa6fa9bb6b5",
+        "df55492df6708466",
+        "07e14476ee2f840c"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "rtss": {
+      "name": "RTSS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:32.558240+00:00",
+      "fingerprints": [
+        "a9ae958242a535c0",
+        "b5710c8cbb0898df",
+        "5edae4d0f7a343d0",
+        "8957a6abaf881040",
+        "40bb10ba8c1a4bc3",
+        "8cfe28d02cc943e8",
+        "39f266f2f58ef251",
+        "70c2b53f84308701",
+        "97beabe2f606e21d",
+        "8edf24cced254113",
+        "dcf2512bf047637f"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "s-p": {
+      "name": "S&P",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:35.732608+00:00",
+      "fingerprints": [
+        "3254a975996b7732",
+        "e7ceedc531503242",
+        "b5d5f9d19878528d",
+        "3f6df4ec654ad335",
+        "bb9075cd6ffeb350",
+        "e8c828eccf3986e8",
+        "d037d031160bb563",
+        "15e706f9a0f06b18",
+        "914f81e8bba96376"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "sc": {
+      "name": "SC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:38.715491+00:00",
+      "fingerprints": [
+        "516fe6c8a764db60",
+        "f216341f62b69565",
+        "096a6bf99a7f0354",
+        "8af7360554e07c4e"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "sigcomm": {
+      "name": "SIGCOMM",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:41.806768+00:00",
+      "fingerprints": [
+        "3f8732f90f046e63",
+        "a30e3aeb6b0d263d",
+        "72c98e36c58db109",
+        "bd6a2d5cda570267",
+        "733d4f014bc960c0",
+        "467b7b53ffc34b50",
+        "ff6fb78b814eed0c",
+        "9415e62066633fb8",
+        "f1d0724efd60f2c6",
+        "c92dbdc76fbb47ff",
+        "2152e3c79f0f3798",
+        "f3a4b92ca81e9876",
+        "0d673a38c02329d3",
+        "b52609cbd5f76cdf",
+        "4be427dc4a0aeb20",
+        "df3a3d8b3cd2c069",
+        "9f95439d2faf2f12",
+        "a949f283400e8687",
+        "479abbae6a1ef6ab",
+        "bca2593528b8291e",
+        "7bccfbc824a786fd",
+        "b09aca520a9c8d86",
+        "2b6d0ad922d95f5b",
+        "d763b8587316dd51"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "sigir": {
+      "name": "SIGIR",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:45.505961+00:00",
+      "fingerprints": [
+        "7054e8562ddd2042",
+        "ddeff44870645388",
+        "13439099984f15fc",
+        "31a4830eed0c621a"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "sigkdd": {
+      "name": "SIGKDD",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:48.460684+00:00",
+      "fingerprints": [
+        "fb714ee9e38e631a",
+        "0a2edb68c4b9cfb7",
+        "b72598b9ddc262e5",
+        "4b1677e0003c122b",
+        "3010758c46451339",
+        "9d6eacd41de08867",
+        "9c195a01bbb8d0ed",
+        "9c356055a8908c7f",
+        "c30303bf26e9d21d",
+        "499ff036db52cbc4"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "sigmetrics": {
+      "name": "SIGMETRICS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:51.863416+00:00",
+      "fingerprints": [
+        "c687b0448e86de1f",
+        "1c09c4c69d66a8b3",
+        "1ebe4c769580af21",
+        "53d56658e3b71aae",
+        "6cffad3e61a033e0",
+        "21bbb18bee8732ec",
+        "a9c99139a78d41ca",
+        "cc3dede4fa024232",
+        "bc6e5091047ceb18",
+        "cca3fbaac97609ad",
+        "e516448418982a74",
+        "1361924dd2b347c9",
+        "a126f41fee3dd66c",
+        "f571d01954c5d42a",
+        "9bafa168c0846e88",
+        "afabfbd511d3ad67",
+        "568eedf077ca8bba",
+        "f794f86a29a9c86f",
+        "abab7c770dc411d9",
+        "8daf7bd0c30ac1ba",
+        "6bf808e58d2becae"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "sigops-atc": {
+      "name": "SIGOPS ATC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:31:57.897520+00:00",
+      "fingerprints": [
+        "9300843cce7135b0",
+        "6038a35c5393d2ef",
+        "3fdc8d00aff1ce20",
+        "e20a4d88b0342a31"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "soda": {
+      "name": "SODA",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:00.433604+00:00",
+      "fingerprints": [
+        "8fd4730fcb3826fb",
+        "a883ac95c037735e",
+        "2a48e8dee19f2070"
+      ],
+      "sources": [
+        "ccfddl"
+      ]
+    },
+    "sosp": {
+      "name": "SOSP",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:03.294898+00:00",
+      "fingerprints": [
+        "87a62edc75daf670",
+        "d8f3c6bb4d5979a6",
+        "ba4dfa3003ee9d50",
+        "3b2b8060bec780cb",
+        "34b6c2da14ea7e08",
+        "92d6758819a055f3",
+        "12745cbb71a2161d",
+        "1838b2e09649e182",
+        "5c08d93a2c817375",
+        "f5c719049f049495"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "stoc": {
+      "name": "STOC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:06.304065+00:00",
+      "fingerprints": [
+        "bc7708f6d8ca3ecb",
+        "b72f93e28581cc98",
+        "d442c57042d42497"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "tacas": {
+      "name": "TACAS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:09.204401+00:00",
+      "fingerprints": [],
+      "sources": []
+    },
+    "ubicomp-iswc": {
+      "name": "UbiComp/ISWC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:13.862511+00:00",
+      "fingerprints": [
+        "4a77c36d97ab7413",
+        "08fa9ec072b0737d",
+        "b04977e46798d63c",
+        "63cd0ed5e27612ab",
+        "65dc3ae9446fe0b1",
+        "970855c526bea742",
+        "9b58b16a1f430e89",
+        "564e3e707e3ca896",
+        "aa4f4c4518a62f87",
+        "793e74980acdeadd",
+        "af9ca2b1a498020e",
+        "575d784df4da4db2",
+        "12dd81a008930be8",
+        "790be9f87ebc6a2f",
+        "81d9aeea0e1a408d",
+        "04ea0124846f01ee",
+        "1478c95823689f78",
+        "2d257f03688b1756"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "uist": {
+      "name": "UIST",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:17.212441+00:00",
+      "fingerprints": [
+        "9c6a3a3194c7d87f",
+        "abd0b766cc7b46ae",
+        "d14ad6063e364ce9",
+        "5bd2d7ccc9da08b1",
+        "cae2c5b0bf250807",
+        "72e35fbdf01a99b9",
+        "d2f17cd09c7dd5ce",
+        "706b8b484a1baa5d",
+        "71d3233a14f9405b",
+        "8060c8e70dff62ca",
+        "b62badd2b27441c7",
+        "d965fa1ec03f8e2a"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "usenix-security": {
+      "name": "USENIX Security",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:21.176260+00:00",
+      "fingerprints": [
+        "7888eb4339eb5a75",
+        "5a0663e882efa633",
+        "36e7dbc65bc8453f",
+        "740ad339be9046b7",
+        "617e69532cf17ccf",
+        "7aa264f48210f7f7",
+        "ae5e0cdcf8e44610",
+        "348c454b4b5b2e1b",
+        "85213a1c2e3535af",
+        "2df907ffeed7bd17",
+        "d6857486514dfb81",
+        "ab6bcf14588e5cfa",
+        "ba300318dbdd572b",
+        "52e21deb66f6768f",
+        "8e9437cc18eec309"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "vldb": {
+      "name": "VLDB",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:23.883142+00:00",
+      "fingerprints": [
+        "96d7e5d5f563b4c5",
+        "9a01d65f227f473a",
+        "32961e750165a1fd",
+        "fd63c0c918429836",
+        "121324b7c642003d",
+        "09173f2777cd8cfb",
+        "c762ed662f7677c0",
+        "f9bee41e4ad2a644",
+        "1f710edc87932fef",
+        "c084445309386a36",
+        "05e0dc4ecf3d2011",
+        "1adc65159037fdd3",
+        "89dfa086607935c9",
+        "cad1a0563d0b9d5c",
+        "416979301c86bc38",
+        "5dc8774ed3559685",
+        "51685d7b4fe988b2",
+        "c67b15033d411b75",
+        "b5273f9277d3082a",
+        "705875119dbc22d1",
+        "28fb0c112ed9683d",
+        "d41cd7a37d302872",
+        "324629c522438a29",
+        "9a99f9da7faca8ce",
+        "3310eb4ace628908",
+        "31a8cc7b5a878f47",
+        "d1650ad41f54f018",
+        "5259e630b1353176",
+        "a834331a2838861b",
+        "3aef84bab5f56f5d",
+        "b801683d7e624abe",
+        "2c4a54a1ae6cccae",
+        "34b8aa597163c1a3",
+        "a2795794dd0a0a54",
+        "21de8fa4ff5bc261",
+        "a82bfa7d083149e6",
+        "185879836fd9206b",
+        "85f91c984231cd21",
+        "80303ca02cc8f324",
+        "28dcf8ffe261f504",
+        "14fd1da5b7761cce",
+        "680ff55b023a5a0f"
+      ],
+      "sources": [
+        "homepage"
+      ]
+    },
+    "www": {
+      "name": "WWW",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:27.108520+00:00",
+      "fingerprints": [
+        "72a4a9cc789bb4de",
+        "625b6c99abbd07cd",
+        "cf1b4578f7f3e6c4",
+        "186c7597291a3189",
+        "e6e7330a6add2a2c",
+        "c5dd4be101ad99cb",
+        "9fe5402520194a6b",
+        "00dd7f1c4bfe1b97",
+        "20b42a6e24bfc1bf",
+        "d3959141285dc52b",
+        "56d23b6b77dbde7d",
+        "46822e36db223a27"
+      ],
+      "sources": [
+        "ccfddl",
+        "homepage"
+      ]
+    },
+    "aij": {
+      "name": "AIJ",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:31.839727+00:00",
+      "fingerprints": [
+        "fd16823849830896",
+        "604a240fb934a980",
+        "2dcac51aa4afae39",
+        "c34d2092027d12f6",
+        "cceed2e51d4ebf32",
+        "4c79243fce20c587",
+        "4db0946c3c1627f1",
+        "3d4f69e651935070"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "jacm": {
+      "name": "JACM",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:36.619621+00:00",
+      "fingerprints": [
+        "36f489e52469d6c5",
+        "d3167a90b73bccb2",
+        "c3a9a6d24327e2dc",
+        "06fc6ac0932a2e91",
+        "49dc698c41d11f70",
+        "33d3bb0646dd19a0",
+        "780f76fbb89d9fbd",
+        "428b663dc24853b4"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "jmlr": {
+      "name": "JMLR",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:41.415905+00:00",
+      "fingerprints": [
+        "72aca2150c205531",
+        "8729316a873bb7df",
+        "8a02a72e63ca22de",
+        "697c8266f9e05810",
+        "e9a573ae98c6b58d",
+        "5a55a77963181818",
+        "b61c84daf97aa4df",
+        "809c18e99c98cbcc",
+        "93889389c2859a5f",
+        "3f620fbe00ca2ac2",
+        "e03dd830552ed755",
+        "c7777e99ac317297",
+        "f3ea1f221b49af3a",
+        "82451b41fd787818",
+        "ce9f44bc3d348133",
+        "428ea5ab1db198d1",
+        "46ff7d96571acafc",
+        "8f5d0f12d14ea509",
+        "878e5879187ee126"
+      ],
+      "sources": [
+        "homepage"
+      ]
+    },
+    "lmcs": {
+      "name": "LMCS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:47.400220+00:00",
+      "fingerprints": [
+        "74e8234ba2e830a8",
+        "3326f106c4ebf143",
+        "7a81dd2ee837af71",
+        "c912d430edd5c32c",
+        "a42871b3e254811e",
+        "3d13c236e3b7e180",
+        "38b46740aae9a374",
+        "7705c8f71209884f",
+        "12da0ee8e62bc49a",
+        "fd2050e412aeb7ae",
+        "f72ad3ae94a8bb0d",
+        "c1a03f5ec67b5eef",
+        "991d043a405ffa3f"
+      ],
+      "sources": [
+        "crossref",
+        "homepage"
+      ]
+    },
+    "tc": {
+      "name": "TC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:52.363701+00:00",
+      "fingerprints": [
+        "210a92fb30e5f70a",
+        "0127f31f78a10a74",
+        "a8fa8114e3df7d86",
+        "4b504bdfa4470ccc",
+        "011b82b080998428",
+        "cf5e3590e3010d31",
+        "af002dbd42bfe93c",
+        "c90e2ed600e3af33"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tcad": {
+      "name": "TCAD",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:32:56.945228+00:00",
+      "fingerprints": [
+        "b8621aad687ac26d",
+        "9affc113bf641d88",
+        "d914bacc3cf12e36",
+        "c174e2b59a72b0e0",
+        "43e05c983ff4d0ba",
+        "aa93f42264fe8b1e",
+        "5867f49572fc49b8",
+        "5a9b3ad646dea6f0"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tifs": {
+      "name": "TIFS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:02.946061+00:00",
+      "fingerprints": [
+        "3923ab829b708cf0",
+        "732cd0062750189f"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tip": {
+      "name": "TIP",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:09.988218+00:00",
+      "fingerprints": [
+        "aac5475e4f0a2189",
+        "8c4abcd4cb612548"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tit": {
+      "name": "TIT",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:16.489549+00:00",
+      "fingerprints": [
+        "33e9b941919c0bc6",
+        "a6a95374d23502a2",
+        "9eb95fd40fca31d4",
+        "3a4c14816f60a6a0",
+        "083fa7bc60a34153",
+        "dd5d87b494b90547",
+        "01a65ef823f1fbce",
+        "95e05da8566adca1"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tkde": {
+      "name": "TKDE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:21.239676+00:00",
+      "fingerprints": [
+        "50c039f7306cfd18",
+        "e62900db276d6644",
+        "4658a5131da81c57",
+        "022a147aa78f81a3",
+        "e4f44c2dfcb7fe97",
+        "55bcb4faa52b3624",
+        "9a0c0b80c89d7ae3",
+        "6a1f2e5cadf41a88"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tmc": {
+      "name": "TMC",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:27.243051+00:00",
+      "fingerprints": [
+        "28d3b2318fc884b1",
+        "3fc359ce396f0595",
+        "d64bee27ae0d3244",
+        "3767ef29c701a900",
+        "4e5a94ddd3e8f7e7",
+        "15f8dfd1d210cb40",
+        "8c0eeb6de4cfd0fd",
+        "94ce1e6896195f78"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tnnls": {
+      "name": "TNNLS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:32.744129+00:00",
+      "fingerprints": [
+        "b37054a2d75425fc",
+        "a1885f1137a19bb6",
+        "4eba72cc8b22d710",
+        "e1181f8a2bc25833",
+        "bd5eaec4bbe2fd37",
+        "b57288cb675b36a9",
+        "124435f1a0bca4af",
+        "5134112181579360"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tochi": {
+      "name": "TOCHI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:36.381451+00:00",
+      "fingerprints": [
+        "08c371a1fba45596",
+        "46837bce5eb1db53",
+        "58c0e6dd3da6feff",
+        "cc95f5afc941ac75",
+        "872e21b86e0243b1",
+        "0e78d3a4bf475a4e",
+        "54c8c46cb05a507f",
+        "d1f898edb64b4e46"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tocl": {
+      "name": "TOCL",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:40.779233+00:00",
+      "fingerprints": [
+        "8cd7579ee23d7dee",
+        "493950e7d7220dec",
+        "1e305c2673897a12",
+        "9ec6651ff0494afc",
+        "10b6339be5499265",
+        "db3b3aef7ba47ce2",
+        "62c3eaf98a2c6379",
+        "0d5040576333f832"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tocs": {
+      "name": "TOCS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:44.448715+00:00",
+      "fingerprints": [
+        "7298381b7f82d60f",
+        "db41a602c607ddc8",
+        "619901f250107119",
+        "f74cb3b2041b8e2e",
+        "ac994fd6c1ed859d",
+        "fbf64cffc0d6e5c8"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tods": {
+      "name": "TODS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:49.928589+00:00",
+      "fingerprints": [
+        "c24e6f6499b0b555",
+        "a11356278227b8dc",
+        "0cc187b2b5605044",
+        "c9cbc93bab0be30b",
+        "53b2a607508c4ad9",
+        "15824da1d730da21",
+        "566934f19fbdfff8",
+        "eedd70bf3a8f851e"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tog": {
+      "name": "TOG",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:54.779379+00:00",
+      "fingerprints": [
+        "b849dcebccfeb917",
+        "f0665eb4b20a27dd",
+        "0811c30a25dcdee9",
+        "9cdbdce63735f6da",
+        "2ff439b0527cfb38",
+        "412b53acbad3f0a5",
+        "57eb8e963243d08f",
+        "6cd256f82750d7f9"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tois": {
+      "name": "TOIS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:33:58.251116+00:00",
+      "fingerprints": [
+        "e72f2544b4c3f44d",
+        "c94ffa3edf8e8921",
+        "7f22e88ac75d1e5a",
+        "586ea8c6ab004c7f",
+        "5ec8b218e010befb",
+        "0d55f5652ca6bb4e",
+        "ecf1383d3b1adf41",
+        "d84d5406219f5ff7"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "toplas": {
+      "name": "TOPLAS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:34:02.925215+00:00",
+      "fingerprints": [
+        "292121448aed7560",
+        "68e0ee7353b7ef68",
+        "8dc11835343f61bf",
+        "d9ff691825446c76",
+        "c59e7348e3b4d5c1",
+        "fc3c2e6feb0a14d0",
+        "e3e6d5df164474bf"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tpami": {
+      "name": "TPAMI",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:34:07.865987+00:00",
+      "fingerprints": [
+        "07d80184831b2d85",
+        "aa0e375111c7078f",
+        "e0c85fd904948336",
+        "616f51a75bebd56a",
+        "e6adcadb7447a99e",
+        "9c55116c5f60b87b",
+        "75d5047147df3ab9",
+        "8f4966be5c1a2a1b"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tpds": {
+      "name": "TPDS",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:34:13.579849+00:00",
+      "fingerprints": [
+        "c117d0c69e4f9a71",
+        "fbcf48776d04eea1",
+        "f74a7ef85926dd64",
+        "898c3477d74a7c03",
+        "edba2982d4e87e36",
+        "ac99509e0410bd3a",
+        "a71208ffc08815e2",
+        "3f88abd9780135bc"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    },
+    "tse": {
+      "name": "TSE",
+      "baseline": true,
+      "last_checked": "2026-09-14T01:34:18.508869+00:00",
+      "fingerprints": [
+        "5d8723336a44ea29",
+        "33fbfab7f41c4eb2",
+        "c2a1c73b08b48412",
+        "b9e785c470344a04",
+        "9c209e7be87ff3cd",
+        "66016c9c83b985a5",
+        "9307904d7410584b",
+        "5957c059e7b25c35"
+      ],
+      "sources": [
+        "crossref"
+      ]
+    }
+  }
+}

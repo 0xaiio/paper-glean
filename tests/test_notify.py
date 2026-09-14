@@ -73,9 +73,31 @@ def test_ack_all_clears(isolated):
 
 def test_summary_groups_by_researcher():
     text = notify._summary(ITEMS, "2026-09-14")
-    assert "2 条新作" in text
+    assert "2 条更新" in text
     assert "魏恒峰 Hengfeng Wei 1 条" in text
     assert "Alexey Gotsman 1 条" in text
+
+
+def test_summary_falls_back_to_venue_and_labels_namespace():
+    """CCF items carry `venue`, not `researcher`, and say which monitor fired."""
+    items = [{"venue": "SIGMOD", "title": "SIGMOD 2027 CFP", "kind": "cfp"}]
+    text = notify._summary(items, "2026-09-14", "ccf")
+    assert "CCF 监控" in text
+    assert "SIGMOD 1 条" in text
+
+
+def test_namespaces_keep_separate_unread_sets(isolated, tmp_path, monkeypatch):
+    monkeypatch.setattr(notify, "CCF_NEW", tmp_path / "ccf_new.json")
+    notify._file_channel(ITEMS, "2026-09-14", "ccf")
+    assert len(notify.load_new("ccf")) == 2
+    assert notify.load_new("watch") == []
+    assert notify.ack_all("ccf") == 2
+    assert notify.load_new("watch") == []
+
+
+def test_unknown_namespace_is_rejected():
+    with pytest.raises(ValueError):
+        notify.load_new("nope")
 
 
 # ------------------------------------------------------------------
