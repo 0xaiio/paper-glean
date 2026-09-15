@@ -172,9 +172,11 @@ python -X utf8 arxiv_daily.py watch run --no-push
 
 - **解析顺序**：个人主页 → DBLP → Semantic Scholar；显式配置了 `dblp`/`s2` 时会并行合并去重。
 - **首次建基线**：新加入的对象第一次运行只记录「已见」，**不推送**历史成果（除非 `--force`）。
-- **落盘 HTML 快照**：每次 `run` 都会产出 `exports/watch-digest-<YYYYMMDD>.html`（失败只降级 `[WARN]`）。
+- **落盘 HTML 快照**：每次 `run` 都会产出 `exports/watch-digest-<YYYY-MM-DD>.html`（失败只降级 `[WARN]`）。
   **零新作也会出页面** —— 页面上带「本次运行」证据表（扫描范围 / 各源取回条数 / 新建基线 / 推送通道），
   「今天没消息」与「脚本根本没跑通」是两件事，这里要把后者排除掉。
+  > ⚠️ **监控快照用 `YYYY-MM-DD`**（`run_monitor` 的 `day` 就是 `strftime("%Y-%m-%d")`），
+  > 与 arXiv 快照的 `arxiv-digest-<YYYYMMDD>.html` **不同**，脚本里拼文件名时别想当然。
 - **盲区告警**：某位学者本轮**一条内容都没取到**（`sources=[]`、指纹 0）时打印
   `[WARN] 盲区：<姓名> …… 源可能不可达（不是「没有新作」）`，并在 HTML 里标为「盲区」。
   这一情形下 `last_checked` 仍会刷新、`sources` 仍可能残留上一次的累积并集，**两者都不能证明本次抓取成功**。
@@ -224,7 +226,7 @@ python -X utf8 arxiv_daily.py ccf run --only SIGMOD
 - **DBLP 不做抓取**：2026-09 起 DBLP 全部端点都有反爬拦截页，`dblp` 字段仅作人工参考链接。
 - **首次建基线**：新条目第一次运行只记录「已见」，**不推送**历史 CFP（除非 `--force`）。
 - **勾选即订阅**：`[ ]` 的条目**不会发起任何网络请求**；`refresh` 不会改动你的勾选状态。
-- **落盘 HTML 快照**：每次 `run` 都会产出 `exports/ccf-digest-<YYYYMMDD>.html`（失败只降级 `[WARN]`）。
+- **落盘 HTML 快照**：每次 `run` 都会产出 `exports/ccf-digest-<YYYY-MM-DD>.html`（失败只降级 `[WARN]`）。
   与学者监控同一套页面骨架与「本次运行」证据表，零更新同样出页面。
 - **盲区告警**：某会议/期刊本轮**一条内容都没取到**时打印 `[WARN] 盲区：…`，
   HTML 中同样标为「盲区」而非「无更新」。注意 `last_error` 恒为空 —— 引擎不持久化抓取错误，
@@ -387,9 +389,12 @@ python -X utf8 arxiv_daily.py html --date 20260914 --out D:/tmp/digest.html
 
 | 链路 | 触发时机 | 产物 | 手动重跑 |
 |------|---------|------|---------|
-| arXiv 日报 | `fetch` / `daily` | `exports/arxiv-digest-<day>.html` | `html` |
-| 学者监控 | `watch run` | `exports/watch-digest-<day>.html` | `watch run` |
-| CCF 监控 | `ccf run` | `exports/ccf-digest-<day>.html` | `ccf run` |
+| arXiv 日报 | `fetch` / `daily` | `exports/arxiv-digest-<YYYYMMDD>.html` | `html` |
+| 学者监控 | `watch run` | `exports/watch-digest-<YYYY-MM-DD>.html` | `watch run` |
+| CCF 监控 | `ccf run` | `exports/ccf-digest-<YYYY-MM-DD>.html` | `ccf run` |
+
+> ⚠️ **日期格式不统一**：arXiv 线用 `YYYYMMDD`（digest 章节的既成格式），
+> 两条监控线用 `YYYY-MM-DD`（`run_monitor` 的 `day`）。这是历史原因，拼文件名时以本表为准。
 
 三份快照共用同一套内联样式、暗色开关与前端筛选脚本，都是**自包含单文件**：
 无 CDN、无外链脚本，`file://` 双击即开、断网可读、关掉 JS 正文照常显示。
