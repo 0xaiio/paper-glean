@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 from glean import notify
 from glean.config import DEFAULT_CAP
@@ -33,6 +34,7 @@ from glean.ccf import (
     set_enabled_area,
     sync_catalog,
 )
+from glean.report import render_day
 from glean.serve import DEFAULT_HOST, DEFAULT_PORT, base_url, ensure, log_path
 from glean.watch import (
     add_researcher,
@@ -57,6 +59,17 @@ def _run_fetch(hours: int, cap: int, date: str | None) -> tuple[str, int, str]:
         print(f"[INFO] interests.md keywords: {n}/{len(papers)} papers hit")
     data_file = save_day_data(day, papers, start, end)
     upsert_digest(day, day_section(day, papers, start, end, cap))
+
+    # 静态快照（可在浏览器直接打开）与 data/digest 同步产出；它是派生产物，
+    # 失败只降级为 WARN，绝不能让一次导出问题废掉已经落盘的抓取结果。
+    try:
+        html_file = render_day(day)
+    except Exception as ex:  # pragma: no cover - 导出是尽力而为
+        print(f"[WARN] html 导出失败: {ex}", file=sys.stderr)
+        html_file = None
+    if html_file:
+        print(f"[OK] html snapshot -> {html_file}")
+
     return day, len(papers), str(data_file)
 
 
@@ -346,6 +359,21 @@ def cmd_feedback(args: argparse.Namespace) -> None:
     print(f"[OK] 反馈已记录 -> feedback.jsonl")
 
 
+def cmd_html(args: argparse.Namespace) -> None:
+    """Render a day as a standalone HTML file (openable via file://)."""
+    day = args.date or datetime.now().strftime("%Y%m%d")
+    try:
+        path = render_day(day, Path(args.out) if args.out else None)
+    except Exception as exc:
+        print(f"[ERR] 渲染失败: {exc}")
+        return
+    if path is None:
+        print(f"[ERR] 没有 {day} 的数据 (data/{day}.json); 先跑 fetch 或 daily")
+        return
+    print(f"[OK] {day} -> {path}")
+    print("[HINT] 填好 arXiv-schedule.md 的 ★/🧐 小节后重跑本命令，推荐理由会同步进 HTML")
+
+
 def cmd_reanchor(args: argparse.Namespace) -> None:
     """Re-anchor a day's section."""
     day = args.date or datetime.now().strftime("%Y%m%d")
@@ -496,6 +524,11 @@ def build_parser() -> argparse.ArgumentParser:
     ra = sub.add_parser("reanchor", help="为指定日期章节补齐锚点与推荐表跳转链接")
     ra.add_argument("--date", help="YYYYMMDD(默认今天)")
     ra.set_defaults(func=cmd_reanchor)
+
+    hp = sub.add_parser("html", help="把某天 digest 渲染成可在浏览器直接打开的独立 HTML")
+    hp.add_argument("--date", help="YYYYMMDD(默认今天)")
+    hp.add_argument("--out", help="输出文件路径(默认 exports/arxiv-digest-<day>.html)")
+    hp.set_defaults(func=cmd_html)
 
     dl = sub.add_parser("daily", help="每日流水线: fetch -> digest -> (可选)确保本地 Web 服务在线")
     _add_window_args(dl)

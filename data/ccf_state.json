@@ -4,7 +4,7 @@
     "sigmod": {
       "name": "SIGMOD",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:54.959815+00:00",
+      "last_checked": "2026-09-15T01:41:01.874336+00:00",
       "fingerprints": [
         "f5d63e96c0c00a42",
         "130a993ecffecf54",
@@ -44,7 +44,7 @@
     "aaai": {
       "name": "AAAI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:27.081826+00:00",
+      "last_checked": "2026-09-15T01:37:24.804863+00:00",
       "fingerprints": [
         "2c842d358d3cef58",
         "4b140368f31c68b5",
@@ -86,7 +86,7 @@
     "acl": {
       "name": "ACL",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:29.476053+00:00",
+      "last_checked": "2026-09-15T01:37:27.155972+00:00",
       "fingerprints": [
         "3a113356dfb87a8c",
         "e54b62bec4f3573d",
@@ -108,7 +108,7 @@
     "acm-mm": {
       "name": "ACM MM",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:32.850463+00:00",
+      "last_checked": "2026-09-15T01:37:32.303606+00:00",
       "fingerprints": [
         "2ca5373d9c3103c3",
         "1106a92433789a65",
@@ -122,7 +122,7 @@
     "acm-siggraph": {
       "name": "ACM SIGGRAPH",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:37.992070+00:00",
+      "last_checked": "2026-09-15T01:37:35.725814+00:00",
       "fingerprints": [
         "4c84f73c69e138de",
         "2e76cc50e78c55cc",
@@ -165,7 +165,7 @@
     "ase": {
       "name": "ASE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:42.253230+00:00",
+      "last_checked": "2026-09-15T01:37:40.047228+00:00",
       "fingerprints": [
         "b799b7c1747512f2",
         "063aaff33ef769c0",
@@ -235,7 +235,7 @@
     "asplos": {
       "name": "ASPLOS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:46.328181+00:00",
+      "last_checked": "2026-09-15T01:37:46.578567+00:00",
       "fingerprints": [
         "4fa5ad67f19b53c5",
         "32e6e3b3f62420b2",
@@ -264,7 +264,7 @@
     "cav": {
       "name": "CAV",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:48.777633+00:00",
+      "last_checked": "2026-09-15T01:37:48.761230+00:00",
       "fingerprints": [
         "24ed7858c201a3d0",
         "0b4421247a1aba6a",
@@ -280,7 +280,8 @@
         "52e3abc7439c6a1b",
         "76c0bd6477273c95",
         "e9f4ac8cecac1faa",
-        "73a3a7393cf0ef36"
+        "73a3a7393cf0ef36",
+        "7d43dd525d3ff47c"
       ],
       "sources": [
         "ccfddl",
@@ -290,7 +291,7 @@
     "ccs": {
       "name": "CCS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:52.002322+00:00",
+      "last_checked": "2026-09-15T01:37:52.745574+00:00",
       "fingerprints": [
         "004576016ea216b6",
         "70858e733a491c32",
@@ -306,7 +307,7 @@
     "chi": {
       "name": "CHI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:55.402860+00:00",
+      "last_checked": "2026-09-15T01:37:56.729620+00:00",
       "fingerprints": [
         "5c480e2a392a8cb3",
         "5e63a4dd91f89e43",
@@ -324,7 +325,7 @@
     "crypto": {
       "name": "CRYPTO",
       "baseline": true,
-      "last_checked": "2026-09-14T01:28:58.280738+00:00",
+      "last_checked": "2026-09-15T01:37:59.505503+00:00",
       "fingerprints": [
         "bb7f2d2d225d1769",
         "2f3097c1dfdcadfe",
@@ -346,7 +347,7 @@
     "cscw": {
       "name": "CSCW",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:01.252632+00:00",
+      "last_checked": "2026-09-15T01:38:02.370823+00:00",
       "fingerprints": [
         "5aec9fdf0b370f33",
         "34c56e2f09dc718c",
@@ -361,7 +362,9 @@
         "ade35caaa20b1ee8",
         "bc03d8111e3bdac4",
         "81299accd5399c38",
-        "1097e7745df5b002"
+        "1097e7745df5b002",
+        "92172dd5f218ebdf",
+        "3a0339d5ad176bc9"
       ],
       "sources": [
         "ccfddl",
@@ -371,7 +374,7 @@
     "cvpr": {
       "name": "CVPR",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:04.607341+00:00",
+      "last_checked": "2026-09-15T01:38:05.849857+00:00",
       "fingerprints": [
         "aa92594b553b4d99",
         "f75bafc1f21156e3",
@@ -392,7 +395,7 @@
     "dac": {
       "name": "DAC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:08.282998+00:00",
+      "last_checked": "2026-09-15T01:38:11.936143+00:00",
       "fingerprints": [
         "b38592ec25346df7",
         "69fcccd85a8616e6",
@@ -423,7 +426,7 @@
     "date": {
       "name": "DATE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:11.438843+00:00",
+      "last_checked": "2026-09-15T01:38:15.204011+00:00",
       "fingerprints": [
         "ef6f7730019cfdd6",
         "a08db69ecd6c6766",
@@ -452,7 +455,7 @@
     "disc": {
       "name": "DISC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:16.115604+00:00",
+      "last_checked": "2026-09-15T01:38:20.377808+00:00",
       "fingerprints": [
         "85b7ec3b1a8c4403",
         "3faf1559b9d40070"
@@ -464,7 +467,7 @@
     "eccv": {
       "name": "ECCV",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:20.337874+00:00",
+      "last_checked": "2026-09-15T01:38:24.129019+00:00",
       "fingerprints": [
         "f442bd74d6da63c9",
         "e04a19bafdbdb7af",
@@ -490,7 +493,7 @@
     "emnlp": {
       "name": "EMNLP",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:23.405732+00:00",
+      "last_checked": "2026-09-15T01:38:26.932724+00:00",
       "fingerprints": [
         "ffcb7e0570f66b48",
         "c543dabf63ed088b",
@@ -560,7 +563,7 @@
     "eurocrypt": {
       "name": "EUROCRYPT",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:26.183444+00:00",
+      "last_checked": "2026-09-15T01:38:30.060730+00:00",
       "fingerprints": [
         "224ca1704ebc7c3e",
         "46b1bba2cf9d3eaa",
@@ -577,7 +580,7 @@
     "eurosys": {
       "name": "EuroSys",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:38.127327+00:00",
+      "last_checked": "2026-09-15T01:38:32.908607+00:00",
       "fingerprints": [
         "2ea9fd0930c92496",
         "d4b93620bba95c8f",
@@ -602,7 +605,7 @@
     "fast": {
       "name": "FAST",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:42.135875+00:00",
+      "last_checked": "2026-09-15T01:38:37.125062+00:00",
       "fingerprints": [
         "c67a2ca8d2f812e0",
         "3f5fe8cafbc5de96",
@@ -622,7 +625,7 @@
     "fm": {
       "name": "FM",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:45.004584+00:00",
+      "last_checked": "2026-09-15T01:38:39.884267+00:00",
       "fingerprints": [
         "d15314c540dc8f11",
         "f80832203011f7d9",
@@ -648,7 +651,7 @@
     "focs": {
       "name": "FOCS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:47.228761+00:00",
+      "last_checked": "2026-09-15T01:38:42.131487+00:00",
       "fingerprints": [
         "e05732a6af7d8e53",
         "e657b761a26ad1ca",
@@ -663,7 +666,7 @@
     "fse": {
       "name": "FSE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:49.835250+00:00",
+      "last_checked": "2026-09-15T01:38:44.770328+00:00",
       "fingerprints": [
         "b820f67a26776070",
         "867c3a45c17158be",
@@ -692,7 +695,7 @@
     "hpca": {
       "name": "HPCA",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:52.338294+00:00",
+      "last_checked": "2026-09-15T01:38:47.473427+00:00",
       "fingerprints": [
         "6cfe837411063d12",
         "6cf73d7ac939d7ee",
@@ -717,7 +720,7 @@
     "hpdc": {
       "name": "HPDC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:29:55.357993+00:00",
+      "last_checked": "2026-09-15T01:38:50.512473+00:00",
       "fingerprints": [
         "4132b6e4953a5e01",
         "1e97bff76d67c2dd",
@@ -740,7 +743,7 @@
     "iccad": {
       "name": "ICCAD",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:02.135695+00:00",
+      "last_checked": "2026-09-15T01:38:57.080196+00:00",
       "fingerprints": [
         "6f146f0eea213b0d",
         "9fcd80ba119463fd",
@@ -773,7 +776,7 @@
     "iccv": {
       "name": "ICCV",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:05.846091+00:00",
+      "last_checked": "2026-09-15T01:39:00.774661+00:00",
       "fingerprints": [
         "c6f379455f96744f",
         "f3db106e2f03d44a",
@@ -804,7 +807,7 @@
     "icde": {
       "name": "ICDE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:07.885178+00:00",
+      "last_checked": "2026-09-15T01:39:07.171669+00:00",
       "fingerprints": [
         "97aa631f21a8c09a",
         "517097b8822ef5a7",
@@ -825,7 +828,7 @@
     "icfp": {
       "name": "ICFP",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:10.438912+00:00",
+      "last_checked": "2026-09-15T01:39:09.972492+00:00",
       "fingerprints": [
         "0c88f9e8ca4633c4",
         "9653dbae48161d26",
@@ -846,7 +849,7 @@
     "iclr": {
       "name": "ICLR",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:12.918623+00:00",
+      "last_checked": "2026-09-15T01:39:12.461255+00:00",
       "fingerprints": [
         "d2ec68ec563dc692",
         "cc6e238291e332ac",
@@ -862,7 +865,7 @@
     "icml": {
       "name": "ICML",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:15.255873+00:00",
+      "last_checked": "2026-09-15T01:39:14.643844+00:00",
       "fingerprints": [
         "d8b56095ba6756a0",
         "3f98a9c4c6c76dea",
@@ -876,7 +879,7 @@
     "icse": {
       "name": "ICSE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:18.590274+00:00",
+      "last_checked": "2026-09-15T01:39:17.592637+00:00",
       "fingerprints": [
         "b1cf9e0b4d42b1ec",
         "f76ce85d04b2d441",
@@ -997,7 +1000,7 @@
     "ieee-vis": {
       "name": "IEEE VIS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:23.046717+00:00",
+      "last_checked": "2026-09-15T01:39:22.257226+00:00",
       "fingerprints": [
         "8a3142182847f3a3",
         "6de7f81469236c4c",
@@ -1033,7 +1036,7 @@
     "ieee-vr": {
       "name": "IEEE VR",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:25.841015+00:00",
+      "last_checked": "2026-09-15T01:39:25.124051+00:00",
       "fingerprints": [
         "b3e7770ecb00f4bf",
         "dfbbd89284c304de",
@@ -1053,7 +1056,7 @@
     "ijcai": {
       "name": "IJCAI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:28.746914+00:00",
+      "last_checked": "2026-09-15T01:39:28.091221+00:00",
       "fingerprints": [
         "82c39511194ee3a7",
         "f3db4d07ab0e74b4",
@@ -1073,7 +1076,7 @@
     "infocom": {
       "name": "INFOCOM",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:37.306452+00:00",
+      "last_checked": "2026-09-15T01:39:36.560134+00:00",
       "fingerprints": [
         "1476edeff12f2585",
         "0bf728aa477386fe",
@@ -1097,7 +1100,7 @@
     "ipdps": {
       "name": "IPDPS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:39.609839+00:00",
+      "last_checked": "2026-09-15T01:39:39.441037+00:00",
       "fingerprints": [
         "3a4e4edbac0b4b24",
         "55c031cf2693830d",
@@ -1120,7 +1123,7 @@
     "isca": {
       "name": "ISCA",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:42.555105+00:00",
+      "last_checked": "2026-09-15T01:39:42.590382+00:00",
       "fingerprints": [
         "39f0cb0a4cd3ba03",
         "1392ffa603f388a7",
@@ -1148,7 +1151,7 @@
     "issta": {
       "name": "ISSTA",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:45.115463+00:00",
+      "last_checked": "2026-09-15T01:39:45.458972+00:00",
       "fingerprints": [
         "a205c3a39b727c21",
         "4f42dfa34ea7f195",
@@ -1166,7 +1169,7 @@
     "lics": {
       "name": "LICS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:48.657413+00:00",
+      "last_checked": "2026-09-15T01:39:48.877693+00:00",
       "fingerprints": [
         "b187c8a90958a391",
         "39555ebd4332e075",
@@ -1186,7 +1189,7 @@
     "micro": {
       "name": "MICRO",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:51.752848+00:00",
+      "last_checked": "2026-09-15T01:39:52.265488+00:00",
       "fingerprints": [
         "dcbccecaa0ff24b7",
         "936137f63524e1b8",
@@ -1212,7 +1215,7 @@
     "mobicom": {
       "name": "MobiCom",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:54.961732+00:00",
+      "last_checked": "2026-09-15T01:39:55.576162+00:00",
       "fingerprints": [
         "d545d684718c16b6",
         "3cf1214130b181d7",
@@ -1234,7 +1237,7 @@
     "naacl": {
       "name": "NAACL",
       "baseline": true,
-      "last_checked": "2026-09-14T01:30:57.634873+00:00",
+      "last_checked": "2026-09-15T01:39:58.473644+00:00",
       "fingerprints": [
         "0df0aab61d1b516b",
         "113e630fe85766e9",
@@ -1305,7 +1308,7 @@
     "ndss": {
       "name": "NDSS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:00.672299+00:00",
+      "last_checked": "2026-09-15T01:40:01.776835+00:00",
       "fingerprints": [
         "10da4d98769bfc0f",
         "d4845a37b47b989b",
@@ -1331,7 +1334,7 @@
     "neurips": {
       "name": "NeurIPS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:03.112354+00:00",
+      "last_checked": "2026-09-15T01:40:04.306300+00:00",
       "fingerprints": [
         "e2602cd46a8e66a6",
         "8f6b1250a4554497",
@@ -1345,7 +1348,7 @@
     "nsdi": {
       "name": "NSDI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:05.844880+00:00",
+      "last_checked": "2026-09-15T01:40:08.625272+00:00",
       "fingerprints": [
         "6660c0f003f3f1f7",
         "f1081e8d082b04e1",
@@ -1365,7 +1368,7 @@
     "oopsla": {
       "name": "OOPSLA",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:09.208779+00:00",
+      "last_checked": "2026-09-15T01:40:13.665230+00:00",
       "fingerprints": [
         "40151a50a9b515f4",
         "cda60b1209546483",
@@ -1412,7 +1415,10 @@
         "5f3cdbd404e25245",
         "f49cf02e499e912f",
         "28067baca4a521f6",
-        "3ad7f5d7557d7689"
+        "3ad7f5d7557d7689",
+        "642a9203b35a0532",
+        "e8c2cd419ed3eca3",
+        "385a7bebf0c105d4"
       ],
       "sources": [
         "ccfddl",
@@ -1422,7 +1428,7 @@
     "osdi": {
       "name": "OSDI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:12.073666+00:00",
+      "last_checked": "2026-09-15T01:40:17.090132+00:00",
       "fingerprints": [
         "d67c3d6e8737a67d",
         "1c6fa848f85c6f27",
@@ -1442,7 +1448,7 @@
     "pldi": {
       "name": "PLDI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:15.391576+00:00",
+      "last_checked": "2026-09-15T01:40:20.842176+00:00",
       "fingerprints": [
         "865fca60fed8e051",
         "dc3617c8d14e006f",
@@ -1459,7 +1465,7 @@
     "podc": {
       "name": "PODC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:19.283937+00:00",
+      "last_checked": "2026-09-15T01:40:25.888441+00:00",
       "fingerprints": [
         "df5fd609512274f9",
         "500e78f17545708c",
@@ -1485,12 +1491,16 @@
     "pods": {
       "name": "PODS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:21.988471+00:00",
+      "last_checked": "2026-09-15T01:40:28.541511+00:00",
       "fingerprints": [
         "d77b3a5f230b0bbf",
         "4a6dc9abf94302c5",
         "2f6218f91f727351",
-        "93168f16a6e09293"
+        "93168f16a6e09293",
+        "4bbf27242c9ec5cd",
+        "186c63a96122bcc2",
+        "9abbdf69eb60f4ca",
+        "a3b5ebfd19c1693f"
       ],
       "sources": [
         "ccfddl"
@@ -1499,7 +1509,7 @@
     "popl": {
       "name": "POPL",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:25.330464+00:00",
+      "last_checked": "2026-09-15T01:40:32.114174+00:00",
       "fingerprints": [
         "e1d82048df90e32f",
         "164451c73aab3c76",
@@ -1547,7 +1557,7 @@
     "ppopp": {
       "name": "PPoPP",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:28.912526+00:00",
+      "last_checked": "2026-09-15T01:40:35.109483+00:00",
       "fingerprints": [
         "96620b1eaec566cb",
         "ae50146710ee49e4",
@@ -1569,7 +1579,7 @@
     "rtss": {
       "name": "RTSS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:32.558240+00:00",
+      "last_checked": "2026-09-15T01:40:38.598722+00:00",
       "fingerprints": [
         "a9ae958242a535c0",
         "b5710c8cbb0898df",
@@ -1591,7 +1601,7 @@
     "s-p": {
       "name": "S&P",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:35.732608+00:00",
+      "last_checked": "2026-09-15T01:40:41.556657+00:00",
       "fingerprints": [
         "3254a975996b7732",
         "e7ceedc531503242",
@@ -1611,7 +1621,7 @@
     "sc": {
       "name": "SC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:38.715491+00:00",
+      "last_checked": "2026-09-15T01:40:44.489858+00:00",
       "fingerprints": [
         "516fe6c8a764db60",
         "f216341f62b69565",
@@ -1625,7 +1635,7 @@
     "sigcomm": {
       "name": "SIGCOMM",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:41.806768+00:00",
+      "last_checked": "2026-09-15T01:40:47.773170+00:00",
       "fingerprints": [
         "3f8732f90f046e63",
         "a30e3aeb6b0d263d",
@@ -1660,7 +1670,7 @@
     "sigir": {
       "name": "SIGIR",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:45.505961+00:00",
+      "last_checked": "2026-09-15T01:40:51.201835+00:00",
       "fingerprints": [
         "7054e8562ddd2042",
         "ddeff44870645388",
@@ -1674,7 +1684,7 @@
     "sigkdd": {
       "name": "SIGKDD",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:48.460684+00:00",
+      "last_checked": "2026-09-15T01:40:54.200026+00:00",
       "fingerprints": [
         "fb714ee9e38e631a",
         "0a2edb68c4b9cfb7",
@@ -1694,7 +1704,7 @@
     "sigmetrics": {
       "name": "SIGMETRICS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:51.863416+00:00",
+      "last_checked": "2026-09-15T01:40:58.787276+00:00",
       "fingerprints": [
         "c687b0448e86de1f",
         "1c09c4c69d66a8b3",
@@ -1726,7 +1736,7 @@
     "sigops-atc": {
       "name": "SIGOPS ATC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:31:57.897520+00:00",
+      "last_checked": "2026-09-15T01:41:04.867135+00:00",
       "fingerprints": [
         "9300843cce7135b0",
         "6038a35c5393d2ef",
@@ -1741,7 +1751,7 @@
     "soda": {
       "name": "SODA",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:00.433604+00:00",
+      "last_checked": "2026-09-15T01:41:08.304378+00:00",
       "fingerprints": [
         "8fd4730fcb3826fb",
         "a883ac95c037735e",
@@ -1754,7 +1764,7 @@
     "sosp": {
       "name": "SOSP",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:03.294898+00:00",
+      "last_checked": "2026-09-15T01:41:10.961707+00:00",
       "fingerprints": [
         "87a62edc75daf670",
         "d8f3c6bb4d5979a6",
@@ -1775,7 +1785,7 @@
     "stoc": {
       "name": "STOC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:06.304065+00:00",
+      "last_checked": "2026-09-15T01:41:14.356742+00:00",
       "fingerprints": [
         "bc7708f6d8ca3ecb",
         "b72f93e28581cc98",
@@ -1789,14 +1799,14 @@
     "tacas": {
       "name": "TACAS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:09.204401+00:00",
+      "last_checked": "2026-09-15T01:41:17.158874+00:00",
       "fingerprints": [],
       "sources": []
     },
     "ubicomp-iswc": {
       "name": "UbiComp/ISWC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:13.862511+00:00",
+      "last_checked": "2026-09-15T01:41:25.003288+00:00",
       "fingerprints": [
         "4a77c36d97ab7413",
         "08fa9ec072b0737d",
@@ -1825,7 +1835,7 @@
     "uist": {
       "name": "UIST",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:17.212441+00:00",
+      "last_checked": "2026-09-15T01:41:28.548212+00:00",
       "fingerprints": [
         "9c6a3a3194c7d87f",
         "abd0b766cc7b46ae",
@@ -1848,7 +1858,7 @@
     "usenix-security": {
       "name": "USENIX Security",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:21.176260+00:00",
+      "last_checked": "2026-09-15T01:41:33.599254+00:00",
       "fingerprints": [
         "7888eb4339eb5a75",
         "5a0663e882efa633",
@@ -1874,7 +1884,7 @@
     "vldb": {
       "name": "VLDB",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:23.883142+00:00",
+      "last_checked": "2026-09-15T01:41:36.357297+00:00",
       "fingerprints": [
         "96d7e5d5f563b4c5",
         "9a01d65f227f473a",
@@ -1917,16 +1927,21 @@
         "80303ca02cc8f324",
         "28dcf8ffe261f504",
         "14fd1da5b7761cce",
-        "680ff55b023a5a0f"
+        "680ff55b023a5a0f",
+        "3197f9809d8f75a0",
+        "9a9898b465be1d6b",
+        "82c0f0f49b98ddde",
+        "9f502a287a5ea011"
       ],
       "sources": [
+        "ccfddl",
         "homepage"
       ]
     },
     "www": {
       "name": "WWW",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:27.108520+00:00",
+      "last_checked": "2026-09-15T01:41:39.588744+00:00",
       "fingerprints": [
         "72a4a9cc789bb4de",
         "625b6c99abbd07cd",
@@ -1949,7 +1964,7 @@
     "aij": {
       "name": "AIJ",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:31.839727+00:00",
+      "last_checked": "2026-09-15T01:41:44.316144+00:00",
       "fingerprints": [
         "fd16823849830896",
         "604a240fb934a980",
@@ -1967,7 +1982,7 @@
     "jacm": {
       "name": "JACM",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:36.619621+00:00",
+      "last_checked": "2026-09-15T01:41:47.998455+00:00",
       "fingerprints": [
         "36f489e52469d6c5",
         "d3167a90b73bccb2",
@@ -1985,7 +2000,7 @@
     "jmlr": {
       "name": "JMLR",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:41.415905+00:00",
+      "last_checked": "2026-09-15T01:41:52.574447+00:00",
       "fingerprints": [
         "72aca2150c205531",
         "8729316a873bb7df",
@@ -2014,7 +2029,7 @@
     "lmcs": {
       "name": "LMCS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:47.400220+00:00",
+      "last_checked": "2026-09-15T01:41:59.595118+00:00",
       "fingerprints": [
         "74e8234ba2e830a8",
         "3326f106c4ebf143",
@@ -2038,7 +2053,7 @@
     "tc": {
       "name": "TC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:52.363701+00:00",
+      "last_checked": "2026-09-15T01:42:05.351826+00:00",
       "fingerprints": [
         "210a92fb30e5f70a",
         "0127f31f78a10a74",
@@ -2056,7 +2071,7 @@
     "tcad": {
       "name": "TCAD",
       "baseline": true,
-      "last_checked": "2026-09-14T01:32:56.945228+00:00",
+      "last_checked": "2026-09-15T01:42:09.987767+00:00",
       "fingerprints": [
         "b8621aad687ac26d",
         "9affc113bf641d88",
@@ -2074,7 +2089,7 @@
     "tifs": {
       "name": "TIFS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:02.946061+00:00",
+      "last_checked": "2026-09-15T01:42:15.159342+00:00",
       "fingerprints": [
         "3923ab829b708cf0",
         "732cd0062750189f"
@@ -2086,7 +2101,7 @@
     "tip": {
       "name": "TIP",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:09.988218+00:00",
+      "last_checked": "2026-09-15T01:42:21.377020+00:00",
       "fingerprints": [
         "aac5475e4f0a2189",
         "8c4abcd4cb612548"
@@ -2098,7 +2113,7 @@
     "tit": {
       "name": "TIT",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:16.489549+00:00",
+      "last_checked": "2026-09-15T01:42:29.251126+00:00",
       "fingerprints": [
         "33e9b941919c0bc6",
         "a6a95374d23502a2",
@@ -2116,7 +2131,7 @@
     "tkde": {
       "name": "TKDE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:21.239676+00:00",
+      "last_checked": "2026-09-15T01:42:33.297217+00:00",
       "fingerprints": [
         "50c039f7306cfd18",
         "e62900db276d6644",
@@ -2134,7 +2149,7 @@
     "tmc": {
       "name": "TMC",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:27.243051+00:00",
+      "last_checked": "2026-09-15T01:42:37.775825+00:00",
       "fingerprints": [
         "28d3b2318fc884b1",
         "3fc359ce396f0595",
@@ -2152,7 +2167,7 @@
     "tnnls": {
       "name": "TNNLS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:32.744129+00:00",
+      "last_checked": "2026-09-15T01:42:43.368911+00:00",
       "fingerprints": [
         "b37054a2d75425fc",
         "a1885f1137a19bb6",
@@ -2170,7 +2185,7 @@
     "tochi": {
       "name": "TOCHI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:36.381451+00:00",
+      "last_checked": "2026-09-15T01:42:47.461192+00:00",
       "fingerprints": [
         "08c371a1fba45596",
         "46837bce5eb1db53",
@@ -2188,7 +2203,7 @@
     "tocl": {
       "name": "TOCL",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:40.779233+00:00",
+      "last_checked": "2026-09-15T01:42:51.175206+00:00",
       "fingerprints": [
         "8cd7579ee23d7dee",
         "493950e7d7220dec",
@@ -2206,7 +2221,7 @@
     "tocs": {
       "name": "TOCS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:44.448715+00:00",
+      "last_checked": "2026-09-15T01:42:54.778696+00:00",
       "fingerprints": [
         "7298381b7f82d60f",
         "db41a602c607ddc8",
@@ -2222,7 +2237,7 @@
     "tods": {
       "name": "TODS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:49.928589+00:00",
+      "last_checked": "2026-09-15T01:42:59.080141+00:00",
       "fingerprints": [
         "c24e6f6499b0b555",
         "a11356278227b8dc",
@@ -2240,7 +2255,7 @@
     "tog": {
       "name": "TOG",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:54.779379+00:00",
+      "last_checked": "2026-09-15T01:43:03.636397+00:00",
       "fingerprints": [
         "b849dcebccfeb917",
         "f0665eb4b20a27dd",
@@ -2249,7 +2264,8 @@
         "2ff439b0527cfb38",
         "412b53acbad3f0a5",
         "57eb8e963243d08f",
-        "6cd256f82750d7f9"
+        "6cd256f82750d7f9",
+        "0757e02ca9c9a7da"
       ],
       "sources": [
         "crossref"
@@ -2258,7 +2274,7 @@
     "tois": {
       "name": "TOIS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:33:58.251116+00:00",
+      "last_checked": "2026-09-15T01:43:06.919240+00:00",
       "fingerprints": [
         "e72f2544b4c3f44d",
         "c94ffa3edf8e8921",
@@ -2276,7 +2292,7 @@
     "toplas": {
       "name": "TOPLAS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:34:02.925215+00:00",
+      "last_checked": "2026-09-15T01:43:10.449149+00:00",
       "fingerprints": [
         "292121448aed7560",
         "68e0ee7353b7ef68",
@@ -2293,7 +2309,7 @@
     "tpami": {
       "name": "TPAMI",
       "baseline": true,
-      "last_checked": "2026-09-14T01:34:07.865987+00:00",
+      "last_checked": "2026-09-15T01:43:15.254139+00:00",
       "fingerprints": [
         "07d80184831b2d85",
         "aa0e375111c7078f",
@@ -2311,7 +2327,7 @@
     "tpds": {
       "name": "TPDS",
       "baseline": true,
-      "last_checked": "2026-09-14T01:34:13.579849+00:00",
+      "last_checked": "2026-09-15T01:43:20.156088+00:00",
       "fingerprints": [
         "c117d0c69e4f9a71",
         "fbcf48776d04eea1",
@@ -2329,7 +2345,7 @@
     "tse": {
       "name": "TSE",
       "baseline": true,
-      "last_checked": "2026-09-14T01:34:18.508869+00:00",
+      "last_checked": "2026-09-15T01:43:26.089070+00:00",
       "fingerprints": [
         "5d8723336a44ea29",
         "33fbfab7f41c4eb2",

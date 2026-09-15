@@ -9,6 +9,9 @@ REPO_DIR = Path(__file__).resolve().parent.parent
 # Data directories
 DATA_DIR = REPO_DIR / "data"
 DIGEST_MD = REPO_DIR / "arXiv-schedule.md"
+# Standalone HTML snapshots (one file per day, openable via file://).
+# Derived output — arXiv-schedule.md / data/*.json remain the source of truth.
+EXPORT_DIR = REPO_DIR / "exports"
 INTERESTS_MD = REPO_DIR / "interests.md"
 FEEDBACK_LOG = REPO_DIR / "feedback.jsonl"
 

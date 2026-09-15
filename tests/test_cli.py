@@ -45,7 +45,7 @@ def test_command_surface_is_exactly_the_documented_one():
     names = {".".join(prefix) for prefix, _ in _leaves(build_parser())}
 
     assert names == {
-        "fetch", "download", "feedback", "reanchor", "daily", "serve",
+        "fetch", "download", "feedback", "reanchor", "html", "daily", "serve",
         "watch.add", "watch.remove", "watch.enable", "watch.disable",
         "watch.list", "watch.run", "watch.ack", "watch.push-test",
         "ccf.list", "ccf.enable", "ccf.disable", "ccf.add", "ccf.remove",
