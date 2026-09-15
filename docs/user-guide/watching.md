@@ -164,7 +164,7 @@ python -X utf8 arxiv_daily.py watch push-test --send   # 真发一条自检消�
 上面四个通道之外，每次 `watch run` 还会**无条件**写一份独立 HTML：
 
 ```
-exports/watch-digest-<YYYYMMDD>.html
+exports/watch-digest-<YYYY-MM-DD>.html        # 注意：日期带连字符
 ```
 
 它与 `WATCH-digest.md` 的区别不是内容而是**场景**：md 是给人翻的日志，HTML 是自包含单文件，
@@ -222,7 +222,7 @@ python -X utf8 arxiv_daily.py watch run --no-push                # 只落盘 dig
 | `WATCH-digest.md` | ✅ | 人读 digest，按日期分节（`<!-- BEGIN WATCH YYYY-MM-DD -->` 幂等） |
 | `data/watch_state.json` | ✅ | 每人已见指纹 + 上次检查时间（**决定「新」的定义**，建议跟踪） |
 | `data/watch_new.json` | ✅ | 未读新作（Web 的 NEW 徽标数据源） |
-| `exports/watch-digest-<day>.html` | ❌ 派生产物 | 自包含静态快照（含「本次运行」证据表），可当附件发出去 |
+| `exports/watch-digest-<YYYY-MM-DD>.html` | ❌ 派生产物 | 自包含静态快照（含「本次运行」证据表），可当附件发出去 |
 | `watch_events.jsonl` | ❌ gitignore | 推送审计日志，append-only |
 
 ---

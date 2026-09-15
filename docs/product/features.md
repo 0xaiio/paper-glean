@@ -142,7 +142,7 @@
 - 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
 - 推送四通道：`file`（digest + Web NEW 徽标）、Web 高亮、`desktop`、`webhook`
   （`generic`/`feishu`/`wecom`）；全部 fail-soft
-- **静态 HTML 快照**：每次 `run` 无条件产出 `exports/watch-digest-<day>.html`（自包含单文件、
+- **静态 HTML 快照**：每次 `run` 无条件产出 `exports/watch-digest-<YYYY-MM-DD>.html`（自包含单文件、
   可当附件发出），零新作也出页面；顶部带「本次运行」证据表（扫描范围 / **各源取回条数** /
   新建基线 / 推送通道 / 抓取错误）
 - **盲区识别**：某人本轮一条都没取到 → 控制台 `[WARN] 盲区：…` + 页面标「盲区」，
@@ -173,7 +173,7 @@
 - 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
 - 复用同一套推送四通道，但走**独立命名空间**（`data/ccf_new.json` + `CCF-digest.md`），
   与学者监控的未读互不清除
-- **静态 HTML 快照** `exports/ccf-digest-<day>.html` + **盲区告警**（同 §11；
+- **静态 HTML 快照** `exports/ccf-digest-<YYYY-MM-DD>.html` + **盲区告警**（同 §11；
   注意 `last_error` 恒为空，判抓取成败只能看指纹数）
 - Web `/ccf` 页面：勾选框名单 + 批量勾选 + NEW 徽标 + 推送历史
 

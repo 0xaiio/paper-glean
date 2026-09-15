@@ -174,9 +174,12 @@ ensure(host, port)
 
 | 链路 | 命令 | 建议时间 | HTML 快照 | 飞书 |
 |------|------|---------|----------|------|
-| arXiv 日报 | `daily --serve` + `html` | 周一至周六 11:30 | `exports/arxiv-digest-<day>.html` | 摘要 + 附件 |
-| 学者监控 | `watch run` | 每日 09:00 | `exports/watch-digest-<day>.html` | 摘要 + 附件 |
-| CCF 监控 | `ccf run` | 每日 09:30 | `exports/ccf-digest-<day>.html` | 摘要 + 附件 |
+| arXiv 日报 | `daily --serve` + `html` | 周一至周六 11:30 | `exports/arxiv-digest-<YYYYMMDD>.html` | 摘要 + 附件 |
+| 学者监控 | `watch run` | 每日 09:00 | `exports/watch-digest-<YYYY-MM-DD>.html` | 摘要 + 附件 |
+| CCF 监控 | `ccf run` | 每日 09:30 | `exports/ccf-digest-<YYYY-MM-DD>.html` | 摘要 + 附件 |
+
+> ⚠️ **日期格式不统一**：arXiv 线是 `YYYYMMDD`，两条监控线是 `YYYY-MM-DD`。
+> 在自动化 prompt 里拼附件路径时按本表写，别统一成一种。
 
 > **监控两条线要盯「盲区」**：`watch run` / `ccf run` 都是 fail-soft，
 > 源不可达时会静默返回 0 条，与控制台打印的「没有新作 / 没有更新」长得一模一样。

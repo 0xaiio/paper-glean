@@ -199,7 +199,7 @@ python -X utf8 arxiv_daily.py watch push-test --send
 每次 `ccf run` 还会**无条件**写一份自包含单文件：
 
 ```
-exports/ccf-digest-<YYYYMMDD>.html
+exports/ccf-digest-<YYYY-MM-DD>.html
 ```
 
 与 `CCF-digest.md` 同源不同场景：md 是给人翻的日志，HTML 可 `file://` 双击即开、
@@ -255,7 +255,7 @@ python -X utf8 arxiv_daily.py ccf run --no-push       # 只落盘 digest
 | `CCF-digest.md` | ✅ | 人读 digest，按日期分节（`<!-- BEGIN CCF YYYY-MM-DD -->` 幂等） |
 | `data/ccf_state.json` | ✅ | 每条目已见指纹 + 上次检查时间（**决定「新」的定义**） |
 | `data/ccf_new.json` | ✅ | 未读更新（Web 的 NEW 徽标数据源） |
-| `exports/ccf-digest-<day>.html` | ❌ 派生产物 | 自包含静态快照（含「本次运行」证据表），可当附件发出去 |
+| `exports/ccf-digest-<YYYY-MM-DD>.html` | ❌ 派生产物 | 自包含静态快照（含「本次运行」证据表），可当附件发出去 |
 | `ccf_events.jsonl` | ❌ gitignore | 推送审计日志，append-only |
 
 ---
