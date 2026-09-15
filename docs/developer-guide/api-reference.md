@@ -158,6 +158,41 @@
         - ack_all
         - enabled_channels
 
+## 静态快照：共享构件
+
+> 三条链路（arXiv 日报 / 学者监控 / CCF 监控）的独立 HTML 共用这一层：
+> 内联样式、渐进增强脚本、HTML 转义、筛选控件与页面外壳。
+> **stdlib only**（纯字符串拼装，不引 Jinja2 —— CLI-only 安装下 Jinja2 并不存在）。
+
+::: glean.htmlkit
+    options:
+      members:
+        - STYLE
+        - SCRIPT
+        - escape
+        - controls
+        - page
+
+## 静态快照：渲染
+
+> 把一天的数据渲染成 `exports/<namespace>-digest-<day>.html`。
+> arXiv 线的推荐理由**从 `arXiv-schedule.md` 反解析**而非重算；
+> 监控线零新增**也出页面**（因为「跑了且什么都没发现」本身是证据）。
+
+::: glean.report
+    options:
+      members:
+        - MonitorView
+        - build_html
+        - build_monitor_html
+        - render_day
+        - render_monitor_day
+        - monitor_export_path
+        - latest_export
+        - latest_monitor_export
+        - group_by_category
+        - parse_recommendations
+
 ## 数据模型
 
 ::: glean.web.models

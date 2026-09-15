@@ -326,7 +326,10 @@ def run_monitor(
     * 审计事件在推送**之后**写，才能记录每条最终落到了哪些通道。
 
     返回 ``{"run_id", "day", "new_items", "grouped", "baselined", "skipped",
-    "errors", "pushed_to"}``。
+    "errors", "pushed_to", "collected"}``。
+
+    ``collected`` 是「条目名 → 本轮取回的条目数」，**与 diff 无关**：它是判断
+    「真的没有新内容」还是「源静默失败」的唯一依据（``0`` 即盲区）。
     """
     spec = job.spec
     state = load_state(job.state_path, spec.state_key)
@@ -340,6 +343,11 @@ def run_monitor(
     baselined: list[str] = []
     skipped: list[str] = []
     errors: list[str] = []
+    # 每个条目本轮**实际取回**的条目数（diff 之前）。0 是一种必须能被看见的结果：
+    # 各源的 fetch 都是 fail-soft 的（`parse_homepage` 明说不抛异常），所以
+    # 「主页挂了」与「这位学者确实没有成果」都会表现为「没有新作」，只有这个计数
+    # 能把两者分开。见 `_blind_subjects` 与 docs/user-guide/troubleshooting.md。
+    collected: dict[str, int] = {}
 
     context: Any = None
     if use_network and job.prepare is not None:
@@ -359,7 +367,9 @@ def run_monitor(
             items = job.collect(entry, use_network, context)
         except Exception as exc:  # 一个坏源不该拖垮整轮
             errors.append(f"{entry['name']}: {type(exc).__name__}: {exc}")
+            collected[entry["name"]] = 0
             continue
+        collected[entry["name"]] = len(items)
 
         for it in items:
             it["fingerprint"] = fingerprint(it)
@@ -421,4 +431,5 @@ def run_monitor(
         "skipped": skipped,
         "errors": errors,
         "pushed_to": pushed_to,
+        "collected": collected,
     }
