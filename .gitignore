@@ -130,8 +130,15 @@ ccf_events.jsonl
 # Runtime logs from the detached web service (see glean/serve.py)
 logs/
 
+# Standalone HTML snapshots (derived from data/*.json + arXiv-schedule.md)
+exports/
+
 # Agent workspace (local memory / scratch, not part of the project)
 .workbuddy/
+
+# Course-project reference material: third-party documents and personal
+# contact data (this repository is public — keep them local)
+ai/refs/
 
 # Data files (keep structure, ignore large/generated)
 # Note: data/*.json is kept as it's the source of truth

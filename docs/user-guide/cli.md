@@ -18,6 +18,7 @@ arxiv-daily <command> [options]
 | `download` | 按 ID 下载 PDF |
 | `feedback` | 人工调整推荐指数 |
 | `reanchor` | 补齐 digest 锚点与跳转链接 |
+| `html` | 把某天 digest 渲染成可直接在浏览器打开的独立 HTML |
 
 ---
 
@@ -35,7 +36,7 @@ python -X utf8 arxiv_daily.py fetch [options]
 |------|------|--------|------|
 | `--hours` | int | 24 | 回溯时间窗口（小时） |
 | `--date` | str | 今天 | 指定 digest 章节日期（YYYYMMDD） |
-| `--cap` | int | 30 | 每类别列表上限 |
+| `--cap` | int | 100 | 每类别列表上限 |
 
 ### 示例
 
@@ -66,6 +67,7 @@ python -X utf8 arxiv_daily.py fetch --cap 50
 |------|------|
 | `data/YYYYMMDD.json` | 当天全部论文原始数据 |
 | `arXiv-schedule.md` | 更新 digest 章节 |
+| `exports/arxiv-digest-YYYYMMDD.html` | 可在浏览器直接打开的独立快照 |
 
 ---
 
@@ -325,3 +327,47 @@ python -X utf8 arxiv_daily.py reanchor --date 20260729
 - 生成论文摘要锚点 `<a id="YYYYMMDD-<arxiv id>">`
 - 在推荐表中添加 `📄` 跳转链接
 - 幂等操作，可重复执行
+
+---
+
+## html — 导出独立 HTML 快照
+
+把某天的 digest 渲染成**一个文件**，`file://` 双击即可在浏览器打开，
+不需要本地 Web 服务、不需要联网、不依赖任何 CDN。
+
+```powershell
+python -X utf8 arxiv_daily.py html [--date YYYYMMDD] [--out 路径]
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `--date` | str | 今天 | 要渲染的日期 |
+| `--out` | str | `exports/arxiv-digest-<day>.html` | 输出文件路径 |
+
+### 示例
+
+```powershell
+# 渲染今天
+python -X utf8 arxiv_daily.py html
+
+# 渲染指定日期
+python -X utf8 arxiv_daily.py html --date 20260914
+
+# 指定输出位置（比如直接交给别人 / 放进网盘）
+python -X utf8 arxiv_daily.py html --date 20260914 --out D:/tmp/digest.html
+```
+
+### 行为说明
+
+- **推荐理由来自 digest**：`★ / 🧐` 两节按 `arXiv-schedule.md` 里 agent 写的内容原样呈现；
+  只有该节仍是占位符时，才退回「按命中关键词的权重和」自动排序，并在页面上明确标注。
+  所以正确顺序是：**先填 md → 再跑 `html`**。
+- **自包含**：样式与交互全部内联，无 CDN、无外链脚本；断网与 `file://` 场景下同样可读。
+- **无 JS 也能读**：搜索 / 类别筛选 / 只看出命中 / 暗色是渐进增强，全部用原生 JS 实现；
+  关掉 JS 后正文、摘要与链接照常显示。
+- **不回写画像**：静态快照背后没有服务端，页面上的「复制打分命令」按钮只把等价的
+  `feedback` 命令放进剪贴板，真正打分仍走本地 Web 服务或 CLI。
+- **派生产物**：`exports/` 不入库，`data/*.json` + `arXiv-schedule.md` 才是事实源。
+
+`fetch` / `daily` 每次运行都会顺带产出这份快照（失败只降级为 `[WARN]`），
+填完推荐后再手动跑一次 `html` 即可把人工判断同步进去。
