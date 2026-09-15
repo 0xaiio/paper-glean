@@ -120,9 +120,16 @@
 或 WorkBuddy 平台定时任务（agent 抓取 + 填推荐 + `present_files` 呈递）。
 见 [定时运行](../user-guide/scheduling.md)。
 
+**已实现（2026-09）**：
+- **飞书投递（定时任务层）**：三条链路各自把「摘要文字 + HTML 快照附件」发到飞书机器人单聊。
+  投递由自动化调用 `lark-cli` 承担，**不在 `paper-glean` 进程内** —— 凭据不进仓库、
+  投递失败不影响 digests/状态落盘、换目标只改自动化 prompt
+- **自包含 HTML 快照**（`exports/<namespace>-digest-<day>.html`）：arXiv 日报 / 学者监控 /
+  CCF 监控各一份，`file://` 双击即开、断网可读，可直接当附件发出
+
 **增强**：
 - 每日 digest 邮件
-- Telegram / 企业微信 webhook
+- Telegram / 企业微信 webhook（`notify.py` 已支持 `feishu` 载荷，飞书机器人 webhook 开箱可用）
 
 **远期**：RSS 输出端点
 
@@ -135,6 +142,11 @@
 - 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
 - 推送四通道：`file`（digest + Web NEW 徽标）、Web 高亮、`desktop`、`webhook`
   （`generic`/`feishu`/`wecom`）；全部 fail-soft
+- **静态 HTML 快照**：每次 `run` 无条件产出 `exports/watch-digest-<day>.html`（自包含单文件、
+  可当附件发出），零新作也出页面；顶部带「本次运行」证据表（扫描范围 / **各源取回条数** /
+  新建基线 / 推送通道 / 抓取错误）
+- **盲区识别**：某人本轮一条都没取到 → 控制台 `[WARN] 盲区：…` + 页面标「盲区」，
+  把「源不可达」与「真的没有新作」分开（`sources` 是累积并集、`last_checked` 成败都刷新，两者都不能当成功证据）
 - Web `/watch` 页面：名单增删 + NEW 徽标 + 推送历史
 
 **增强**：
@@ -161,6 +173,8 @@
 - 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
 - 复用同一套推送四通道，但走**独立命名空间**（`data/ccf_new.json` + `CCF-digest.md`），
   与学者监控的未读互不清除
+- **静态 HTML 快照** `exports/ccf-digest-<day>.html` + **盲区告警**（同 §11；
+  注意 `last_error` 恒为空，判抓取成败只能看指纹数）
 - Web `/ccf` 页面：勾选框名单 + 批量勾选 + NEW 徽标 + 推送历史
 
 **增强**：

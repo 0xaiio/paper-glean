@@ -175,6 +175,39 @@
 | `test_webhook_off_without_url` | 未配置则关闭 | ✅ |
 | `test_webhook_payload_shapes` | generic / feishu / wecom 三种载荷 | ✅ |
 | `test_webhook_posts_when_configured` | 配置后确实 POST | ✅ |
+
+### `tests/test_report.py`（arXiv 独立 HTML 快照）
+
+| 测试函数 | 测试内容 | 状态 |
+|----------|----------|------|
+| `test_build_html_lists_every_paper` | 页面列出当天全部论文 | ✅ |
+| `test_snapshot_is_self_contained` | **零 CDN / 零 `127.0.0.1` 外链**（`file://` + 断网可读的硬约束） | ✅ |
+| `test_titles_are_escaped` | 标题转义，防注入 | ✅ |
+| `test_recommendations_come_from_the_digest` | 推荐理由**从 `arXiv-schedule.md` 反解析**而非重算 | ✅ |
+| `test_filled_recommendations_render_verbatim` | agent 写的理由原样呈现 | ✅ |
+| `test_placeholder_block_falls_back_to_score_ranking` | 占位符时退回权重和自动排序，且页面上明确标注 | ✅ |
+| `test_render_day_writes_into_exports` | 落盘到 `exports/` | ✅ |
+| `test_render_day_without_data_is_none` | 无数据返回 `None`（arXiv 线**不**出空页） | ✅ |
+| `test_group_by_category_orders_like_the_digest` | 类别顺序与 digest 一致 | ✅ |
+
+### `tests/test_monitor_report.py`（watch / ccf 独立 HTML 快照）
+
+| 测试函数 | 测试内容 | 状态 |
+|----------|----------|------|
+| `test_snapshot_is_self_contained` | 零 CDN / 零 `127.0.0.1` 外链 | ✅ |
+| `test_dark_mode_is_opt_in` | **默认亮色**：只有 `localStorage.darkMode === 'true'` 才进暗色（防回归 `!== 'false'` 陷阱） | ✅ |
+| `test_titles_are_escaped` | 转义 | ✅ |
+| `test_subjects_and_items_are_listed` | 学者/会议名与新条目都在页面上 | ✅ |
+| `test_low_confidence_item_is_flagged` | 低置信标 ⚠️ | ✅ |
+| `test_run_report_states_the_evidence` | 「本次运行」证据表（运行编号 / 取回条数 / 通道） | ✅ |
+| `test_zero_items_with_errors_reports_them` | 零新增 + 有抓取错误 → **归因到源**，不写「健康」 | ✅ |
+| `test_blind_subject_is_flagged_not_called_healthy` | **盲区**被试标为「盲区」而非「无新增」 | ✅ |
+| `test_partly_blind_run_still_lists_what_was_found` | 部分盲区时已取到的条目照常列出 | ✅ |
+| `test_zero_items_without_errors_is_honest` | 真的零新增时如实说「没有」 | ✅ |
+| `test_scoped_run_says_so` | `--only` 写进「扫描范围」 | ✅ |
+| `test_render_monitor_day_writes_into_exports` | 落盘到 `exports/` | ✅ |
+| `test_empty_day_still_produces_a_snapshot` | **零新增也出页面**（与 `test_render_day_without_data_is_none` 刻意相反） | ✅ |
+| `test_monitor_and_arxiv_snapshots_do_not_collide` | 与 arXiv 快照文件名不冲突 | ✅ |
 | `test_webhook_failure_is_swallowed` | 网络失败降级不抛异常 | ✅ |
 | `test_push_runs_enabled_channels_only` | 编排只跑已启用通道 | ✅ |
 | `test_push_no_items_is_noop` | 空 items 直接返回不推送 | ✅ |

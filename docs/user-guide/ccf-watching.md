@@ -194,6 +194,33 @@ python -X utf8 arxiv_daily.py watch push-test          # 通道是共用的，�
 python -X utf8 arxiv_daily.py watch push-test --send
 ```
 
+### 第五个落点：HTML 快照
+
+每次 `ccf run` 还会**无条件**写一份自包含单文件：
+
+```
+exports/ccf-digest-<YYYYMMDD>.html
+```
+
+与 `CCF-digest.md` 同源不同场景：md 是给人翻的日志，HTML 可 `file://` 双击即开、
+断网可读、能直接当附件发出去。导出失败只打印 `[WARN] html 导出失败`，不影响 digest 与状态落盘。
+
+页面顶部的**「本次运行」证据表**（运行日期 / 运行编号 / 扫描范围 / 新增 / **各源取回条数** /
+新建基线 / 无变化 / 推送通道 / 抓取错误）在 CCF 这条线上尤其要紧：
+
+- `ccf run` 全程 fail-soft，**站点不可达时会静默返回 0 条**，「没有新动态」和「根本没抓到」长得一模一样；
+- `last_error` **恒为空** —— 引擎不持久化抓取错误，别指望靠它识别盲点。
+
+所以判据只有两个：**逐源取回条数**，以及控制台/页面上的 `[WARN] 盲区：…`。
+
+### 飞书投递（Feishu）：不在进程内
+
+与[学者监控](watching.md#feishu)一样，`ccf run` **自己不发飞书**，只落盘 HTML 快照；
+投递由定时任务调用 `lark-cli`（摘要文字 + HTML 附件发给机器人单聊）承担。
+好处是凭据不进仓库、飞书发不出去也不影响监控本身。
+
+> ⚠️ `lark-cli im +messages-send` 的 `--dry-run` **不能阻止发送**。自检请用 `watch push-test`。
+
 ---
 
 ## 六、定时运行
@@ -228,6 +255,7 @@ python -X utf8 arxiv_daily.py ccf run --no-push       # 只落盘 digest
 | `CCF-digest.md` | ✅ | 人读 digest，按日期分节（`<!-- BEGIN CCF YYYY-MM-DD -->` 幂等） |
 | `data/ccf_state.json` | ✅ | 每条目已见指纹 + 上次检查时间（**决定「新」的定义**） |
 | `data/ccf_new.json` | ✅ | 未读更新（Web 的 NEW 徽标数据源） |
+| `exports/ccf-digest-<day>.html` | ❌ 派生产物 | 自包含静态快照（含「本次运行」证据表），可当附件发出去 |
 | `ccf_events.jsonl` | ❌ gitignore | 推送审计日志，append-only |
 
 ---
@@ -243,6 +271,16 @@ python -X utf8 arxiv_daily.py ccf run --no-push       # 只落盘 digest
 | 主页改版后误报一堆 | 标题变了 → 指纹变了 | 删 `data/ccf_state.json` 中该条目的记录重建基线 |
 | 全量跑太慢 | 93 个条目 × 1.5s 延时 | `ccf disable --area <领域>` 批量取消，或 `--only` 分组 |
 | webhook 不通 | URL 未设、被代理拦、格式不符 | `watch push-test --send`；回环探测记得 `--noproxy '*'` |
+| `[WARN] 盲区：某会议` | 该条目本轮一条都没取到（主页不可达 / 解析规则不匹配） | 看 HTML 证据表的「各源取回」；换一个可解析的 `homepage`（如 CFP 子页） |
+| 想知道某会议是不是永久失聪 | 盲区会每天都报，但只看 `last_error` 看不出来（恒为空） | 连续几天在同一条目上出现 0 指纹即可判定；见下例 |
+
+### 已知的永久失聪条目
+
+- **TACAS**：ccfddl 只在伞形标题 `ETAPS 2027 Deadline [ESOP round 2, FoSSaCS, TACAS, iFS]`
+  里收录它，而解析要求标题的年份前缀**精确等于** venue 名（`"etaps" ≠ "tacas"`）→ 跳过；
+  主页 `www.etaps.org` 是 ETAPS 门户站，实测 0 条；DBLP 按设计不抓。**待修，勿擅自改动解析规则。**
+- **DISC**：不在 ccfddl 名录里，只有主页能取到稀疏的 2 条指纹 —— 这是**正常稀疏，不是故障**。
+  注意别按子串数它：`DISC` 会命中 "distributed"，计数虚高。
 
 ---
 

@@ -26,6 +26,8 @@ from glean.core import (
     find_paper,
 )
 from glean.ccf import (
+    KIND_ICONS as CCF_KIND_ICONS,
+    KIND_LABELS as CCF_KIND_LABELS,
     add_venue,
     load_venues,
     remove_venue,
@@ -34,9 +36,11 @@ from glean.ccf import (
     set_enabled_area,
     sync_catalog,
 )
-from glean.report import render_day
+from glean.report import MonitorView, render_day, render_monitor_day
 from glean.serve import DEFAULT_HOST, DEFAULT_PORT, base_url, ensure, log_path
 from glean.watch import (
+    KIND_ICONS as WATCH_KIND_ICONS,
+    KIND_LABELS as WATCH_KIND_LABELS,
     add_researcher,
     load_events as load_watch_events,
     load_watchlist,
@@ -73,46 +77,71 @@ def _run_fetch(hours: int, cap: int, date: str | None) -> tuple[str, int, str]:
     return day, len(papers), str(data_file)
 
 
-# ``kind`` → 人类可读标签。两条监控线的词表不同，其余输出格式完全相同。
-_WATCH_KIND_LABELS = {
-    "paper": "论文",
-    "video": "视频",
-    "report": "技术报告",
-    "talk": "报告/演讲",
-    "other": "其它",
-}
-_CCF_KIND_LABELS = {
-    "cfp": "CFP",
-    "program": "Program",
-    "papers": "接收论文",
-    "other": "其它",
-}
+# 每个监控子系统在**呈现层**的身份：措辞 + kind 词表。
+#
+# 词表从子系统模块里取（`watch.KIND_LABELS` / `ccf.KIND_LABELS`），不再在 CLI
+# 里另抄一份——控制台、digest 与 HTML 快照因此永远说同一套话。用哪套措辞
+# （语量词、digest 文件名）也收在这里，`_report_monitor_run` 与 HTML 渲染共用。
+_WATCH_VIEW = MonitorView(
+    namespace="watch",
+    title="学者监控 · 新作推送",
+    noun="新作",
+    digest_name="WATCH-digest.md",
+    kind_labels=WATCH_KIND_LABELS,
+    kind_icons=WATCH_KIND_ICONS,
+)
+_CCF_VIEW = MonitorView(
+    namespace="ccf",
+    title="CCF-A 会议 / 期刊监控",
+    noun="更新",
+    digest_name="CCF-digest.md",
+    kind_labels=CCF_KIND_LABELS,
+    kind_icons=CCF_KIND_ICONS,
+)
 
 
-def _report_monitor_run(
-    res: dict, *, noun: str, digest_name: str, kind_labels: dict[str, str]
-) -> None:
+def _render_monitor_html(view: MonitorView, res: dict, *, scope: str | None = None) -> None:
+    """把一次监控运行落成可在浏览器直接打开的静态快照。
+
+    与 ``_run_fetch`` 的 html 导出同一定位：派生产物，失败只降级为 WARN，
+    绝不让一次导出问题废掉已经落盘的 digest 与状态。零新增也会出页面——
+    「扫描跑过且什么都没发现」本身就是要留下的证据（见 monitor.py 的静默失败）。
+    """
+    try:
+        path = render_monitor_day(view, res["day"], res["grouped"], run=res, scope=scope)
+    except Exception as ex:  # pragma: no cover - 导出是尽力而为
+        print(f"[WARN] html 导出失败: {ex}", file=sys.stderr)
+        return
+    print(f"[OK] html snapshot -> {path}")
+
+
+def _report_monitor_run(res: dict, view: MonitorView) -> None:
     """Print one monitor run.
 
     ``watch`` 与 ``ccf`` 的这份输出原本各写一遍，只差三个措辞（新作/更新、
     digest 文件名、kind 词表），因此收敛到这里；``res`` 的形状由
-    ``monitor.run_monitor`` 保证一致。
+    ``monitor.run_monitor`` 保证一致，措辞由 :class:`MonitorView` 提供。
     """
     for b in res["baselined"]:
         print(f"[BASE] {b} — 已建立基线，本次不推送（加 --force 可强制推送）")
     for name, items in res["grouped"].items():
-        print(f"[NEW] {name}: {len(items)} 条{noun}")
+        print(f"[NEW] {name}: {len(items)} 条{view.noun}")
         for it in items:
-            label = kind_labels.get(it.get("kind"), "其它")
+            label = view.kind_labels.get(it.get("kind"), "其它")
             extra = f"  截稿 {it['deadline']}" if it.get("deadline") else ""
             flag = " ⚠️低置信" if (it.get("confidence") or 1.0) < 0.6 else ""
             print(f"      · [{label}] {it['title'][:80]}{extra}{flag}")
     if not res["grouped"] and not res["baselined"]:
-        print(f"[OK] 没有{noun}")
+        print(f"[OK] 没有{view.noun}")
     for err in res["errors"]:
         print(f"[WARN] {err}")
+    # 盲区：本轮取回 0 条的条目。抓取是 fail-soft 的，主页挂掉只会让 collect 返回 []，
+    # 与「确实没有新内容」在结果上完全一样——不把它显式打出来，就是静默假阴性。
+    blind = [name for name, n in (res.get("collected") or {}).items() if not n]
+    if blind:
+        print(f"[WARN] 盲区：{', '.join(blind)} —— 本轮一条内容都没取到，源可能不可达（不是「没有新作」）")
     if res["new_items"]:
-        print(f"[OK] 共 {len(res['new_items'])} 条{noun} -> {digest_name} (run {res['run_id']})")
+        print(f"[OK] 共 {len(res['new_items'])} 条{view.noun} -> {view.digest_name} (run {res['run_id']})")
         print(f"[OK] 推送通道: {', '.join(res['pushed_to']) or '无（仅落盘 digest）'}")
 
 
@@ -209,9 +238,8 @@ def cmd_watch_list(args: argparse.Namespace) -> None:
 def cmd_watch_run(args: argparse.Namespace) -> None:
     """Scan every enabled researcher and push what is new."""
     res = run_watch(only=args.only, force=args.force, push=not args.no_push)
-    _report_monitor_run(
-        res, noun="新作", digest_name="WATCH-digest.md", kind_labels=_WATCH_KIND_LABELS
-    )
+    _report_monitor_run(res, _WATCH_VIEW)
+    _render_monitor_html(_WATCH_VIEW, res, scope=args.only)
 
 
 def cmd_watch_ack(args: argparse.Namespace) -> None:
@@ -302,9 +330,8 @@ def cmd_ccf_remove(args: argparse.Namespace) -> None:
 def cmd_ccf_run(args: argparse.Namespace) -> None:
     """Scan every ticked venue and push what is new."""
     res = run_ccf(only=args.only, force=args.force, push=not args.no_push)
-    _report_monitor_run(
-        res, noun="更新", digest_name="CCF-digest.md", kind_labels=_CCF_KIND_LABELS
-    )
+    _report_monitor_run(res, _CCF_VIEW)
+    _render_monitor_html(_CCF_VIEW, res, scope=args.only)
 
 
 def cmd_ccf_ack(args: argparse.Namespace) -> None:

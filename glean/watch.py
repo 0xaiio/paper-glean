@@ -62,6 +62,18 @@ KIND_ICONS = {
     "other": "\U0001f517",  # 🔗
 }
 
+# Single vocabulary for every surface (console / Web / digest / HTML snapshot).
+# The digest line itself carries only the icon — the label is what makes
+# ``kind`` readable to a human, so it lives next to the icons rather than being
+# re-typed per consumer.
+KIND_LABELS = {
+    "paper": "论文",
+    "video": "视频",
+    "report": "技术报告",
+    "talk": "报告/演讲",
+    "other": "其它",
+}
+
 DBLP_SEARCH = "https://dblp.org/search/publ/api"
 DBLP_PID = "https://dblp.org/pid/{pid}.xml"
 S2_AUTHOR_PAPERS = "https://api.semanticscholar.org/graph/v1/author/{aid}/papers"
@@ -512,7 +524,8 @@ def run(
     """Scan every enabled researcher and return what is new.
 
     Returns ``{"run_id", "day", "new_items", "grouped", "baselined", "skipped",
-    "errors", "pushed_to"}``.
+    "errors", "pushed_to", "collected"}`` — ``collected`` (条目名 → 本轮取回数)
+    is what separates "真的没有新作" from "主页不可达导致静默空转"。
     """
     from glean.config import WATCH_REQUEST_INTERVAL
 

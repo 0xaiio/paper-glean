@@ -50,6 +50,8 @@ glean/
 ├── homeparse.py     # 个人主页启发式解析（stdlib html.parser，零依赖）
 ├── venueparse.py    # 会议/期刊页解析 + ccfddl RSS + Crossref 卷期（零依赖）
 ├── notify.py        # 推送四通道（file / desktop / webhook / Web NEW），双命名空间
+├── htmlkit.py       # 静态快照共享构件（内联 CSS/JS、escape、筛选控件、页面外壳）
+├── report.py        # 独立 HTML 快照渲染（arXiv / watch / ccf 三条链路共用同一套骨架）
 ├── config.py        # 常量与配置
 └── web/
     ├── main.py      # FastAPI 应用工厂（含 watch_new_count / ccf_new_count 模板全局）

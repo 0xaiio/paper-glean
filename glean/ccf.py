@@ -471,7 +471,8 @@ def run(
     """Scan every ticked venue and return what is new.
 
     Returns ``{"run_id", "day", "new_items", "grouped", "baselined", "skipped",
-    "errors", "pushed_to"}``.
+    "errors", "pushed_to", "collected"}`` — ``collected`` (条目名 → 本轮取回数)
+    is what separates "真的没有更新" from "源不可达导致静默空转"。
     """
     from glean.config import CCF_REQUEST_INTERVAL
 

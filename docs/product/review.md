@@ -85,6 +85,8 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 | `glean/homeparse.py` | 主页启发式解析（stdlib `html.parser` 零依赖）：论文/视频/TR/talk + 置信度 | ✅ |
 | `glean/venueparse.py` | 会议/期刊页启发式解析（cfp/program/papers）+ ccfddl RSS + Crossref 卷期 | ✅ |
 | `glean/notify.py` | 推送四通道 `file`/Web NEW/`desktop`/`webhook`（generic·feishu·wecom），全 fail-soft；支持 `watch`/`ccf` 双命名空间 | ✅ |
+| `glean/htmlkit.py` | 静态快照共享构件：内联 CSS/JS（暗色 opt-in）、`escape()`、筛选控件、页面外壳 `page()`；三条链路共用 | ✅ |
+| `glean/report.py` | 独立 HTML 快照渲染：arXiv 的 `build_html()`（理由从 digest 反解析）+ watch/ccf 的 `MonitorView`/`build_monitor_html()`（零新增也出页面，含运行证据表与盲区标注） | ✅ |
 | `glean/web/main.py` | FastAPI 应用工厂、静态挂载；`watch_new_count` / `ccf_new_count` 模板全局（导航未读角标） | ✅ |
 | `glean/web/routes.py` | 页面 / API（含 `/api/ping` 存活探测）/ HTMX 片段三类路由；`PaperFilters` 查询参数组与 `_require_paper` / `_require_entry` / `_run_summary` 三个共用助手 | ✅ |
 | `glean/web/models.py` | Pydantic 线上模型 + `PaperFilters`（`Depends()` 注入的查询参数组） | ✅ |
@@ -141,7 +143,7 @@ Crossref 卷期分组与指纹稳定性）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组；
 并在进程内遍历 `build_parser()` 的命令树，断言**每个叶子子命令都挂了 `func`**、
 命令面恰好是文档所载的 22 个叶子、`watch run` 与 `ccf run` 共用同一组标志）。
-共 **160 个测试，全部通过**（`pytest -q` → `160 passed`）。
+共 **183 个测试，全部通过**（`pytest -q` → `183 passed`）。
 
 ---
 
