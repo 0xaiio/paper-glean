@@ -454,15 +454,26 @@ def apply_feedback(
 # Reanchor
 # ------------------------------------------------------------------
 
+def has_day_section(day: str) -> bool:
+    """Whether ``day`` has a BEGIN/END-delimited section in the digest.
+
+    Kept separate from :func:`reanchor_day` so callers can tell "no such day"
+    apart from "nothing to do" — conflating the two made the CLI print ``[ERR]``
+    on an already-fully-anchored section, i.e. on the happy path.
+    """
+    if not DIGEST_MD.exists():
+        return False
+    content = DIGEST_MD.read_text(encoding="utf-8")
+    return f"<!-- BEGIN {day} -->" in content and f"<!-- END {day} -->" in content
+
+
 def reanchor_day(day: str | None = None) -> tuple[int, int]:
     """Add anchors and jump links for a day's section. Returns (n_anchor, n_link)."""
     day = day or datetime.now().strftime("%Y%m%d")
-    if not DIGEST_MD.exists():
+    if not has_day_section(day):
         return 0, 0
     content = DIGEST_MD.read_text(encoding="utf-8")
     begin, endm = f"<!-- BEGIN {day} -->", f"<!-- END {day} -->"
-    if begin not in content or endm not in content:
-        return 0, 0
     i, j = content.index(begin), content.index(endm) + len(endm)
     out: list[str] = []
     n_anchor, n_link = 0, 0

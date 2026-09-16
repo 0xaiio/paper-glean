@@ -19,6 +19,7 @@ from glean.core import (
     download_paper,
     fetch_all,
     load_interest_entries,
+    has_day_section,
     reanchor_day,
     save_day_data,
     upsert_digest,
@@ -404,9 +405,13 @@ def cmd_html(args: argparse.Namespace) -> None:
 def cmd_reanchor(args: argparse.Namespace) -> None:
     """Re-anchor a day's section."""
     day = args.date or datetime.now().strftime("%Y%m%d")
+    if not has_day_section(day):
+        print(f"[ERR] digest 中无 {day} 章节")
+        return
     n_anchor, n_link = reanchor_day(day)
     if n_anchor == 0 and n_link == 0:
-        print(f"[ERR] digest 中无 {day} 章节")
+        # 幂等重跑是常态（定时任务每天跑），「无需改动」不是错误。
+        print(f"[OK] {day}: 锚点与跳转链接均已是最新，无需改动")
     else:
         print(f"[OK] {day}: +{n_anchor} 锚点, +{n_link} 跳转链接")
 
