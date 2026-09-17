@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-15T01:43:26.092670+00:00",
-  "day": "2026-09-15",
+  "updated": "2026-09-17T01:41:22.992614+00:00",
+  "day": "2026-09-17",
   "items": [
     {
       "title": "Submission deadline Wednesday, 20 January 2027 Full call coming soon",
@@ -182,6 +182,198 @@
       "article_count": 1,
       "fingerprint": "0757e02ca9c9a7da",
       "key": "tog"
+    },
+    {
+      "title": "The official schedule for the conference has been posted for both online and in-person days! September 15, 2026",
+      "url": "https://cscw.acm.org/2026/onlineprogram.html",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "CSCW",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "e2325530a7f040d3",
+      "key": "cscw"
+    },
+    {
+      "title": "Awards for this year's conference have been announced! September 10, 2026",
+      "url": "https://cscw.acm.org/2026/programoverview.html",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "CSCW",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "5a9dc72dab9e59d5",
+      "key": "cscw"
+    },
+    {
+      "title": "ECCV 2024 Proceedings",
+      "url": "https://link.springer.com/book/10.1007/978-3-031-73033-7",
+      "kind": "papers",
+      "year": 2024,
+      "deadline": "",
+      "venue": "ECCV",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "16623b033f386e6b",
+      "key": "eccv"
+    },
+    {
+      "title": "SPLASH/ISSTA Program",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "465341ba03de3196",
+      "key": "oopsla"
+    },
+    {
+      "title": "Your Program",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "68a1c73d2a327046",
+      "key": "oopsla"
+    },
+    {
+      "title": "Sat 3 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "43fcf672e2306eb8",
+      "key": "oopsla"
+    },
+    {
+      "title": "Sun 4 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "6d6bf158afd945c0",
+      "key": "oopsla"
+    },
+    {
+      "title": "Mon 5 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "214724549fba98e7",
+      "key": "oopsla"
+    },
+    {
+      "title": "Tue 6 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "4a8b2f1c2ce63b69",
+      "key": "oopsla"
+    },
+    {
+      "title": "Wed 7 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "e5ef2f265876be8e",
+      "key": "oopsla"
+    },
+    {
+      "title": "Thu 8 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "472057689c907778",
+      "key": "oopsla"
+    },
+    {
+      "title": "Fri 9 Oct",
+      "url": "https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.7,
+      "fingerprint": "ef75974e9b4e2e7b",
+      "key": "oopsla"
+    },
+    {
+      "title": "Program",
+      "url": "http://2026.rtss.org/program/program/",
+      "kind": "program",
+      "year": 2026,
+      "deadline": "",
+      "venue": "RTSS",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "5ae345bd34120179",
+      "key": "rtss"
+    },
+    {
+      "title": "IJCAI 2026 Proceedings",
+      "url": "https://www.ijcai.org/proceedings/2026/",
+      "kind": "papers",
+      "year": 2026,
+      "deadline": "",
+      "venue": "IJCAI",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "90f54918ed38e54e",
+      "key": "ijcai"
+    },
+    {
+      "title": "Spring Accepted Papers",
+      "url": "https://www.usenix.org/conference/nsdi27/spring_accepted_papers",
+      "kind": "papers",
+      "year": null,
+      "deadline": "",
+      "venue": "NSDI",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "47eb2e978ccc7c3c",
+      "key": "nsdi"
+    },
+    {
+      "title": "Jaromír Antoch",
+      "url": "https://2026.splashcon.org/profile/jaromirantoch",
+      "kind": "papers",
+      "year": 2026,
+      "deadline": "",
+      "venue": "OOPSLA",
+      "source": "homepage",
+      "confidence": 0.85,
+      "fingerprint": "3412ebef44823c5f",
+      "key": "oopsla"
     }
   ]
 }

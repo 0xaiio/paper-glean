@@ -4,6 +4,53 @@
 > 每次 `arxiv_daily.py ccf run` 只追加**新发现**的 CFP / Program / 接收论文列表。
 > 用法与故障排查见 [docs/user-guide/ccf-watching.md](docs/user-guide/ccf-watching.md)。
 
+<!-- BEGIN CCF 2026-09-17 -->
+
+## 2026-09-17
+
+### IJCAI　`1 条更新`
+
+- 📄 **IJCAI 2026 Proceedings** — 接收论文 · 2026 — [链接](https://www.ijcai.org/proceedings/2026/) · 来源 homepage
+
+### NSDI　`1 条更新`
+
+- 📄 **Spring Accepted Papers** — 接收论文 — [链接](https://www.usenix.org/conference/nsdi27/spring_accepted_papers) · 来源 homepage
+
+### OOPSLA　`1 条更新`
+
+- 📄 **Jaromír Antoch** — 接收论文 · 2026 — [链接](https://2026.splashcon.org/profile/jaromirantoch) · 来源 homepage
+
+<!-- END CCF 2026-09-17 -->
+<!-- BEGIN CCF 2026-09-16 -->
+
+## 2026-09-16
+
+### CSCW　`2 条更新`
+
+- 📅 **The official schedule for the conference has been posted for both online and in-person days! September 15, 2026** — 会议日程 · 2026 — [链接](https://cscw.acm.org/2026/onlineprogram.html) · 来源 homepage
+- 📅 **Awards for this year's conference have been announced! September 10, 2026** — 会议日程 · 2026 — [链接](https://cscw.acm.org/2026/programoverview.html) · 来源 homepage
+
+### ECCV　`1 条更新`
+
+- 📄 **ECCV 2024 Proceedings** — 接收论文 · 2024 — [链接](https://link.springer.com/book/10.1007/978-3-031-73033-7) · 来源 homepage
+
+### OOPSLA　`9 条更新`
+
+- 📅 **SPLASH/ISSTA Program** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Your Program** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Sat 3 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Sun 4 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Mon 5 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Tue 6 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Wed 7 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Thu 8 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+- 📅 **Fri 9 Oct** — 会议日程 · 2026 — [链接](https://conf.researchr.org/program/splash-issta-2026/program-splash-issta-2026/) · 来源 homepage
+
+### RTSS　`1 条更新`
+
+- 📅 **Program** — 会议日程 · 2026 — [链接](http://2026.rtss.org/program/program/) · 来源 homepage
+
+<!-- END CCF 2026-09-16 -->
 <!-- BEGIN CCF 2026-09-15 -->
 
 ## 2026-09-15
