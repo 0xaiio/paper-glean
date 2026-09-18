@@ -4,6 +4,13 @@
 > 每次 `arxiv_daily.py watch run` 只追加**新发现**的条目；已推送过的不会再出现。
 > 用法与故障排查见 [docs/user-guide/watching.md](docs/user-guide/watching.md)。
 
+<!-- BEGIN WATCH 2026-09-18 -->
+
+## 2026-09-18
+
+_本次运行没有发现新作。_
+
+<!-- END WATCH 2026-09-18 -->
 <!-- BEGIN WATCH 2026-09-17 -->
 
 ## 2026-09-17
