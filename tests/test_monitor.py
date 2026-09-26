@@ -167,10 +167,21 @@ ENTRIES = [
 ]
 
 
-def _job(tmp_path, collect, **overrides) -> monitor.MonitorJob:
+def _job(tmp_path, collect, saved=None, **overrides) -> monitor.MonitorJob:
+    """Build a job over a fixed roster.
+
+    ``saved`` 可选：传入一个 list 时，``save_entries`` 会把每次写回的名单快照
+    append 进去，供「启停 / 移除」类断言使用。扫描流程本身不写名单，所以多数
+    用例不需要它。
+    """
     kwargs = {
         "spec": _spec(),
         "entries": lambda: ENTRIES,
+        "save_entries": (
+            (lambda entries: saved.append([dict(e) for e in entries]))
+            if saved is not None
+            else (lambda entries: None)
+        ),
         "state_path": tmp_path / "state.json",
         "events_path": tmp_path / "events.jsonl",
         "digest_path": tmp_path / "digest.md",
@@ -186,6 +197,119 @@ def _fixed(titles):
         return [{"title": t, "url": "", "source": "stub"} for t in titles]
 
     return collect
+
+
+# ------------------------------------------------------------------
+# 名单变更（启停 / 遗忘指纹）
+#
+# 这一段是 watch 与 ccf 的**共用**实现，所以在这里测一次即可覆盖两条线；
+# 两侧各自的 `set_enabled` / `remove_*` 只是转发（见 test_watch / test_ccf）。
+# ------------------------------------------------------------------
+
+
+def _mutation_job(tmp_path, entries, saved):
+    """A job over a caller-owned roster, so mutation tests can't leak state.
+
+    ``ENTRIES``（上面那个共享名单）不能用于本组用例：`set_enabled_where` 会
+    **就地**改名单，用它会污染其它用例。
+    """
+    return monitor.MonitorJob(
+        spec=_spec(),
+        entries=lambda: entries,
+        save_entries=lambda es: saved.append([dict(e) for e in es]),
+        state_path=tmp_path / "state.json",
+        events_path=tmp_path / "events.jsonl",
+        digest_path=tmp_path / "digest.md",
+        digest_header="# H\n\n",
+        render_item=lambda i: i["title"],
+        collect=lambda entry, use_network, _ctx: [],
+    )
+
+
+def test_set_enabled_toggles_one_and_leaves_the_rest_alone(tmp_path):
+    entries = [
+        {"name": "Alice", "key": "alice", "enabled": True},
+        {"name": "Bob", "key": "bob", "enabled": False},
+    ]
+    saved: list[list[dict[str, object]]] = []
+    job = _mutation_job(tmp_path, entries, saved)
+
+    assert monitor.set_enabled(job, "Bob", True) is True
+    assert saved[-1][0]["enabled"] is True  # Alice 不受影响
+    assert saved[-1][1]["enabled"] is True
+
+
+def test_set_enabled_is_false_for_unknown_name_and_writes_nothing(tmp_path):
+    entries = [{"name": "Alice", "key": "alice", "enabled": True}]
+    saved: list[list[dict[str, object]]] = []
+    job = _mutation_job(tmp_path, entries, saved)
+
+    assert monitor.set_enabled(job, "Nobody", True) is False
+    assert saved == []  # 没命中就不写盘，避免无意义的 mtime 变化
+
+
+def test_set_enabled_where_is_bulk_and_reports_touched(tmp_path):
+    entries = [
+        {"name": "Alice", "key": "alice", "area": "数据库", "enabled": True},
+        {"name": "Bob", "key": "bob", "area": "理论", "enabled": True},
+        {"name": "Carol", "key": "carol", "area": "数据库", "enabled": True},
+    ]
+    saved: list[list[dict[str, object]]] = []
+    job = _mutation_job(tmp_path, entries, saved)
+
+    touched = monitor.set_enabled_where(
+        job, lambda e: "数据库" in e.get("area", ""), False
+    )
+    assert touched == ["Alice", "Carol"]
+    assert [e["enabled"] for e in saved[-1]] == [False, True, False]
+
+
+def test_forget_state_removes_seen_fingerprints(tmp_path):
+    """移除名单条目后必须连指纹一起删，否则重新加入时会「全都见过」而永不推送。"""
+    entries = [{"name": "Alice", "key": "alice", "enabled": True}]
+    saved: list[list[dict[str, object]]] = []
+    job = _mutation_job(tmp_path, entries, saved)
+    monitor.save_state(
+        job.state_path, {"version": 1, "researchers": {"alice": {"fingerprints": ["abc"]}}}
+    )
+
+    assert monitor.forget_state(job, "alice") is True
+    assert "alice" not in monitor.load_state(job.state_path, "researchers")["researchers"]
+    # 幂等：状态里本来就没记录时也不会报错（移除名单条目时无法保证一定有）
+    assert monitor.forget_state(job, "alice") is False
+
+
+def test_each_subsystem_wires_its_own_request_interval_into_the_job():
+    """节流值挂在 job 上，两个子系统就不必各写一遍「取配置 or 取入参」的样板。"""
+    from glean import ccf, watch
+    from glean.config import CCF_REQUEST_INTERVAL, WATCH_REQUEST_INTERVAL
+
+    assert watch._job().request_interval == WATCH_REQUEST_INTERVAL
+    assert ccf._job().request_interval == CCF_REQUEST_INTERVAL
+
+
+def test_run_monitor_prefers_an_explicit_delay_over_the_job_default(tmp_path):
+    """显式入参优先——`run(..., request_interval=0)` 必须能关掉节流。"""
+    job = _job(tmp_path, _fixed(["P1"]), request_interval=99.0)
+    result = monitor.run_monitor(job, push=False, delay=0)
+    assert result["baselined"] == ["Alice（1 条基线）"]
+
+
+# ------------------------------------------------------------------
+# 共享词表：同一 kind 不得在不同界面出现两种说法
+# ------------------------------------------------------------------
+
+
+def test_kind_vocabulary_has_one_source_of_truth():
+    """`program` 曾漂移成「会议日程」(digest) / 「会议日程 (Program)」(推送)。"""
+    from glean import ccf, kinds, notify, watch
+
+    assert watch.KIND_LABELS is kinds.WATCH_KIND_LABELS
+    assert ccf.KIND_LABELS is kinds.CCF_KIND_LABELS
+    # 推送文案用的是合并视图，必须与子系统自身的说法逐字一致
+    assert notify._KIND_LABEL is kinds.KIND_LABELS
+    for key, label in ccf.KIND_LABELS.items():
+        assert kinds.KIND_LABELS[key] == label
 
 
 def test_first_run_baselines_silently_then_reports_only_the_delta(tmp_path):

@@ -124,12 +124,17 @@ class MonitorJob:
     Attributes:
         spec: 子系统的静态身份。
         entries: 读取名单（``load_watchlist`` / ``load_venues``）。
+        save_entries: 写回名单（``_save_entries`` / ``_save``）。扫描流程不用它，
+            但「启停 / 移除」这类**改名单**的操作要用——把它和 ``entries`` 放在
+            一起，是为了让这类操作也只写一份（见 :func:`set_enabled`）。
         state_path: 已见指纹状态文件。
         events_path: append-only 审计日志。
         digest_path: 人类可读的 Markdown digest。
         digest_header: digest 首次创建时的文件头。
         render_item: 单条条目 → digest 里的一行 Markdown。
         collect: 把名单条目变成候选条目；签名 ``(entry, use_network, context)``。
+        request_interval: 相邻两次抓取之间的节流秒数。放在 job 上而不是每次
+            ``run()`` 现取配置常量，省掉两个子系统各写一遍的取值样板。
         prepare: 循环前的一次性准备（ccf 用它把 ccfddl RSS 只下载一次），
             返回 ``(errors, context)``，``context`` 会原样传给 ``collect``。
         accept: 采集后的清洗钩子（watch 用它按年份砍掉过老的主页条目）。
@@ -137,12 +142,14 @@ class MonitorJob:
 
     spec: MonitorSpec
     entries: Callable[[], list[dict[str, Any]]]
+    save_entries: Callable[[list[dict[str, Any]]], None]
     state_path: Path
     events_path: Path
     digest_path: Path
     digest_header: str
     render_item: Callable[[dict[str, Any]], str]
     collect: Callable[[dict[str, Any], bool, Any], list[dict[str, Any]]]
+    request_interval: float = 0.0
     prepare: Callable[[], tuple[list[str], Any]] | None = None
     accept: Callable[[dict[str, Any], list[dict[str, Any]]], list[dict[str, Any]]] | None = None
 
@@ -169,6 +176,57 @@ def save_state(path: Path, state: dict[str, Any]) -> None:
     path.write_text(
         json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+
+
+# ------------------------------------------------------------------
+# 名单变更（启停 / 移除）
+#
+# 这一段此前在 watch / ccf 各写一遍：「遍历名单 → 改 enabled → 写回」和
+# 「移除后把已见指纹也删掉」。后者尤其危险——忘删指纹，日后重新加入同名条目
+# 会因为「全都见过」而永远不推送，且没有任何报错。收口到这里，两个子系统
+# 只需各留一行调用。
+# ------------------------------------------------------------------
+
+
+def forget_state(job: MonitorJob, key: str) -> bool:
+    """移除某条目的已见指纹，让下次运行为它重建基线。返回是否真的删掉了什么。
+
+    从名单里移除条目后**必须**调用，否则该条目的指纹会永远留在状态文件里。
+    """
+    state = load_state(job.state_path, job.spec.state_key)
+    subjects = state.setdefault(job.spec.state_key, {})
+    if key not in subjects:
+        return False
+    subjects.pop(key)
+    save_state(job.state_path, state)
+    return True
+
+
+def set_enabled(job: MonitorJob, name: str, enabled: bool) -> bool:
+    """启用 / 暂停名单里的一条（按 key 匹配）。返回是否命中。"""
+    wanted = slugify(name)
+    return bool(set_enabled_where(job, lambda e: e.get("key") == wanted, enabled))
+
+
+def set_enabled_where(
+    job: MonitorJob,
+    predicate: Callable[[dict[str, Any]], bool],
+    enabled: bool,
+) -> list[str]:
+    """批量启用 / 暂停满足 ``predicate`` 的条目，返回被改动的条目名。
+
+    :func:`set_enabled` 是它的单条特例；ccf 的「按领域全选 / 全不选」直接用它。
+    没有任何条目命中时**不写盘**（与历史行为一致，避免无意义的 mtime 变化）。
+    """
+    entries = job.entries()
+    touched: list[str] = []
+    for e in entries:
+        if predicate(e):
+            e["enabled"] = enabled
+            touched.append(e["name"])
+    if touched:
+        job.save_entries(entries)
+    return touched
 
 
 # ------------------------------------------------------------------
@@ -325,6 +383,9 @@ def run_monitor(
     * 有新条目才推送；无论有无新条目都会落盘一份当日 digest。
     * 审计事件在推送**之后**写，才能记录每条最终落到了哪些通道。
 
+    ``delay`` 为 ``None`` 时取 ``job.request_interval``（把节流值挂在 job 上，
+    省掉两个子系统各写一遍的「取配置常量 or 取入参」样板）。
+
     返回 ``{"run_id", "day", "new_items", "grouped", "baselined", "skipped",
     "errors", "pushed_to", "collected"}``。
 
@@ -346,8 +407,10 @@ def run_monitor(
     # 每个条目本轮**实际取回**的条目数（diff 之前）。0 是一种必须能被看见的结果：
     # 各源的 fetch 都是 fail-soft 的（`parse_homepage` 明说不抛异常），所以
     # 「主页挂了」与「这位学者确实没有成果」都会表现为「没有新作」，只有这个计数
-    # 能把两者分开。见 `_blind_subjects` 与 docs/user-guide/troubleshooting.md。
+    # 能把两者分开。消费方见 `glean.report._blind_subjects`（盲区告警）。
     collected: dict[str, int] = {}
+
+    delay = job.request_interval if delay is None else delay
 
     context: Any = None
     if use_network and job.prepare is not None:
@@ -398,29 +461,26 @@ def run_monitor(
 
     save_state(job.state_path, state)
 
+    # 无论有没有新条目都落盘当日 digest。安静日那句「本次运行没有发现…」本身就是
+    # 要给人看的证据——监控线与 arXiv 线相反，零新增也要出页面（见 report.py）。
+    # 空分组由 render_section 自己渲染成空态文案，所以这里不需要分支。
+    upsert_digest(
+        job.digest_path,
+        job.digest_header,
+        spec.digest_marker,
+        day,
+        render_section(spec, day, grouped, job.render_item),
+    )
+
     pushed_to: list[str] = []
+    if new_items and push:
+        try:
+            pushed_to = notify.push(new_items, day=day, namespace=spec.namespace) or []
+        except Exception as exc:
+            errors.append(f"push: {type(exc).__name__}: {exc}")
     if new_items:
-        upsert_digest(
-            job.digest_path,
-            job.digest_header,
-            spec.digest_marker,
-            day,
-            render_section(spec, day, grouped, job.render_item),
-        )
-        if push:
-            try:
-                pushed_to = notify.push(new_items, day=day, namespace=spec.namespace) or []
-            except Exception as exc:
-                errors.append(f"push: {type(exc).__name__}: {exc}")
+        # 事件在推送**之后**写，才能记录每条最终落到了哪些通道。
         append_events(job.events_path, new_items, pushed_to, run_id, spec.subject_field)
-    else:
-        upsert_digest(
-            job.digest_path,
-            job.digest_header,
-            spec.digest_marker,
-            day,
-            render_section(spec, day, {}, job.render_item),
-        )
 
     return {
         "run_id": run_id,

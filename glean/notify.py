@@ -32,11 +32,11 @@ import platform
 import subprocess
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from glean.config import CCF_NEW, WATCH_NEW
-
-CHANNELS = ("file", "desktop", "webhook")
+from glean.kinds import KIND_LABELS as _KIND_LABEL
 
 # A push target is a *namespace*: researchers and CCF venues keep separate
 # unacknowledged sets so that "mark read" on one page never clears the other.
@@ -44,26 +44,13 @@ _NEW_PATHS = {"watch": "WATCH_NEW", "ccf": "CCF_NEW"}
 NS_LABEL = {"watch": "监控", "ccf": "CCF 监控"}
 
 
-def _new_path(namespace: str):
+def _new_path(namespace: str) -> Path:
     """Resolve the unacknowledged-set file for ``namespace`` (late-bound so
     tests can ``monkeypatch`` the module global)."""
     try:
         return globals()[_NEW_PATHS[namespace]]
     except KeyError:
         raise ValueError(f"unknown notify namespace: {namespace!r}") from None
-
-
-_KIND_LABEL = {
-    "paper": "论文",
-    "video": "视频",
-    "report": "技术报告",
-    "talk": "报告/演讲",
-    # CCF venue monitoring
-    "cfp": "征稿 (CFP)",
-    "program": "会议日程 (Program)",
-    "papers": "接收论文列表",
-    "other": "其它",
-}
 
 
 def _subject(item: dict[str, Any]) -> str:

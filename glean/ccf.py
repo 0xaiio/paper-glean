@@ -41,8 +41,12 @@ from glean.config import (
     CCF_ITEM_KINDS,
     CCF_MAX_ITEMS,
     CCF_MD,
+    CCF_REQUEST_INTERVAL,
     CCF_STATE,
 )
+# 词表来自 glean.kinds —— 与 watch / notify 共用同一份定义。
+from glean.kinds import CCF_KIND_ICONS as KIND_ICONS
+from glean.kinds import CCF_KIND_LABELS as KIND_LABELS
 from glean.monitor import fingerprint, kind_of, slugify
 from glean.venueparse import (
     fetch_crossref_issues,
@@ -50,20 +54,6 @@ from glean.venueparse import (
     parse_ccfddl,
     parse_venue_page,
 )
-
-KIND_ICONS = {
-    "cfp": "\U0001f4e2",  # 📢
-    "program": "\U0001f4c5",  # 📅
-    "papers": "\U0001f4c4",  # 📄
-    "other": "\U0001f517",  # 🔗
-}
-
-KIND_LABELS = {
-    "cfp": "征稿 (CFP)",
-    "program": "会议日程",
-    "papers": "接收论文",
-    "other": "其它",
-}
 
 CCF_DIGEST_HEADER = """# CCF-A 会议 / 期刊监控
 
@@ -252,39 +242,24 @@ def remove_venue(name: str) -> bool:
     if len(kept) == len(entries):
         return False
     _save(kept)
-    state = load_state()
-    if key in state.get("venues", {}):
-        state["venues"].pop(key)
-        save_state(state)
+    # 指纹也必须一起删：否则日后重新勾选同名会议时，会因为「全都见过」而永不推送。
+    monitor.forget_state(_job(), key)
     return True
 
 
 def set_enabled(name: str, enabled: bool) -> bool:
     """Tick / untick one venue. Returns True if found."""
-    entries = load_venues()
-    key = slugify(name)
-    hit = False
-    for e in entries:
-        if e["key"] == key:
-            e["enabled"] = enabled
-            hit = True
-    if hit:
-        _save(entries)
-    return hit
+    return monitor.set_enabled(_job(), name, enabled)
 
 
 def set_enabled_area(area: str, enabled: bool) -> list[str]:
     """Bulk tick / untick every venue whose ``area`` contains ``area``."""
     needle = (area or "").strip().lower()
-    entries = load_venues()
-    touched: list[str] = []
-    for e in entries:
-        if needle and needle in (e.get("area") or "").lower():
-            e["enabled"] = enabled
-            touched.append(e["name"])
-    if touched:
-        _save(entries)
-    return touched
+    if not needle:
+        return []
+    return monitor.set_enabled_where(
+        _job(), lambda e: needle in (e.get("area") or "").lower(), enabled
+    )
 
 
 def sync_catalog(default_enabled: bool = True) -> tuple[int, int]:
@@ -384,11 +359,6 @@ def save_state(state: dict[str, Any]) -> None:
     monitor.save_state(CCF_STATE, state)
 
 
-def append_events(items: list[dict[str, Any]], pushed_to: list[str], run_id: str) -> None:
-    """Append one JSON line per new item to ``ccf_events.jsonl``."""
-    monitor.append_events(CCF_EVENTS, items, pushed_to, run_id, _SPEC.subject_field)
-
-
 def load_events(limit: int = 200) -> list[dict[str, Any]]:
     """Most recent CCF events, newest first."""
     return monitor.load_events(CCF_EVENTS, limit)
@@ -448,6 +418,7 @@ def _job() -> monitor.MonitorJob:
     return monitor.MonitorJob(
         spec=_SPEC,
         entries=load_venues,
+        save_entries=_save,
         state_path=CCF_STATE,
         events_path=CCF_EVENTS,
         digest_path=CCF_DIGEST_MD,
@@ -457,6 +428,7 @@ def _job() -> monitor.MonitorJob:
         collect=lambda entry, use_network, rss_text: collect_items(
             entry, use_network=use_network, rss_text=rss_text
         ),
+        request_interval=CCF_REQUEST_INTERVAL,
     )
 
 
@@ -474,14 +446,11 @@ def run(
     "errors", "pushed_to", "collected"}`` — ``collected`` (条目名 → 本轮取回数)
     is what separates "真的没有更新" from "源不可达导致静默空转"。
     """
-    from glean.config import CCF_REQUEST_INTERVAL
-
-    delay = CCF_REQUEST_INTERVAL if request_interval is None else request_interval
     return monitor.run_monitor(
         _job(),
         only=only,
         use_network=use_network,
         force=force,
         push=push,
-        delay=delay,
+        delay=request_interval,  # None → 回落到 job.request_interval
     )

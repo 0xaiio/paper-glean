@@ -60,7 +60,8 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/core.py` | HTTP/XML、抓取、命中标注、digest 生成、反馈、下载、持久化 | CLI 参数、HTTP 路由 |
 | `glean/cli.py` | argparse 子命令 `fetch`/`daily`/`serve`/`watch`/`ccf`/`download`/`feedback`/`reanchor`；控制台输出 | 业务逻辑（全部委托 core / serve / watch / ccf） |
 | `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）、后台 detached 拉起、`ensure()` 复用已在线的实例；日志落 `logs/` | 业务逻辑、路由 |
-| `glean/monitor.py` | **监控内核（共享）**：`MonitorSpec`/`MonitorJob` 描述子系统，`run_monitor()` 实现「名单 → 抓取 → 指纹 diff → 基线 → digest → 推送 → 审计」；另含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of` | **任何网络请求**（抓取函数由调用方注入，故可离线测试） |
+| `glean/monitor.py` | **监控内核（共享）**：`MonitorSpec`/`MonitorJob` 描述子系统，`run_monitor()` 实现「名单 → 抓取 → 指纹 diff → 基线 → digest → 推送 → 审计」；`set_enabled`/`set_enabled_where`/`forget_state` 收口**改名单**的动作；另含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of` | **任何网络请求**（抓取函数由调用方注入，故可离线测试） |
+| `glean/kinds.py` | `kind` 的图标与文案：watch / ccf 分组 + 合并视图；**唯一事实源**（此前三处各存一份并已漂移） | 任何同层模块（叶子模块，防 import 成环） |
 | `glean/watch.py` | 学者监控：`watchlist.md` 解析/增删/启停、主页→DBLP→S2 解析、digest 文案；diff/基线/推送/审计委托 `monitor` | HTTP 细节（委托 homeparse / core.http_get） |
 | `glean/ccf.py` | 会议期刊监控：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源、digest 文案；diff/基线/推送/审计委托 `monitor` | HTTP 细节（委托 venueparse） |
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（生成物）：71 会议 + 22 期刊，含官网/领域/DBLP/ISSN | 网络（由 `scripts/gen_ccf_catalog.py` 生成） |
@@ -163,14 +164,22 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 
 ```
 MonitorSpec  ← 静态身份：namespace / subject_field / state_key / digest_marker / item_noun / max_items
-MonitorJob   ← 注入点：entries / collect / prepare / accept / render_item + 四条路径
+MonitorJob   ← 注入点：entries / save_entries / collect / prepare / accept / render_item
+               + 四条路径 + request_interval
 run_monitor()← 唯一实现：基线 → diff → 分组 → digest → 推送 → 审计
+名单变更      ← set_enabled / set_enabled_where（批量）/ forget_state：改名单也只有一份实现
+kinds.py     ← 图标与文案的唯一事实源（叶子模块，被 watch / ccf / notify 引用）
 ```
 
 关键约定：
 
 - **`subject_field` 统一「主语」概念**：新条目挂在 `researcher` 还是 `venue` 名下，由
   `spec` 决定，推送摘要分组、事件日志、digest 小标题都读同一个字段。
+- **改名单的动作也在内核里**：`set_enabled()` / `set_enabled_where()` / `forget_state()`
+  只实现一次，两个子系统的 `set_enabled` / `remove_*` 是一行转发。没有命中时**不写盘**，
+  避免无意义的 mtime 变化。
+- **`forget_state` 是移除流程的一部分，不是可选清理**：指纹若留在状态文件里，日后重新
+  加入同名条目会因「全都见过」而永不推送，且没有任何报错。
 - **首次静默建基线**：`subjects.get(key) is None` 时只写指纹不推送，避免上线即刷屏；
   `force=True` 才把首扫结果当作新条目。
 - **逐条失败隔离**：单个条目抛异常只进 `errors`，同轮其余条目照跑。

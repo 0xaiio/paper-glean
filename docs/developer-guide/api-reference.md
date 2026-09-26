@@ -62,6 +62,9 @@
 
 > `watch` 与 `ccf` 共用的「名单 → 抓取 → diff → 落盘 → 推送」引擎。
 > 本模块**不发任何网络请求**，抓取函数由调用方通过 `MonitorJob` 注入。
+>
+> 除**抓取**与**文案**之外的一切都在这一层：状态、事件、digest、启停、移除后遗忘
+> 指纹。两个子系统只保留各自的领域知识（抓什么、主语叫什么、写到哪）。
 
 ::: glean.monitor
     options:
@@ -76,10 +79,28 @@
         - year_of
         - load_state
         - save_state
+        - forget_state
+        - set_enabled
+        - set_enabled_where
         - append_events
         - load_events
         - render_section
         - upsert_digest
+
+## 条目类型词表
+
+> `kind` 的图标与文案。此前分散在 `watch` / `ccf` / `notify` 三处（`notify` 那份是
+> 手工合并副本），已发生漂移；现统一到这个**不依赖任何同层模块**的叶子模块。
+
+::: glean.kinds
+    options:
+      members:
+        - WATCH_KIND_ICONS
+        - WATCH_KIND_LABELS
+        - CCF_KIND_ICONS
+        - CCF_KIND_LABELS
+        - KIND_ICONS
+        - KIND_LABELS
 
 ## 学者监控
 
@@ -97,7 +118,6 @@
         - collect_items
         - load_state
         - save_state
-        - append_events
         - load_events
         - render_section
         - upsert_watch_digest
@@ -125,7 +145,6 @@
         - collect_items
         - load_state
         - save_state
-        - append_events
         - load_events
         - render_section
         - upsert_ccf_digest
