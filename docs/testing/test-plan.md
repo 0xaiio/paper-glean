@@ -230,8 +230,11 @@
 
 | 测试函数 | 测试内容 | 状态 |
 |----------|----------|------|
-| `test_cli_help` | 列出全部八个子命令（含 `watch` / `ccf`） | ✅ |
+| `test_cli_help` | 列出全部九个子命令（含 `watch` / `ccf` / `weekly`） | ✅ |
 | `test_cli_daily_help` | `daily` 暴露 `--serve/--host/--port` | ✅ |
+| `test_cli_weekly_help` | `weekly` 暴露 `--hours/--cap/--no-serve/--skip-*` 等全套开关 | ✅ |
+| `test_weekly_window_defaults_cover_a_full_week` | 周频默认值不变量：`--hours 168`、`--cap 300`、服务默认开 | ✅ |
+| `test_weekly_isolates_a_failing_stage` | 一段崩掉不带走其余两段；退出码仅在全部失败时非 0 | ✅ |
 | `test_cli_serve_help` | `serve` 暴露 `--reload` | ✅ |
 | `test_cli_watch_help` | `watch` 暴露 add/remove/enable/disable/list/run/ack/push-test | ✅ |
 | `test_cli_watch_list_is_read_only` | `watch list --all` 只读输出名单 | ✅ |

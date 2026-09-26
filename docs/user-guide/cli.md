@@ -12,6 +12,7 @@ arxiv-daily <command> [options]
 |------|------|
 | `fetch` | 抓取 arXiv 论文并生成 digest |
 | `daily` | 每日流水线：fetch → digest →（可选）确保本地 Web 服务在线 |
+| `weekly` | 周频三链路：CCF 监控 → 学者监控 → arXiv 日报 → 确保 Web 服务在线 |
 | `serve` | 启动本地 Web 应用（前台） |
 | `watch` | 学者监控与推送（子命令见下，详见 [学者监控与推送](watching.md)） |
 | `ccf` | CCF-A 会议/期刊监控与推送（子命令见下，详见 [CCF 会议期刊监控](ccf-watching.md)） |
@@ -109,6 +110,90 @@ python -X utf8 arxiv_daily.py daily --serve --port 8100
 - **fail-soft**：digest 先落盘，服务拉不起来只警告、不报错退出，
   最坏情况下你仍有 `arXiv-schedule.md` 可读。
 - 服务在线判定口径是 `GET /api/ping` 返回 200；已在线则复用，不重复启动。
+
+详见 [定时运行](scheduling.md)。
+
+---
+
+## weekly — 周频三链路聚合（定时任务入口）
+
+把「CCF 监控 → 学者监控 → arXiv 日报 → 确保 Web 服务在线」四步收口成**一条命令**。
+它取代了此前只写在自动化 prompt 里的那串命令 —— 那里的编排依赖模型逐条照做，
+而这里的行为是确定的、进测试的。
+
+```powershell
+python -X utf8 arxiv_daily.py weekly [options]
+```
+
+### 参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `--hours` | int | **168** | 抓取回溯窗口（小时）。周频必须覆盖整周，**不要照搬 `daily` 的 24** |
+| `--cap` | int | **300** | digest 中每类别最多列出的论文数 |
+| `--date` | str | 今天 | 覆盖 digest 章节日期（YYYYMMDD） |
+| `--no-serve` | flag | 关 | 不碰 Web 服务（默认会确保其在线，等价于每天都带 `--serve`） |
+| `--host` | str | `127.0.0.1` | Web 服务地址 |
+| `--port` | int | `8000` | Web 服务端口 |
+| `--no-push` | flag | 关 | 两条监控线只落盘 digest，不推送 |
+| `--force` | flag | 关 | 两条监控线首次运行也推送（默认只建基线） |
+| `--skip-ccf` / `--skip-watch` / `--skip-fetch` | flag | 关 | 跳过对应那一段（用于单独排查某条链路） |
+
+### 示例
+
+```powershell
+# 标准周频运行（定时任务就用这一条）
+python -X utf8 arxiv_daily.py weekly --port 8011
+
+# 只补 arXiv 线，不碰两条监控线，也不动服务
+python -X utf8 arxiv_daily.py weekly --skip-ccf --skip-watch --no-serve
+
+# 两条监控线首次也推送（默认新条目只建基线）
+python -X utf8 arxiv_daily.py weekly --force
+```
+
+### 行为说明
+
+1. **顺序固定** — CCF 监控 → 学者监控 → arXiv 日报 → 服务。「确保服务在线」放在最后：
+   三段产物都已落盘，服务起不来不影响已有结果。
+2. **三段各自独立容错** — 任一段抛异常只打印 `[ERR]`，然后继续下一段。
+   周频的代价是单轮失败要再等一周才可能被下一轮覆盖，所以这里宁可「部分成功」，
+   也不要「一起失败」。
+3. **`--hours` 默认 168 是硬要求** — `daily --hours` 默认 24，语义是「近 N 小时」的
+   滚动窗口。周频沿用 24 只会抓到最近 1 天、静默漏掉一周里 6/7 的论文，而且**不报错**。
+   代码默认值已改为 168，并由 `tests/test_cli.py` 钉住。
+4. **退出码** — 只有**三段全部失败**才非 0（与 `daily` 的 fail-soft 口径一致）。
+   RSS 降级通道、单个源不可达都属于设计内的降级，不该让定时任务整体报红。
+5. **容错代价（须知）** — RSS 兜底通道的粒度是**单个公告批次**（见 `scripts/backfill_rss.py`）。
+   周频把「API 被限流」的代价从 1 天放大到最多 6/7 天（一轮只能补 1 天）。
+   相邻两轮的 168h 窗口首尾相接，这批论文会被下一轮重新覆盖，不会永久丢。
+
+### 输出示例
+
+```text
+[INFO] weekly 开始: hours=168 cap=300 date=今天 serve=1
+------ [1/3] CCF-A 会议 / 期刊监控 ------
+[NEW] SIGMOD: 2 条更新
+[OK] 共 2 条更新 -> CCF-digest.md (run 20260926-100000)
+------ [2/3] 学者监控 ------
+[OK] 没有新作
+[WARN] 盲区：Alexey Gotsman —— 本轮一条内容都没取到，源可能不可达（不是「没有新作」）
+------ [3/3] arXiv 日报 ------
+[OK] 502 papers -> arXiv-schedule.md section 20260926; data -> ...\data\20260926.json
+[OK] html snapshot -> ...\exports\arxiv-digest-20260926.html
+
+======== weekly 汇总 ========
+[OK]   CCF-A 会议 / 期刊监控: 2 条更新
+[WARN] 学者监控: 0 条新作 · 1 处源级告警（见上方 [WARN]）
+[OK]   arXiv 日报: 502 篇 -> data/20260926.json
+[OK] 3/3 段完成
+[OK] web app already online -> http://127.0.0.1:8011
+[NEXT] agent 填 ★/🧐 推荐 -> reanchor -> html，再经 lark-cli 推飞书
+```
+
+> **`weekly` 不含 ★/🧐 推荐与飞书推送** —— 那是 agent 的语义工作（读 `data/*.json`
+> 写推荐、跑 `html`、经 `lark-cli` 发送）。命令层只负责把数据抓下来、把 digest 与
+> 快照落盘、把服务拉起来。
 
 详见 [定时运行](scheduling.md)。
 
@@ -389,9 +474,9 @@ python -X utf8 arxiv_daily.py html --date 20260914 --out D:/tmp/digest.html
 
 | 链路 | 触发时机 | 产物 | 手动重跑 |
 |------|---------|------|---------|
-| arXiv 日报 | `fetch` / `daily` | `exports/arxiv-digest-<YYYYMMDD>.html` | `html` |
-| 学者监控 | `watch run` | `exports/watch-digest-<YYYY-MM-DD>.html` | `watch run` |
-| CCF 监控 | `ccf run` | `exports/ccf-digest-<YYYY-MM-DD>.html` | `ccf run` |
+| arXiv 日报 | `fetch` / `daily` / `weekly` | `exports/arxiv-digest-<YYYYMMDD>.html` | `html` |
+| 学者监控 | `watch run` / `weekly` | `exports/watch-digest-<YYYY-MM-DD>.html` | `watch run` |
+| CCF 监控 | `ccf run` / `weekly` | `exports/ccf-digest-<YYYY-MM-DD>.html` | `ccf run` |
 
 > ⚠️ **日期格式不统一**：arXiv 线用 `YYYYMMDD`（digest 章节的既成格式），
 > 两条监控线用 `YYYY-MM-DD`（`run_monitor` 的 `day`）。这是历史原因，拼文件名时以本表为准。

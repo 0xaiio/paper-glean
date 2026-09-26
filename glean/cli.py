@@ -176,6 +176,97 @@ def cmd_daily(args: argparse.Namespace) -> None:
         print("[WARN] digest 与 data/*.json 已生成，可直接阅读 arXiv-schedule.md")
 
 
+# 周频聚合的默认窗口：168h = 7 × 24h。
+#
+# 这两个默认值是**语义要求**，不是口味偏好。`daily --hours` 默认 24，语义是
+# 「近 N 小时」的滚动窗口；定时任务从日频改成周频后若沿用 24，只会抓到最近 1 天、
+# 静默漏掉一周里 6/7 的论文，而且**不报任何错**。`--cap` 同理：一周的量必然顶满
+# 默认的 100。把它们写成模块常量，测试才能把它们钉住。
+_WEEKLY_HOURS = 168
+_WEEKLY_CAP = 300
+
+
+def cmd_weekly(args: argparse.Namespace) -> int | None:
+    """Weekly pipeline: CCF scan -> watch scan -> arXiv digest -> (default) serve.
+
+    这是**周频定时任务的唯一入口**，把此前只存在于自动化 prompt 里的编排收口到
+    代码层：prompt 里那串命令一旦漏写 ``--hours 168`` 就会静默少抓一周的论文，
+    而代码里的默认值可以进 ``tests/``、可回归、可在文档里被引用。
+
+    三段**各自独立容错**——任一段抛异常只记 ``[ERR]`` 然后继续下一段。周频的
+    代价是单轮失败要再等一周才可能被下一轮覆盖，所以这里宁可「部分成功」，
+    也不要「一起失败」。
+
+    返回值仅在**三段全失败**时非 0（与 :func:`cmd_daily` 的 fail-soft 口径一致）：
+    RSS 降级通道、单个源不可达都属于设计内的降级，不该让定时任务整体报红。
+    """
+    print(
+        f"[INFO] weekly 开始: hours={args.hours} cap={args.cap} "
+        f"date={args.date or '今天'} serve={int(not args.no_serve)}"
+    )
+
+    def stage_ccf() -> dict:
+        res = run_ccf(force=args.force, push=not args.no_push)
+        _report_monitor_run(res, _CCF_VIEW)
+        _render_monitor_html(_CCF_VIEW, res)
+        return {"summary": f"{len(res['new_items'])} 条更新", "warnings": len(res["errors"])}
+
+    def stage_watch() -> dict:
+        res = run_watch(force=args.force, push=not args.no_push)
+        _report_monitor_run(res, _WATCH_VIEW)
+        _render_monitor_html(_WATCH_VIEW, res)
+        return {"summary": f"{len(res['new_items'])} 条新作", "warnings": len(res["errors"])}
+
+    def stage_daily() -> dict:
+        day, n, data_file = _run_fetch(args.hours, args.cap, args.date)
+        print(f"[OK] {n} papers -> arXiv-schedule.md section {day}; data -> {data_file}")
+        return {"summary": f"{n} 篇 -> data/{day}.json", "warnings": 0}
+
+    plan = []
+    if not args.skip_ccf:
+        plan.append(("CCF-A 会议 / 期刊监控", stage_ccf))
+    if not args.skip_watch:
+        plan.append(("学者监控", stage_watch))
+    if not args.skip_fetch:
+        plan.append(("arXiv 日报", stage_daily))
+
+    if not plan:
+        print("[ERR] 三段都被 --skip-* 跳过，没有要跑的链路")
+        return 1
+
+    results: list[dict] = []
+    for i, (label, fn) in enumerate(plan, 1):
+        print(f"\n{'-' * 6} [{i}/{len(plan)}] {label} {'-' * 6}")
+        try:
+            results.append({"label": label, "ok": True, **fn()})
+        except Exception as exc:  # 一段失败不得中断其余两段
+            print(f"[ERR] {label} 失败: {exc}", file=sys.stderr)
+            results.append({"label": label, "ok": False, "summary": str(exc), "warnings": 0})
+
+    print(f"\n{'=' * 8} weekly 汇总 {'=' * 8}")
+    for r in results:
+        if not r["ok"]:
+            print(f"[ERR]  {r['label']}: {r['summary']}")
+        elif r["warnings"]:
+            print(f"[WARN] {r['label']}: {r['summary']} · {r['warnings']} 处源级告警（见上方 [WARN]）")
+        else:
+            print(f"[OK]   {r['label']}: {r['summary']}")
+    done = sum(1 for r in results if r["ok"])
+    print(f"[{'OK' if done == len(results) else 'WARN'}] {done}/{len(results)} 段完成")
+
+    # 服务放在最后：三段产物都已落盘，服务起不来不影响已有结果（同 `daily` 的降级口径）。
+    if not args.no_serve:
+        online, started = ensure(args.host, args.port)
+        url = base_url(args.host, args.port)
+        if online:
+            print(f"[OK] web app {'started' if started else 'already online'} -> {url}")
+        else:
+            print(f"[WARN] web app 未在 {args.host}:{args.port} 上线; 日志: {log_path(args.host, args.port)}")
+
+    print("[NEXT] agent 填 ★/🧐 推荐 -> reanchor -> html，再经 lark-cli 推飞书")
+    return 0 if done else 1
+
+
 def cmd_serve(args: argparse.Namespace) -> None:
     """Start the web app in the foreground (manual / development use)."""
     try:
@@ -568,6 +659,29 @@ def build_parser() -> argparse.ArgumentParser:
     _add_web_args(dl)
     dl.set_defaults(func=cmd_daily)
 
+    wk = sub.add_parser(
+        "weekly",
+        help="周频三链路: CCF 监控 -> 学者监控 -> arXiv 日报 -> 确保 Web 服务在线",
+    )
+    wk.add_argument(
+        "--hours",
+        type=int,
+        default=_WEEKLY_HOURS,
+        help=f"抓取回溯窗口(小时), 默认 {_WEEKLY_HOURS}(一周); 周频务必覆盖整周",
+    )
+    wk.add_argument("--cap", type=int, default=_WEEKLY_CAP,
+                    help=f"digest 中每类别最多列出的论文数, 默认 {_WEEKLY_CAP}")
+    wk.add_argument("--date", help="覆盖章节日期 YYYYMMDD(默认今天)")
+    wk.add_argument("--no-serve", action="store_true",
+                    help="不碰 Web 服务(默认会确保其在线, 等价于每天都带 --serve)")
+    _add_web_args(wk)
+    wk.add_argument("--no-push", action="store_true", help="两条监控线只落盘 digest，不推送")
+    wk.add_argument("--force", action="store_true", help="两条监控线首次运行也推送(默认只建基线)")
+    wk.add_argument("--skip-ccf", action="store_true", help="跳过 CCF-A 监控这一段")
+    wk.add_argument("--skip-watch", action="store_true", help="跳过学者监控这一段")
+    wk.add_argument("--skip-fetch", action="store_true", help="跳过 arXiv 日报这一段")
+    wk.set_defaults(func=cmd_weekly)
+
     sv = sub.add_parser("serve", help="启动本地 Web 应用(前台)")
     _add_web_args(sv)
     sv.add_argument("--reload", action="store_true", help="开发模式: 代码变更自动重载")
@@ -585,7 +699,11 @@ def main() -> None:
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
     args = build_parser().parse_args()
-    args.func(args)
+    # 子命令可返回退出码（目前只有 `weekly` 用得到，且仅在**全部**链路都失败时非 0）。
+    # 其余命令返回 None，等价于 0，行为不变。
+    code = args.func(args)
+    if isinstance(code, int) and code:
+        sys.exit(code)
 
 
 if __name__ == "__main__":
