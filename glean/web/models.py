@@ -76,3 +76,35 @@ class WatchResearcher(BaseModel):
     tags: list[str] = Field(default_factory=list)
     enabled: bool = True
     note: str = ""
+
+
+# --- The contract shared by both monitoring surfaces (watch / ccf) -----------
+#
+# These three are typed because they are the *only* payloads produced by the
+# shared monitoring kernel: if `watch` and `ccf` answered `/new`, `/ack` or
+# `/run` with different shapes, the two front-ends would have to duplicate
+# code again. Declaring them once keeps that from happening.
+
+class RunSummary(BaseModel):
+    """What a monitor run reports: counts, never payloads."""
+
+    run_id: str
+    new_count: int
+    grouped: dict[str, int]
+    baselined: list[str]
+    errors: list[str]
+    pushed_to: list[str]
+
+
+class NewItems(BaseModel):
+    """Unacknowledged items — what the UI badges as NEW."""
+
+    count: int
+    items: list[dict]
+
+
+class AckResult(BaseModel):
+    """Result of clearing the NEW badges."""
+
+    success: bool
+    cleared: int

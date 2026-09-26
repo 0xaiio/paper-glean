@@ -94,6 +94,10 @@
 | `test_api_papers_category_search_and_paging` | category / search / limit / offset 组合 | ✅ |
 | `test_htmx_paper_card_explains_why_recommended` | **端到端**：卡片按命中关键词反查条目名与权重；无命中则不渲染该区块 | ✅ |
 | `test_htmx_paper_card_unknown_id_is_404` | 卡片/详情片段的未知 id 返回 404 | ✅ |
+| `test_every_surface_is_mounted` | 路由拆成 `routes_papers` / `routes_watch` / `routes_ccf` 后，三个界面的关键路径都还在（漏挂一个子路由 = 整个界面消失） | ✅ |
+| `test_openapi_groups_operations_by_surface` | `/docs` 按 `papers` / `watch` / `ccf` 分组，标签来自各路由模块 | ✅ |
+| `test_monitor_surfaces_answer_new_and_ack_with_the_same_shape` | watch 与 ccf 的 `/new`、`/ack` 返回同一形状（同一个内核，契约必须一致） | ✅ |
+| `test_toggle_reports_whether_it_actually_worked` | 勾选接口如实上报 `success`（此前 CCF 侧丢弃 `set_enabled` 的返回值、恒报 true） | ✅ |
 
 > 注：`/api/watch/*` 与 `/api/ccf/*` 的写操作分别通过 `isolated_watch` /
 > `isolated_ccf` fixture 把 `watchlist.md`、`ccf.md` 及其状态/未读文件

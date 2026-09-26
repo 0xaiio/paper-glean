@@ -33,9 +33,33 @@
 
 ## Web API
 
-::: glean.web.routes
+> 一屏一组路由。`glean.web.routes` 只负责把下面三个子路由聚合起来，
+> 因此没有端点可列；每个路由模块自带 OpenAPI `tags`（`papers` / `watch` / `ccf`），
+> 在 `/docs` 里按界面分组。
+
+::: glean.web.routes_papers
     options:
       members: true
+
+::: glean.web.routes_watch
+    options:
+      members: true
+
+::: glean.web.routes_ccf
+    options:
+      members: true
+
+### 路由共用助手
+
+::: glean.web.common
+    options:
+      members:
+        - current_papers
+        - require_paper
+        - require_entry
+        - run_summary
+        - hit_visible
+        - filter_papers
 
 ### 存活探测
 

@@ -55,10 +55,14 @@ glean/
 ├── report.py        # 独立 HTML 快照渲染（arXiv / watch / ccf 三条链路共用同一套骨架）
 ├── config.py        # 常量与配置
 └── web/
-    ├── main.py      # FastAPI 应用工厂（含 watch_new_count / ccf_new_count 模板全局）
-    ├── routes.py    # 路由定义（含 /api/ping、/api/watch/*、/api/ccf/*）
-    ├── models.py    # Pydantic 模型
-    └── templates/   # Jinja2 模板
+    ├── main.py         # FastAPI 应用工厂（含 watch_new_count / ccf_new_count 模板全局）
+    ├── routes.py       # 只做聚合：include 下面三个子路由
+    ├── routes_papers.py# /digest /profile /archive + /api/* + /htmx/*
+    ├── routes_watch.py # /watch + /api/watch/*
+    ├── routes_ccf.py   # /ccf + /api/ccf/*
+    ├── common.py       # 三个路由模块共用的助手
+    ├── models.py       # Pydantic 模型
+    └── templates/      # Jinja2 模板
 ```
 
 > 仓库根另含 `scripts/`（`run_daily.ps1` / `register_task.ps1`），
