@@ -4,6 +4,140 @@
 > 每次 `arxiv_daily.py ccf run` 只追加**新发现**的 CFP / Program / 接收论文列表。
 > 用法与故障排查见 [docs/user-guide/ccf-watching.md](docs/user-guide/ccf-watching.md)。
 
+<!-- BEGIN CCF 2026-09-26 -->
+
+## 2026-09-26
+
+_本次运行没有发现更新。_
+
+<!-- END CCF 2026-09-26 -->
+<!-- BEGIN CCF 2026-09-24 -->
+
+## 2026-09-24
+
+### UbiComp/ISWC　`3 条更新`
+
+- 📅 **Overall Program** — 会议日程 · 2026 — [链接](https://www.ubicomp.org/ubicomp-iswc-2026/program-2026/) · 来源 homepage
+- 📅 **Plenary Sessions** — 会议日程 · 2026 — [链接](https://www.ubicomp.org/ubicomp-iswc-2026/keynotes/) · 来源 homepage
+- 📅 **Paper Sessions** — 会议日程 · 2026 — [链接](https://www.ubicomp.org/ubicomp-iswc-2026/accepted-papers/) · 来源 homepage
+
+<!-- END CCF 2026-09-24 -->
+<!-- BEGIN CCF 2026-09-23 -->
+
+## 2026-09-23
+
+### DATE　`1 条更新`
+
+- 📢 **Download the DATE 2027 Call for Papers here** — 征稿 (CFP) · 2027 — [链接](https://www.date-conference.com/DATE2027-Call-for-Papers.pdf) · 来源 homepage
+
+### ICSE　`3 条更新`
+
+- 📅 **Research Track** — 会议日程 · 2027 — [链接](https://conf.researchr.org/committee/seams-2027/seams-2027-research-track-program-committee) · 来源 homepage
+- 📅 **Artifact Track** — 会议日程 · 2027 — [链接](https://conf.researchr.org/committee/seams-2027/seams-2027-artifact-track-program-committee) · 来源 homepage
+- 📄 **Organizing Committee** — 接收论文 · 2027 — [链接](https://conf.researchr.org/committee/icse-2027/wsese-2027-papers-organizing-committee) · 来源 homepage
+
+### IEEE VIS　`1 条更新`
+
+- 📅 **Vis Program** — 会议日程 · 2026 — [链接](https://ieeevis.org/year/2026/program/sessions) · 来源 homepage
+
+### MICRO　`1 条更新`
+
+- 📅 **Main Program** — 会议日程 — [链接](https://microarch.org/micro59/program/) · 来源 homepage
+
+### AIJ　`1 条更新`
+
+- 📄 **AIJ Volume 361** — 接收论文 · 2026 — [链接](https://www.sciencedirect.com/journal/artificial-intelligence) · 来源 crossref
+
+<!-- END CCF 2026-09-23 -->
+<!-- BEGIN CCF 2026-09-22 -->
+
+## 2026-09-22
+
+### ASE　`1 条更新`
+
+- 📅 **Program Committee** — 会议日程 · 2026 — [链接](https://conf.researchr.org/committee/ase-2026/ase-2026-student-research-competition-dominik-winterer) · 来源 homepage
+
+### CAV　`1 条更新`
+
+- 📢 **Submission deadline Wednesday, 20 January 2027** — 征稿 (CFP) · 2027 — [链接](https://conferences.i-cav.org/2027/cfp/) · 来源 homepage
+
+### SC　`25 条更新`
+
+- 📅 **Program** — 会议日程 — [链接](https://sc26.supercomputing.org/program/) · 来源 homepage
+- 📅 **Keynote** — 会议日程 — [链接](https://sc26.supercomputing.org/program/keynote/) · 来源 homepage
+- 📅 **HPC Unites Plenary** — 会议日程 — [链接](https://sc26.supercomputing.org/program/hpc-unites-plenary/) · 来源 homepage
+- 📅 **Invited Talks** — 会议日程 — [链接](https://sc26.supercomputing.org/program/invited-talks/) · 来源 homepage
+- 📅 **Panels** — 会议日程 — [链接](https://sc26.supercomputing.org/program/panels/) · 来源 homepage
+- 📅 **Birds of a Feather** — 会议日程 — [链接](https://sc26.supercomputing.org/program/birds-of-a-feather/) · 来源 homepage
+- 📅 **Papers** — 会议日程 — [链接](https://sc26.supercomputing.org/program/papers/) · 来源 homepage
+- 📅 **Reproducibility Initiative** — 会议日程 — [链接](https://sc26.supercomputing.org/program/papers/reproducibility-initiative/) · 来源 homepage
+- 📅 **AD/AE Process & Badges** — 会议日程 — [链接](https://sc26.supercomputing.org/program/papers/reproducibility-appendices-badges/) · 来源 homepage
+- 📅 **AD/AE Appendices** — 会议日程 — [链接](https://sc26.supercomputing.org/program/papers/ad-ae-appendices/) · 来源 homepage
+- 📅 **Early Career** — 会议日程 — [链接](https://sc26.supercomputing.org/program/early-career/) · 来源 homepage
+- 📅 **Art of HPC** — 会议日程 — [链接](https://sc26.supercomputing.org/program/art-of-hpc/) · 来源 homepage
+- 📅 **Career Fair** — 会议日程 — [链接](https://sc26.supercomputing.org/program/career-fair/) · 来源 homepage
+- 📅 **Posters** — 会议日程 — [链接](https://sc26.supercomputing.org/program/posters/) · 来源 homepage
+- 📅 **ACM SRC** — 会议日程 — [链接](https://sc26.supercomputing.org/program/posters/acm-student-research-competition/) · 来源 homepage
+- 📅 **Doctoral Showcase** — 会议日程 — [链接](https://sc26.supercomputing.org/program/posters/doctoral-showcase/) · 来源 homepage
+- 📅 **Research Posters** — 会议日程 — [链接](https://sc26.supercomputing.org/program/posters/research-posters/) · 来源 homepage
+- 📅 **Interactive Research e-Posters** — 会议日程 — [链接](https://sc26.supercomputing.org/program/posters/interactive-research-e-posters/) · 来源 homepage
+- 📅 **Awards** — 会议日程 — [链接](https://sc26.supercomputing.org/program/awards/) · 来源 homepage
+- 📅 **Regional Tech Hub** — 会议日程 — [链接](https://sc26.supercomputing.org/program/regional-tech-hub/) · 来源 homepage
+- 📅 **Student Programming** — 会议日程 — [链接](https://sc26.supercomputing.org/students/student-programming/) · 来源 homepage
+- 📢 **Looking for submissions and applications? See the pages in Program.** — 征稿 (CFP) — [链接](https://sc26.supercomputing.org/program/) · 来源 homepage
+- 📅 **Program** — 会议日程 — [链接](https://sc26.supercomputing.org/category/program/) · 来源 homepage
+- 📅 **DISCOVER & PARTICIPATE** — 会议日程 — [链接](https://sc26.supercomputing.org/program/) · 来源 homepage
+- 📅 **Proceedings & Archives** — 会议日程 — [链接](https://sc26.supercomputing.org/program/proceedings-archives/) · 来源 homepage
+
+### SIGKDD　`4 条更新`
+
+- 📢 **Research Track: Call for Papers** — 征稿 (CFP) — [链接](https://kdd2027.kdd.org/research-track-call-for-papers/) · 来源 homepage
+- 📢 **Applied Data Science (ADS) Track: Call for Papers** — 征稿 (CFP) — [链接](https://kdd2027.kdd.org/applied-data-science-ads-track-call-for-papers/) · 来源 homepage
+- 📢 **Datasets and Benchmarks Track: Call for Papers** — 征稿 (CFP) — [链接](https://kdd2027.kdd.org/datasets-and-benchmarks-track-call-for-papers/) · 来源 homepage
+- 📢 **AI for Sciences Track: Call for Papers** — 征稿 (CFP) — [链接](https://kdd2027.kdd.org/ai4sciences-track-call-for-papers/) · 来源 homepage
+
+<!-- END CCF 2026-09-22 -->
+<!-- BEGIN CCF 2026-09-21 -->
+
+## 2026-09-21
+
+### UbiComp/ISWC　`1 条更新`
+
+- 📅 **Keynotes** — 会议日程 · 2026 — [链接](https://www.ubicomp.org/ubicomp-iswc-2026/keynotes/) · 来源 homepage
+
+### TPDS　`1 条更新`
+
+- 📄 **TPDS Volume 37 Issue 11** — 接收论文 · 2026 — [链接](https://www.computer.org/csdl/journal/td) · 来源 crossref
+
+<!-- END CCF 2026-09-21 -->
+<!-- BEGIN CCF 2026-09-20 -->
+
+## 2026-09-20
+
+### ICSE　`1 条更新`
+
+- 📄 **Web Chair** — 接收论文 · 2027 — [链接](https://conf.researchr.org/committee/icse-2027/responsiblese-2027-papers-web-chair) · 来源 homepage
+
+### IEEE VIS　`4 条更新`
+
+- 📅 **Vis Program** — 会议日程 · 2026 — [链接](https://ieeevis.org/year/2026/info/program/week-at-a-glance) · 来源 homepage
+- 📅 **Schedule** — 会议日程 · 2026 — [链接](https://ieeevis.org/year/2026/program/calendar) · 来源 homepage
+- 📅 **Accepted Papers** — 会议日程 · 2026 — [链接](https://ieeevis.org/year/2026/program/papers) · 来源 homepage
+- 📅 **Panels** — 会议日程 · 2026 — [链接](https://ieeevis.org/year/2026/program/sessions/?type=panel) · 来源 homepage
+
+### STOC　`1 条更新`
+
+- 📢 **STOC 2027 Deadline** — 征稿 (CFP) · 2027 · 截稿 2026-11-02 23:59:59 — [链接](https://acm-stoc.org/stoc2027/) · 来源 ccfddl
+
+### TIT　`1 条更新`
+
+- 📄 **TIT Volume 72 Issue 10** — 接收论文 · 2026 — [链接](https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=18) · 来源 crossref
+
+### TSE　`1 条更新`
+
+- 📄 **TSE Volume 52 Issue 9** — 接收论文 · 2026 — [链接](https://www.computer.org/csdl/journal/ts) · 来源 crossref
+
+<!-- END CCF 2026-09-20 -->
 <!-- BEGIN CCF 2026-09-17 -->
 
 ## 2026-09-17
