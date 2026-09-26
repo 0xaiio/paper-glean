@@ -1,17 +1,23 @@
 # 定时运行
 
-> 让「抓取 → 生成 digest → 确保本地 Web 服务在线 → 呈递」无人值守地跑起来
+> 让「三条链路抓取 → 生成 digest 与快照 → 确保本地 Web 服务在线 → 呈递」无人值守地跑起来
 
 Paper-Glean 的定时能力**就在仓库内**，不依赖任何外部脚本：
 
 | 层次 | 载体 | 适用场景 |
 |------|------|---------|
-| ① 一键命令 | `arxiv_daily.py daily` | 手动跑一次完整流水线 |
-| ② 平台定时任务 | WorkBuddy 自动化（推荐） | 每天由 agent 抓取、写推荐、呈递页面 |
+| ① 一键命令（日频） | `arxiv_daily.py daily` | 手动跑一次 arXiv 线流水线 |
+| ① 一键命令（周频） | `arxiv_daily.py weekly` | 手动跑一次完整周任务（三条链路） |
+| ② 平台定时任务 | WorkBuddy 自动化（推荐） | 每周由 agent 抓取、写推荐、呈递页面 |
 | ③ Windows 计划任务 | `scripts/register_task.ps1` | 不想开 agent，只要确定性地抓取落盘 |
 
-三层共用同一段实现：命令层的 `daily` → `glean.cli.cmd_daily` → `glean.serve.ensure`。
-无论走哪条路，产出的文件、日志与失败降级行为完全一致。
+三层共用同一段实现：`daily` → `glean.cli.cmd_daily`；`weekly` → `glean.cli.cmd_weekly`
+（其 arXiv 段复用同一个 `_run_fetch`，因此两个入口永不漂移）；服务保证统一走
+`glean.serve.ensure`。无论走哪条路，产出的文件、日志与失败降级行为完全一致。
+
+> **周频请用 `weekly`**：它是三条链路（CCF 监控 / 学者监控 / arXiv 日报）的聚合入口，
+> 且 `--hours` 默认 **168**（覆盖整周，不必在 prompt 里重复交代）。
+> 细节见 [CLI 参考](cli.md) 的 `weekly` 一节。
 
 ---
 
@@ -131,31 +137,45 @@ ensure(host, port)
 | 字段 | 值 |
 |------|-----|
 | 工作目录 | `D:\code-repo\paper-glean` |
-| 周期 | 每周 · 周一、二、三、四、五、六 · 11:30 |
-| 名称 | 例：`paper-glean 论文日报（周一至周六 11:30）` |
+| 周期 | 每周 · 周五 · 10:00 |
+| 名称 | 例：`paper-glean 周报（每周五 10:00 · 日报 + 学者监控 + CCF-A 监控）` |
+
+**一个任务、一条命令。** 三条链路此前是三个独立自动化（各自 `daily` / `watch run` /
+`ccf run`，时间错峰），现已在**代码层**收口为 `weekly`，因此调度层只需要一个周任务。
+
+> **端口**：下面示例用 `8011`（`8000` 常被其他常驻程序占用；`ensure()` 会先探测复用）。
+> 换端口只影响 `--port` 与 `/api/ping` 的探测地址，其余步骤不变。
 
 ### 推荐的任务提示词
 
-> 在 `D:\code-repo\paper-glean` 跑当日流水线：
+> 在 `D:\code-repo\paper-glean` 跑**每周一次**的三链路流水线：
 >
-> 1. `cd` 到该目录，执行 `python -X utf8 arxiv_daily.py daily --serve --host 127.0.0.1 --port 8000`
->    （抓取 → 更新 `arXiv-schedule.md` → 确保本地 Web 服务在线）。
+> 1. 执行 `python -X utf8 arxiv_daily.py weekly --host 127.0.0.1 --port 8011`
+>    —— 一条命令跑完 CCF 监控 → 学者监控 → arXiv 日报 → 确保 Web 服务在线
+>    （`--hours 168` / `--cap 300` 已是默认值，**不必**在命令里再交代）。
+>    三段各自独立容错，一段失败不影响其余；末段失败不要紧，前三段产物已落盘。
 > 2. 阅读 `data/<YYYYMMDD>.json` 与 `interests.md`，在 `arXiv-schedule.md` 的当日章节填写
 >    **★ 重点关注** / **🧐 视野扩展** 推荐小节（附理由：命中了哪个条目、权重多少），
 >    随后跑一次 `python -X utf8 arxiv_daily.py reanchor` 补锚点与跳转链接。
-> 3. 确认服务在线：`curl --noproxy '*' http://127.0.0.1:8000/api/ping` 返回 200。
->    不在线则重跑第 1 步的 `--serve`；仍失败则提示查看 `logs/serve-127.0.0.1-8000.log`。
-> 4. 用 `present_files` 呈递（顺序即优先级）：
->    - `http://127.0.0.1:8000/`（主界面，同源 `/api/*`，打分/下载/收藏均可用）
->    - `arXiv-schedule.md`（离线可读备份）
->    - `interests.md`（本次推荐所依据的画像）
-> 5. 若 arXiv API 拉取失败或网络不通，保留**上一期** `arXiv-schedule.md` 内容即可，
->    不要向用户报错刷屏。
-> 6. **补一次 HTML 快照并推飞书**：填完推荐后再跑
->    `python -X utf8 arxiv_daily.py html`（第 1 步的快照是填推荐**之前**的，
->    这一步才把人工判断写进页面），然后用 `lark-cli` 把**摘要文字 + HTML 附件**
->    发到机器人单聊（发给自己）。发送前 `cd` 到仓库根，附件用相对路径
->    `./exports/arxiv-digest-<YYYYMMDD>.html`。
+> 3. 确认服务在线：`curl --noproxy '*' http://127.0.0.1:8011/api/ping` 返回 200。
+>    不在线则重跑 `weekly`（它默认就会确保服务在线）；仍失败则提示查看
+>    `logs/serve-127.0.0.1-8011.log`。
+> 4. **补一次 HTML 快照**：填完推荐后再跑 `python -X utf8 arxiv_daily.py html`
+>    （第 1 步的快照是填推荐**之前**的，这一步才把人工判断写进页面）。
+> 5. 用 `present_files` 呈递（顺序即优先级）：
+>    - `exports/arxiv-digest-<YYYYMMDD>.html`
+>    - `exports/watch-digest-<YYYY-MM-DD>.html`
+>    - `exports/ccf-digest-<YYYY-MM-DD>.html`
+>    - `http://127.0.0.1:8011/`（主界面，同源 `/api/*`，打分/下载/收藏均可用）、
+>      `http://127.0.0.1:8011/watch`、`http://127.0.0.1:8011/ccf`
+>    - `arXiv-schedule.md`（离线可读备份）、`interests.md`（本次推荐所依据的画像）
+> 6. 推飞书（发给用户本人的机器人单聊）：**一条汇总文字 + 每个 HTML 附件各一条**。
+>    发送前 `cd` 到仓库根，附件用相对路径（`./exports/...`）。
+> 7. 若 arXiv API 被限流（429/503），改跑
+>    `python -X utf8 scripts/backfill_rss.py --date <YYYYMMDD> --cap 1000000`。
+>    **RSS 一轮只覆盖一个公告批次**，报告里必须写明「本轮仅 RSS 补到最近 1 天」，
+>    不要含糊成「本周已全覆盖」。论文不会永久丢：下一轮 168h 窗口的起点正好接上
+>    本轮窗口的终点。
 
 > ⚠️ **呈递与附件是两份不同的 HTML，别混**：
 >
@@ -170,13 +190,21 @@ ensure(host, port)
 
 ### 三条链路的自动化
 
-三条链路各自独立、时间错峰，互不阻塞：
+三条链路在**代码层**已收口为一条命令（`weekly`），调度层因此只有一个周任务：
 
-| 链路 | 命令 | 建议时间 | HTML 快照 | 飞书 |
-|------|------|---------|----------|------|
-| arXiv 日报 | `daily --serve` + `html` | 周一至周六 11:30 | `exports/arxiv-digest-<YYYYMMDD>.html` | 摘要 + 附件 |
-| 学者监控 | `watch run` | 每日 09:00 | `exports/watch-digest-<YYYY-MM-DD>.html` | 摘要 + 附件 |
-| CCF 监控 | `ccf run` | 每日 09:30 | `exports/ccf-digest-<YYYY-MM-DD>.html` | 摘要 + 附件 |
+| 链路 | `weekly` 中的步骤 | HTML 快照 | 飞书 |
+|------|-----------------|----------|------|
+| CCF 监控 | 第 1 段 | `exports/ccf-digest-<YYYY-MM-DD>.html` | 摘要 + 附件 |
+| 学者监控 | 第 2 段 | `exports/watch-digest-<YYYY-MM-DD>.html` | 摘要 + 附件 |
+| arXiv 日报 | 第 3 段 | `exports/arxiv-digest-<YYYYMMDD>.html` | 摘要 + 附件 |
+
+任一段都可用 `--skip-ccf` / `--skip-watch` / `--skip-fetch` 单独跳过，
+便于只排查一条链路而不动其余两条。
+
+> **为什么不再是三个错峰任务**：三条链路本就是同一个本地 Web 应用（一个 FastAPI app）
+> 的三个页面，此前却要起两个端口（日报一个、监控一个）、写三份 prompt。
+> 收口到 `weekly` 后：一个端口、一条命令、一份行为可回归的实现。顺带修掉一个真实的坑
+> —— 日频改周频时若沿用 `daily` 的 `--hours 24` 默认值，会静默漏掉一周里 6/7 的论文。
 
 > ⚠️ **日期格式不统一**：arXiv 线是 `YYYYMMDD`，两条监控线是 `YYYY-MM-DD`。
 > 在自动化 prompt 里拼附件路径时按本表写，别统一成一种。
@@ -191,9 +219,13 @@ ensure(host, port)
 注册后先手动跑一次，确认：
 
 ```powershell
-python -X utf8 arxiv_daily.py daily --serve
-curl --noproxy '*' http://127.0.0.1:8000/api/ping
+python -X utf8 arxiv_daily.py weekly --port 8011
+curl --noproxy '*' http://127.0.0.1:8011/api/ping
 ```
+
+`weekly` 末尾会打印一份汇总：每段的新增条数、源级告警数、完成段数。
+**退出码只在三段全部失败时非 0** —— 所以「退出码 0」不等于「三段都拿到了新内容」，
+要读汇总里的 `[WARN] … 处源级告警` 与各段打印的 `[WARN] 盲区：…`。
 
 ---
 
@@ -210,6 +242,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\register_task.ps1
 
 默认行为：创建计划任务 `PaperGleanDaily`，**周一至周六 11:30**，
 执行 `scripts\run_daily.ps1`。
+
+> 这条路径走的是 `daily`（**日频、只含 arXiv 线**），与 `weekly` 的三链路周任务定位不同。
+> 需要周频三链路时请用方式 A，或手动跑 `weekly`；只想改本节的频率与时刻，
+> 用 `-Time` / `-Days` 即可。
 
 | 参数 | 默认 | 说明 |
 |------|------|------|

@@ -45,7 +45,7 @@ def test_command_surface_is_exactly_the_documented_one():
     names = {".".join(prefix) for prefix, _ in _leaves(build_parser())}
 
     assert names == {
-        "fetch", "download", "feedback", "reanchor", "html", "daily", "serve",
+        "fetch", "download", "feedback", "reanchor", "html", "daily", "weekly", "serve",
         "watch.add", "watch.remove", "watch.enable", "watch.disable",
         "watch.list", "watch.run", "watch.ack", "watch.push-test",
         "ccf.list", "ccf.enable", "ccf.disable", "ccf.add", "ccf.remove",
@@ -79,6 +79,7 @@ def test_cli_help():
     assert "feedback" in result.stdout
     assert "reanchor" in result.stdout
     assert "daily" in result.stdout
+    assert "weekly" in result.stdout
     assert "serve" in result.stdout
     assert "watch" in result.stdout
     assert "ccf" in result.stdout
@@ -150,6 +151,88 @@ def test_cli_daily_help():
     assert "--serve" in result.stdout
     assert "--host" in result.stdout
     assert "--port" in result.stdout
+
+
+def test_cli_weekly_help():
+    """The weekly aggregate entry point exposes the whole orchestration surface."""
+    result = subprocess.run(
+        [sys.executable, "-m", "glean.cli", "weekly", "--help"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0
+    for opt in (
+        "--hours", "--cap", "--date", "--no-serve", "--host", "--port",
+        "--no-push", "--force",
+        "--skip-ccf", "--skip-watch", "--skip-fetch",
+    ):
+        assert opt in result.stdout, opt
+
+
+def test_weekly_window_defaults_cover_a_full_week():
+    """``weekly`` must default to a 7-day window and a 300-item cap.
+
+    This is the regression that matters most about the aggregate command. The
+    day-frequency entry point defaults to ``--hours 24``; reusing that default
+    after the schedule moved to weekly would fetch one day out of seven,
+    silently drop the other six, and still exit 0. The code-level default is
+    the fix, so the code-level default is what this test pins.
+    """
+    from glean.cli import _WEEKLY_CAP, _WEEKLY_HOURS, build_parser
+
+    wk = dict(_leaves(build_parser()))[("weekly",)]
+    defaults = {a.dest: a.default for a in wk._actions}
+
+    assert _WEEKLY_HOURS == 168
+    assert _WEEKLY_CAP == 300
+    assert defaults["hours"] == 168
+    assert defaults["cap"] == 300
+    # 服务默认打开：周任务不必再记 --serve（只有显式 --no-serve 才跳过）。
+    assert defaults["no_serve"] is False
+
+
+def test_weekly_isolates_a_failing_stage(monkeypatch, capsys):
+    """一段崩溃不得带走其余两段 —— 这是 `weekly` 存在的核心理由。
+
+    周频的代价是单轮失败要再等一周才可能被下一轮覆盖，所以「部分成功」远好过
+    「一起失败」。这里让第一段抛异常，断言后两段照跑完、退出码仍为 0。
+    """
+    from glean import cli
+
+    # 呈现层与网络层都替换掉：本用例只关心编排，不碰真实站点。
+    monkeypatch.setattr(cli, "_report_monitor_run", lambda res, view: None)
+    monkeypatch.setattr(cli, "_render_monitor_html", lambda view, res, scope=None: None)
+
+    def boom(**kwargs):
+        raise RuntimeError("源整站不可达")
+
+    monkeypatch.setattr(cli, "run_ccf", boom)
+    monkeypatch.setattr(
+        cli, "run_watch",
+        lambda **kw: {
+            "run_id": "t", "day": "2026-09-26", "new_items": [{"title": "x"}],
+            "grouped": {}, "baselined": [], "skipped": [], "errors": [],
+            "pushed_to": [], "collected": {},
+        },
+    )
+    monkeypatch.setattr(
+        cli, "_run_fetch",
+        lambda hours, cap, date: ("20260926", 42, "data/20260926.json"),
+    )
+
+    code = cli.cmd_weekly(argparse.Namespace(
+        hours=168, cap=300, date=None, no_serve=True, no_push=True, force=False,
+        skip_ccf=False, skip_watch=False, skip_fetch=False,
+        host="127.0.0.1", port=8011,
+    ))
+    captured = capsys.readouterr()
+
+    assert code == 0                      # 全失败才非 0，这里 2/3 成功
+    assert "2/3 段完成" in captured.out
+    assert "源整站不可达" in captured.err  # 崩掉的那段要如实报出来
+    assert "42 篇" in captured.out         # 第三段照常跑完
 
 
 def test_cli_serve_help():
