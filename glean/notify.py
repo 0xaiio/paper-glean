@@ -1,15 +1,33 @@
 """Push channels for newly detected work.
 
+Display contract: the result is always an HTML page
+---------------------------------------------------
+Nothing here (and nothing in the scheduled pipeline) pops up a window or a
+system notification. A run leaves its result behind as HTML, and the scheduled
+task is what makes those pages exist:
+
+* ``exports/<namespace>-digest-<YYYYMMDD>.html`` — a self-contained snapshot
+  written on every run (see :mod:`glean.report`); opens straight from the file
+  system, no server and no network needed. **零新增也会出页面**，因为「跑过且
+  什么都没发现」本身就是要留下的证据。
+* the local web app — ``/watch`` / ``/ccf`` / ``/digest``. The scheduled task
+  keeps it online (``glean.serve.ensure``), and this module's ``file`` channel
+  is what feeds its NEW badges.
+
+So "did anything happen" is answered by *reading a page*, never by a toast that
+is gone the moment you look away. The ``PAPER_GLEAN_DESKTOP`` environment
+variable and the PowerShell balloon channel were removed for exactly this
+reason (they were the only non-HTML surface).
+
 Channels (all best-effort — a failing channel never fails the run)
 -----------------------------------------------------------------
 ``file``     Always on. Writes the unacknowledged "new" set to
              ``data/watch_new.json``; the Web UI badges these as NEW.
              (The human-readable ``WATCH-digest.md`` is written by
              :func:`glean.watch.run`, not here.)
-``desktop``  Windows balloon toast via PowerShell. On by default on Windows,
-             off with ``PAPER_GLEAN_DESKTOP=0``.
 ``webhook``  HTTP POST to ``PAPER_GLEAN_WEBHOOK_URL``. Off unless the variable
-             is set. Payload shape selected with ``PAPER_GLEAN_WEBHOOK_FORMAT``
+             is set — the only channel that leaves the machine, and opt-in.
+             Payload shape selected with ``PAPER_GLEAN_WEBHOOK_FORMAT``
              (``generic`` | ``feishu`` | ``wecom``).
 
 **Secrets never live in tracked files.** The webhook URL is a credential — it is
@@ -28,8 +46,6 @@ from __future__ import annotations
 
 import json
 import os
-import platform
-import subprocess
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -127,47 +143,6 @@ def ack_all(namespace: str = "watch") -> int:
 
 
 # ------------------------------------------------------------------
-# desktop — Windows balloon toast
-# ------------------------------------------------------------------
-
-def _desktop_enabled() -> bool:
-    return os.environ.get("PAPER_GLEAN_DESKTOP", "1").lower() not in ("0", "false", "no")
-
-
-def _desktop_channel(items: list[dict[str, Any]], day: str, namespace: str = "watch") -> bool:
-    if not _desktop_enabled() or platform.system() != "Windows":
-        return False
-    title = f"paper-glean {NS_LABEL.get(namespace, namespace)}提醒"
-    text = _summary(items, day, namespace)
-    if items:
-        first = items[0]
-        text += f"\n{_subject(first)}｜{_kind(first)}｜{first.get('title', '')[:60]}"
-    # WinForms NotifyIcon: no extra module needed, degrades silently.
-    ps = (
-        "Add-Type -AssemblyName System.Windows.Forms;"
-        "$n = New-Object System.Windows.Forms.NotifyIcon;"
-        "$n.Icon = [System.Drawing.SystemIcons]::Information;"
-        f"$n.BalloonTipTitle = '{title}';"
-        f"$n.BalloonTipText = '{text}';"
-        "$n.Visible = $true;"
-        "$n.ShowBalloonTip(8000);"
-        "Start-Sleep -Seconds 4;"
-        "$n.Dispose()"
-    )
-    try:
-        subprocess.run(
-            ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps],
-            timeout=30,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        )
-        return True
-    except Exception:
-        return False
-
-
-# ------------------------------------------------------------------
 # webhook — generic / feishu / wecom
 # ------------------------------------------------------------------
 
@@ -230,15 +205,17 @@ def push(
     day: str | None = None,
     namespace: str = "watch",
 ) -> list[str]:
-    """Deliver ``items`` through every enabled channel. Returns names that ran."""
+    """Deliver ``items`` through every enabled channel. Returns names that ran.
+
+    Only two channels exist on purpose: ``file`` hands the items to the HTML
+    pages, ``webhook`` is opt-in and off the machine. Nothing opens a window.
+    """
     if not items:
         return []
     day = day or datetime.now().strftime("%Y-%m-%d")
     done: list[str] = []
     if _file_channel(items, day, namespace):
         done.append("file")
-    if _desktop_channel(items, day, namespace):
-        done.append("desktop")
     if _webhook_channel(items, day, namespace):
         done.append("webhook")
     return done
@@ -248,6 +225,5 @@ def enabled_channels() -> dict[str, bool]:
     """Report which channels would fire (used by ``watch push-test``)."""
     return {
         "file": True,
-        "desktop": _desktop_enabled() and platform.system() == "Windows",
         "webhook": bool(os.environ.get("PAPER_GLEAN_WEBHOOK_URL", "").strip()),
     }

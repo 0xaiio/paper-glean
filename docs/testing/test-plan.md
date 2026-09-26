@@ -181,8 +181,8 @@
 | `test_summary_falls_back_to_venue_and_labels_namespace` | 无学者字段时回落 venue，并按命名空间打标 | ✅ |
 | `test_namespaces_keep_separate_unread_sets` | watch / ccf 未读集合互相隔离 | ✅ |
 | `test_unknown_namespace_is_rejected` | 未知命名空间被拒绝 | ✅ |
-| `test_desktop_disabled_by_env` / `test_desktop_skipped_off_windows` | 桌面通道开关 | ✅ |
-| `test_desktop_shells_out_on_windows` | Windows 下确实调用 PowerShell | ✅ |
+| `test_notify_has_no_shell_out_surface` | **源码级**回归：模块内不得再出现 `subprocess` / `platform.system` / `BalloonTip` / `NotifyIcon`——弹窗通道（PowerShell 气泡）不得复活 | ✅ |
+| `test_push_reaches_only_the_page_channels` | 一次推送只写页面的未读集合（`["file"]`），不产生任何副作用 | ✅ |
 | `test_webhook_off_without_url` | 未配置则关闭 | ✅ |
 | `test_webhook_payload_shapes` | generic / feishu / wecom 三种载荷 | ✅ |
 | `test_webhook_posts_when_configured` | 配置后确实 POST | ✅ |

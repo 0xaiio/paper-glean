@@ -1,12 +1,14 @@
-"""Tests for :mod:`glean.notify` — the four push channels.
+"""Tests for :mod:`glean.notify` — the push channels.
 
-Nothing here opens a socket or pops a toast: paths go to ``tmp_path`` and the
-desktop/webhook transports are either disabled or monkeypatched.
+Nothing here opens a socket or pops a window: paths go to ``tmp_path`` and the
+webhook transport is either disabled or monkeypatched. The display surface is
+the HTML page, so there is deliberately no pop-up channel left to test.
 """
 
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -37,7 +39,6 @@ ITEMS = [
 def isolated(tmp_path, monkeypatch):
     monkeypatch.setattr(notify, "WATCH_NEW", tmp_path / "watch_new.json")
     monkeypatch.delenv("PAPER_GLEAN_WEBHOOK_URL", raising=False)
-    monkeypatch.setenv("PAPER_GLEAN_DESKTOP", "0")
     return tmp_path
 
 
@@ -101,32 +102,26 @@ def test_unknown_namespace_is_rejected():
 
 
 # ------------------------------------------------------------------
-# desktop
+# no pop-up channel (the display surface is HTML)
 # ------------------------------------------------------------------
 
-def test_desktop_disabled_by_env(isolated):
-    assert notify._desktop_enabled() is False
-    assert notify._desktop_channel(ITEMS, "2026-09-14") is False
+def test_notify_has_no_shell_out_surface():
+    """No pop-up channel may come back.
+
+    The removed desktop channel worked by shelling out to PowerShell and asking
+    WinForms for a balloon tip. Checking the source (not just behaviour) makes
+    that reintroduction a test failure instead of something to notice by hand.
+    """
+    src = Path(notify.__file__).read_text(encoding="utf-8")
+    for banned in ("subprocess", "platform.system", "BalloonTip", "NotifyIcon"):
+        assert banned not in src, f"{banned!r} would bring a pop-up channel back"
 
 
-def test_desktop_skipped_off_windows(isolated, monkeypatch):
-    monkeypatch.setenv("PAPER_GLEAN_DESKTOP", "1")
-    monkeypatch.setattr(notify.platform, "system", lambda: "Linux")
-    assert notify._desktop_channel(ITEMS, "2026-09-14") is False
-
-
-def test_desktop_shells_out_on_windows(isolated, monkeypatch):
-    monkeypatch.setenv("PAPER_GLEAN_DESKTOP", "1")
-    monkeypatch.setattr(notify.platform, "system", lambda: "Windows")
-    calls = {}
-
-    def fake_run(cmd, **kw):
-        calls["cmd"] = cmd
-        return None
-
-    monkeypatch.setattr(notify.subprocess, "run", fake_run)
-    assert notify._desktop_channel(ITEMS, "2026-09-14") is True
-    assert "powershell" in calls["cmd"][0].lower()
+def test_push_reaches_only_the_page_channels(isolated, monkeypatch):
+    """A real push writes the page's unread set and nothing else."""
+    monkeypatch.setenv("PAPER_GLEAN_WEBHOOK_URL", "")  # webhook stays opt-in
+    assert notify.push(ITEMS, "2026-09-14") == ["file"]
+    assert len(notify.load_new()) == 2
 
 
 # ------------------------------------------------------------------
@@ -201,10 +196,13 @@ def test_push_no_items_is_noop(isolated):
 
 
 def test_enabled_channels_report(isolated, monkeypatch):
+    """Exactly two channels: `file` (feeds the HTML pages) and `webhook` (opt-in).
+
+    Asserted as an exact dict so that re-adding a pop-up channel — the removed
+    PowerShell balloon was one — has to break a test rather than slip back in.
+    """
     states = notify.enabled_channels()
-    assert states["file"] is True
-    assert states["webhook"] is False
-    assert states["desktop"] is False  # PAPER_GLEAN_DESKTOP=0 in fixture
+    assert states == {"file": True, "webhook": False}
 
     monkeypatch.setenv("PAPER_GLEAN_WEBHOOK_URL", "https://example.invalid/hook")
-    assert notify.enabled_channels()["webhook"] is True
+    assert notify.enabled_channels() == {"file": True, "webhook": True}

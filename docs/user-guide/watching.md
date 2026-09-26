@@ -120,16 +120,30 @@ python -X utf8 arxiv_daily.py watch list --all
 
 ---
 
-## 四、推送通道
+## 四、展示与推送通道
 
-四个通道，全部 **fail-soft**（某个通道挂了不影响其它，也不让 `watch run` 失败）：
+**展示口径只有一种：页面。** 定时任务不弹窗口、不发系统通知——它跑完就把结果落成
+HTML，你看页面即可。因此只有两个通道，且全部 **fail-soft**（某个通道挂了不影响其它，
+也不让 `watch run` 失败）：
 
 | 通道 | 默认 | 落点 | 开关 |
 |------|------|------|------|
-| `file` | ✅ 常开 | `WATCH-digest.md` + `data/watch_new.json`（Web 的 NEW 徽标数据源） | — |
-| Web 高亮 | ✅ 常开 | `/watch` 页面新条目打 `NEW` 红标，导航「学者」显示未读计数（与「CCF」计数互相独立） | 页面上「全部标记已读」或 `watch ack` |
-| `desktop` | ✅ Windows 开 | 系统气泡通知 | `PAPER_GLEAN_DESKTOP=0` 关闭 |
-| `webhook` | ❌ 关 | POST JSON 到自定义 URL | 设 `PAPER_GLEAN_WEBHOOK_URL` |
+| `file` | ✅ 常开 | `data/watch_new.json` —— `/watch` 页面 `NEW` 红标与导航未读计数的数据源（**尚未 ack 的累积集合**，不是「今日新增」） | — |
+| `webhook` | ❌ 关 | POST JSON 到自定义 URL；**唯一出网的通道** | 设 `PAPER_GLEAN_WEBHOOK_URL` |
+
+除通道之外，`watch run` 每次还会独立落下两样**页面**产物：
+
+| 产物 | 位置 | 说明 |
+|------|------|------|
+| digest（事实源） | `WATCH-digest.md` | 按人只追加新发现的条目 |
+| 离线快照 | `exports/watch-digest-<YYYYMMDD>.html` | 双击即开、无需联网。**零新增也会出页面**——「扫描跑过且什么都没发现」本身就是要留下的证据（含各源取回条数，用来分辨「真没有」与「源挂了」） |
+| 在线页面 | `/watch` | 定时任务负责让它在线（`glean.serve.ensure`）；`NEW` 徽标即未读 |
+
+清空 `NEW`：页面上「全部标记已读」或 `watch ack`（只清学者侧，不影响 CCF 侧）。
+
+> 早期版本还有一个 `desktop` 通道（Windows 托盘气泡，靠 PowerShell 弹窗）。
+> **已移除**：气泡看完即消失，留不下证据，也无法回答「是安静日还是源挂了」。
+> 需要外部提醒就走可选的 `webhook`。
 
 ### 配置 webhook
 
@@ -147,7 +161,6 @@ python -X utf8 arxiv_daily.py watch push-test --send
 |------|------|------|
 | `PAPER_GLEAN_WEBHOOK_URL` | URL | 空则关闭该通道 |
 | `PAPER_GLEAN_WEBHOOK_FORMAT` | `generic`（默认）/ `feishu` / `wecom` | 载荷形状 |
-| `PAPER_GLEAN_DESKTOP` | `1`（默认）/ `0` | 关闭桌面通知 |
 
 `generic` 载荷：`{"text": "...", "day": "2026-09-14", "count": 2, "items": [...]}`
 （飞书/企业微信机器人需要各自的信封格式，用 `feishu` / `wecom` 一步到位。）
@@ -159,9 +172,9 @@ python -X utf8 arxiv_daily.py watch push-test          # 只看哪些通道开�
 python -X utf8 arxiv_daily.py watch push-test --send   # 真发一条自检消息
 ```
 
-### 第五个落点：HTML 快照
+### 离线快照
 
-上面四个通道之外，每次 `watch run` 还会**无条件**写一份独立 HTML：
+每次 `watch run` 都会**无条件**写一份独立 HTML：
 
 ```
 exports/watch-digest-<YYYY-MM-DD>.html        # 注意：日期带连字符
@@ -178,7 +191,7 @@ exports/watch-digest-<YYYY-MM-DD>.html        # 注意：日期带连字符
 
 ### 飞书投递（Feishu）：不在进程内，由定时任务承担
 
-`watch run` **自己不发飞书** —— 四个通道里没有飞书，它只把 HTML 快照写到 `exports/`。
+`watch run` **自己不发飞书** —— 推送通道里没有飞书，它只把 HTML 快照写到 `exports/`。
 投递是**自动化那一层**的事：定时任务在 `run` 之后调用 `lark-cli`，把摘要文字 + HTML 附件
 发给机器人单聊（即发给你自己）。
 
@@ -235,7 +248,7 @@ python -X utf8 arxiv_daily.py watch run --no-push                # 只落盘 dig
 | `[WARN] 盲区：某人` | 该人本轮**一条内容都没取到**（源不可达），不是「没有新作」 | 看 HTML 证据表的「各源取回」；补 `dblp:`/`s2:` 兜底；或换可解析的 `homepage` |
 | 加人后一次性推几十条 | 用了 `--force` | 去掉 `--force`，让首次运行建基线 |
 | 主页改版后误报一堆「新作」 | 标题变了 → 指纹变了 | 删掉 `data/watch_state.json` 里该人的记录重建基线 |
-| 桌面通知没弹 | 非 Windows / `PAPER_GLEAN_DESKTOP=0` / 无托盘环境 | 用 `watch push-test` 确认通道状态 |
+| 没等到任何提醒 | **设计如此**：已不再有弹窗 / 系统通知（`desktop` 通道已移除） | 看页面：`/watch` 的 `NEW` 徽标、`exports/watch-digest-*.html`；要外部提醒就配 `PAPER_GLEAN_WEBHOOK_URL` |
 | webhook 不通 | URL 未设、被代理拦、格式不符 | `push-test --send`；回环探测记得 `--noproxy '*'` |
 | 想要被墙站点的主页 | 网络限制 | 走 DBLP / S2 兜底，或配代理后重试 |
 | 报告「没有新作」但心里没底 | 整轮 fail-soft 假阴性：网络不通时三个源都是 0 | **别信 `sources` 与 `last_checked`** —— `sources` 是累积并集（粘性）、`last_checked` 无论成败都刷新。判据是 HTML 证据表的逐源取回条数 |

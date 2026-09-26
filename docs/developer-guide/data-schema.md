@@ -335,11 +335,11 @@
 每行一个 JSON 对象，append-only，每条未见过条目**只记一次**：
 
 ```json
-{"time": "2026-09-14T02:11:05+00:00", "run_id": "20260914T021105Z", "key": "sigmod", "venue": "SIGMOD", "item": {"title": "SIGMOD 2027 CFP", "kind": "cfp", "url": "https://sigmod.org/2027/", "source": "ccfddl", "fingerprint": "cfp|..."}, "pushed_to": ["file", "desktop"]}
+{"time": "2026-09-14T02:11:05+00:00", "run_id": "20260914T021105Z", "key": "sigmod", "venue": "SIGMOD", "item": {"title": "SIGMOD 2027 CFP", "kind": "cfp", "url": "https://sigmod.org/2027/", "source": "ccfddl", "fingerprint": "cfp|..."}, "pushed_to": ["file", "webhook"]}
 ```
 
 - `run_id` 形如 `YYYYMMDDTHHMMSSZ`（UTC）；`item` 为去掉 `key`/`venue` 后的原始条目；
-  `pushed_to` 列出实际生效的推送通道。
+  `pushed_to` 列出实际生效的推送通道（`file` / `webhook`；`file` 是喂给 HTML 页面的那一个）。
 
 > `ccf_events.jsonl` 与 `watch_events.jsonl` 均在 `.gitignore` 中（本地审计，不入库）。
 
