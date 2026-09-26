@@ -66,8 +66,12 @@ paper-glean/
 │   ├── web/            # Web 应用
 │   │   ├── __init__.py
 │   │   ├── __main__.py
-│   │   ├── main.py
-│   │   ├── routes.py
+│   │   ├── main.py            # FastAPI 应用工厂
+│   │   ├── routes.py          # 只做聚合（include 三个子路由）
+│   │   ├── routes_papers.py   # 论文流页面 + API + HTMX 片段
+│   │   ├── routes_watch.py    # 学者监控页面 + API
+│   │   ├── routes_ccf.py      # 会议期刊监控页面 + API
+│   │   ├── common.py          # 三个路由模块共用助手
 │   │   ├── models.py
 │   │   └── templates_config.py
 │   └── templates/      # Jinja2 模板（与 web/ 平级）
@@ -150,23 +154,26 @@ type:
 
 ### 3. 添加 Web 功能
 
-1. 在 `glean/web/routes.py` 中添加路由
+1. 找到该功能所属的界面模块（`routes_papers.py` / `routes_watch.py` / `routes_ccf.py`）并在其中加路由；
+   只有**新界面**才新建一个 `routes_<surface>.py`，并在 `routes.py` 里 `include_router` 一行
 2. 如需新数据模型，在 `glean/web/models.py` 中添加 Pydantic 模型
 3. 如需新模板，在 `glean/templates/`（与 `glean/web/` 平级）中添加
-4. 在 `tests/test_web.py` 中添加测试
+4. 在 `tests/test_web.py` 中添加测试；若新增了界面，补一条
+   `test_every_surface_is_mounted` 的路径断言
 
 几条「不要抄第二遍」的纪律（对应本轮重构消掉的重复）：
 
 | 重复源 | 唯一出处 |
 |--------|----------|
-| 论文筛选的六个查询参数（`day` / `category` / `search` / `show_*`） | `models.PaperFilters` + `routes.Filters`（`Depends()` 注入），过滤逻辑只在 `_filter_papers` |
+| 论文筛选的六个查询参数（`day` / `category` / `search` / `show_*`） | `models.PaperFilters` + `common.Filters`（`Depends()` 注入），过滤逻辑只在 `common.filter_papers` |
+| 「没指定日期就看最新一天」 | `common.current_papers()`（页面 / API / HTMX 片段三处共用） |
 | 导航项（桌面/移动两份版式） | `base.html` 顶部的 `nav_items` 列表 |
 | `hx-include` 的六项选择器 | `digest.html` 顶部的 `hx_include` 变量 |
 | 出站 HTTP 请求（User-Agent / 超时 / charset 兜底） | `core._http_request()` → `http_get()` / `http_get_text()`；`homeparse.fetch_html` 只是委托，**别再写一份 `urlopen`** |
 | 监控扫描的 `--only/--force/--no-push` | `cli._add_run_args()`（`watch run` 与 `ccf run` 共用） |
 
-「查表或 404」「跑一次监控并汇总结果」分别走 `_require_paper` / `_require_entry`
-与 `_run_summary`，不要在路由里各写一遍。
+「查表或 404」「跑一次监控并汇总结果」分别走 `common.require_paper` / `common.require_entry`
+与 `common.run_summary`，不要在路由里各写一遍。
 
 ### 4. 添加新的监控线
 
@@ -187,7 +194,8 @@ type:
    - `run()` 一行转调 `monitor.run_monitor(...)`
    - **启停与移除不用自己写**：`set_enabled()` / `set_enabled_where()` / `forget_state()`
      直接转调 `monitor`，一行即可
-5. 在 `glean/cli.py` 中挂子命令，在 `glean/web/routes.py` 中挂 API 与页面
+5. 在 `glean/cli.py` 中挂子命令，并新建 `glean/web/routes_<line>.py` 承载页面与 API
+   （在 `routes.py` 里 `include_router` 一行）
 6. 补测试：新增 `tests/test_<line>.py`（隔离路径 + stub 抓取），引擎本身的语义由
    `tests/test_monitor.py` 覆盖，**不要**在新线里重复测基线/差异/幂等/启停/遗忘指纹
 

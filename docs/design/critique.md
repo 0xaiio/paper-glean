@@ -33,7 +33,7 @@
 | **P0-2** | `bindControls()` 定义完整却**从未调用** → ~16 个控件静默失效 | `prototype.html:1284` 新增 `bindControls();`（定义 `1159`，唯一调用） | CDP：视图/主题/密度/数据集/筛选/选中**全部生效** ✅ |
 | **P0-3（C1）** | `renderStream()` 正常分支只 `renderWindow()`、**不 `renderDetail()`** → 所有"清空选中"路径（重置/切类别/切日期/切数据集/搜索/取消勾选）后中栏无选中卡，**右栏却残留上一张详情** | `renderStream()` 内 `renderWindow();`（`817`）之后新增 `renderDetail();`（**`818`**） | CDP：点「重置演示状态」后 `[data-selected="true"]`=**0**、`.detail-empty` 存在（修复前 `ABSENT`）、右栏文案「选择一篇论文查看详情」；切类别→空态；切洪峰日→384 篇且右栏空态；console **0 报错** ✅ |
 | **P1-1** | `⌘K` 未加「规划中」视觉区分 | builder 已加**虚线描边 + `<span class="planned">规划中</span>`**（`482` 起） | CDP：`cmdkPlanned:true`、`densityPlanned:false` ✅ |
-| （默认值，已修） | `state.showOther` 默认 `true`，与未勾选的 `#fOther`（`550`）及真实实现 `routes.py:35 show_other=False` 冲突 | 默认改为 `false`（`708`） | 静态核验：默认筛选状态与控件勾选一致 ✅ |
+| （默认值，已修） | `state.showOther` 默认 `true`，与未勾选的 `#fOther`（`550`）及真实实现 `PaperFilters.show_other=False` 冲突 | 默认改为 `false`（`708`） | 静态核验：默认筛选状态与控件勾选一致 ✅ |
 
 > **要点**：
 > 1. **P0-2 / P0-3 是本流程最值得记录的教训**：两处均为"定义完整、接线遗漏"，导致功能静默失效/状态不一致，我的静态阅读与 DOM 桩均未捕获，由主理人 CDP 实测发现——**「无头浏览器实测」应成为原型交付强制关卡**。

@@ -496,3 +496,72 @@ def test_htmx_paper_card_explains_why_recommended(client, isolated_papers):
 def test_htmx_paper_card_unknown_id_is_404(client, isolated_papers):
     assert client.get("/htmx/paper-card/no-such-id").status_code == 404
     assert client.get("/htmx/paper-detail/no-such-id").status_code == 404
+
+
+# ------------------------------------------------------------------
+# Route composition (guards the split into routes_papers / routes_watch /
+# routes_ccf: forgetting to mount one would silently drop a whole surface)
+# ------------------------------------------------------------------
+
+def test_every_surface_is_mounted(client):
+    """One router per surface — all of them must reach the app."""
+    paths = client.get("/openapi.json").json()["paths"]
+    for path in (
+        "/digest", "/profile", "/archive", "/api/papers", "/htmx/paper-list",
+        "/watch", "/api/watch/researchers", "/api/watch/run",
+        "/ccf", "/api/ccf/venues", "/api/ccf/run",
+    ):
+        assert path in paths, f"{path} did not survive the router split"
+
+
+def test_openapi_groups_operations_by_surface(client):
+    """Tags are what make /docs readable; they come from each route module."""
+    spec = client.get("/openapi.json").json()
+    tagged = {
+        tag
+        for operation in (op for path in spec["paths"].values() for op in path.values())
+        for tag in operation.get("tags", [])
+    }
+    assert {"papers", "watch", "ccf"} <= tagged
+
+
+def test_monitor_surfaces_answer_new_and_ack_with_the_same_shape(
+    client, isolated_watch, isolated_ccf
+):
+    """watch and ccf share one kernel, so /new and /ack must answer alike."""
+    from glean import notify
+
+    notify.WATCH_NEW.parent.mkdir(parents=True, exist_ok=True)
+    notify.WATCH_NEW.write_text(
+        '{"day": "2026-09-14", "items": [{"title": "A", "kind": "paper"}]}',
+        encoding="utf-8",
+    )
+    notify.CCF_NEW.parent.mkdir(parents=True, exist_ok=True)
+    notify.CCF_NEW.write_text(
+        '{"day": "2026-09-14", "items": [{"title": "B", "kind": "cfp"}]}',
+        encoding="utf-8",
+    )
+
+    for namespace in ("watch", "ccf"):
+        body = client.get(f"/api/{namespace}/new").json()
+        assert body == {"count": 1, "items": [{"title": body["items"][0]["title"],
+                                               "kind": body["items"][0]["kind"]}]}
+        assert client.post(f"/api/{namespace}/ack").json() == {
+            "success": True,
+            "cleared": 1,
+        }
+
+
+def test_toggle_reports_whether_it_actually_worked(client, isolated_ccf):
+    """Both surfaces must report the real outcome, not a hardcoded success.
+
+    `set_enabled` answers False for an unknown name; the CCF toggle used to
+    throw that away and always claim success.
+    """
+    venues = client.get("/api/ccf/venues").json()
+    key = next(v["key"] for v in venues if v["name"] == "SIGMOD")
+    assert client.post(f"/api/ccf/venues/{key}/toggle?enabled=false").json() == {
+        "success": True,
+        "enabled": False,
+    }
+    assert client.post("/api/ccf/venues/no-such-key/toggle").status_code == 404

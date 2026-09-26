@@ -38,12 +38,13 @@
 | `glean/htmlkit.py` | ✅ | — | — |
 | `glean/report.py` | ✅ | — | ✅ |
 | `glean/cli.py` | ✅ | ✅ | ✅ |
-| `glean/web/routes.py` | — | ✅ | ✅ |
+| `glean/web/routes*.py`（聚合 + 三界面） | — | ✅ | ✅ |
+| `glean/web/common.py` | — | ✅ | — |
 | `glean/web/models.py` | ✅ | — | — |
 | 数据文件格式 | — | ✅ | — |
 | 端到端工作流 | — | — | ✅ |
 
-> 全量测试数：**193 passed**（`pytest tests/ -q`）。
+> 全量测试数：**197 passed**（`pytest tests/ -q`）。
 > `weekly`（三条链路的聚合入口）由 `tests/test_cli.py` 的两条测试守住：命令面锁定
 > （含全套开关）与**默认值不变量**（`--hours 168` / `--cap 300` / 服务默认开）。
 > 后者才是真正要防的回归 —— 周频沿用 `daily` 的 `--hours 24` 会静默漏掉一周里

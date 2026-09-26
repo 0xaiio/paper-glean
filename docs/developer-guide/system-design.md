@@ -71,8 +71,12 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/htmlkit.py` | **静态快照的共享构件**：内联 CSS（`STYLE`）、渐进增强脚本（`SCRIPT`，暗色为 opt-in）、`escape()`、筛选控件、页面外壳 `page()`；三条链路共用，避免样式/暗色逻辑三份漂移 | 业务逻辑、网络（纯字符串拼装） |
 | `glean/report.py` | **独立 HTML 快照渲染**：`build_html()`（arXiv，理由从 `arXiv-schedule.md` 反解析而非重算）+ `MonitorView` / `build_monitor_html()` / `render_monitor_day()`（watch/ccf 共用，零新增也出页面，含「本次运行」证据表与盲区标注）；输出 `exports/<namespace>-digest-<day>.html` | 网络、画像重算 |
 | `glean/web/main.py` | `create_app()` 应用工厂；挂载 `/static`；`/` 重定向 | 路由实现 |
-| `glean/web/routes.py` | 页面路由、REST API（含 `/api/ping` 存活探测）、HTMX 片段；共享 `PaperFilters` 查询参数组 + `_require_paper` / `_require_entry` / `_run_summary` 助手 | 业务逻辑（全部委托 core） |
-| `glean/web/models.py` | Pydantic 线上模型（`FeedbackRequest` 带 0–5 校验）+ `PaperFilters`（`Depends()` 注入的查询参数组） | 持久化 |
+| `glean/web/routes.py` | **只做聚合**：把三个子路由 `include_router` 进一个 router（不加前缀，路径不变） | 端点实现 |
+| `glean/web/routes_papers.py` | 论文流：`/digest` `/profile` `/archive` + `/api/ping` `/api/days` `/api/papers` `/api/interests` `/api/feedback` `/api/download/*` + `/htmx/*` | 业务逻辑（全部委托 core） |
+| `glean/web/routes_watch.py` | 学者监控：`/watch` + `/api/watch/*`（名单增删启停、`new`/`ack`、`events`、`run`） | 业务逻辑（委托 watch） |
+| `glean/web/routes_ccf.py` | 会议期刊监控：`/ccf` + `/api/ccf/*`（venue 增删启停、`toggle-area`、`refresh`、`new`/`ack`、`events`、`run`） | 业务逻辑（委托 ccf） |
+| `glean/web/common.py` | 三个路由模块的共用助手：`Filters`、`current_papers()`（取哪一天的唯一实现）、`require_paper`/`require_entry`（查不到即 404）、`filter_papers`/`hit_visible`、`run_summary()` | — |
+| `glean/web/models.py` | Pydantic 线上模型（`FeedbackRequest` 带 0–5 校验）+ `PaperFilters`（`Depends()` 注入的查询参数组）+ 监控共用契约 `RunSummary`/`NewItems`/`AckResult` | 持久化 |
 | `glean/web/templates_config.py` | 共享 Jinja2 环境（Starlette `Jinja2Templates`）+ `format_timestamp` 过滤器 | — |
 | `arxiv_daily.py` | 向后兼容入口 → `glean.cli:main` | — |
 | `scripts/run_daily.ps1` / `register_task.ps1` | Windows 计划任务入口（ASCII-only）与注册器 | 业务逻辑 |

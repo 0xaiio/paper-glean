@@ -13,15 +13,35 @@
 ```
 glean/web/
 ├── __init__.py
-├── __main__.py      # 入口：python -m glean.web
-├── main.py          # FastAPI 应用工厂
-├── routes.py        # 路由定义 + 三个共用助手
-├── models.py        # 线上模型（Pydantic）+ PaperFilters（查询参数组）
+├── __main__.py       # 入口：python -m glean.web
+├── main.py           # FastAPI 应用工厂
+├── routes.py         # 只做聚合：把下面三个子路由 include 进一个 router
+├── routes_papers.py  # 论文流：/digest /profile /archive + /api/* + /htmx/*
+├── routes_watch.py   # 学者监控：/watch + /api/watch/*
+├── routes_ccf.py     # 会议期刊监控：/ccf + /api/ccf/*
+├── common.py         # 三个路由模块共用的助手（取日 / 404 / 过滤 / 运行摘要）
+├── models.py         # 线上模型（Pydantic）+ PaperFilters（查询参数组）
 ├── templates_config.py  # 共享 Jinja2 环境 + 自定义过滤器
 └── (模板在 glean/templates/)
 ```
 
 > 模板目录是 `glean/templates/`（与 `glean/web/` 平级），不是 `glean/web/templates/`。
+
+**一屏一组路由。** `routes.py` 不再承载任何端点，只把三个子路由挂到一起
+（`include_router` 不加前缀，因此路径与拆分前逐字相同）；加一个新界面 =
+新写一个路由模块 + 在 `routes.py` 加一行。每个模块自带 OpenAPI `tags`
+（`papers` / `watch` / `ccf`），`/docs` 因此按界面分组而不是糊成一片。
+
+**共用的东西只有一份。** 三个界面都要「决定看哪一天、过滤、论文不存在就 404」，
+这些放在 `common.py`：
+
+| 助手 | 作用 |
+|------|------|
+| `Filters` | `Annotated[PaperFilters, Depends()]` 类型别名，见下节 |
+| `current_papers(filters)` | 「没指定日期就看最新一天」的**唯一**实现（此前在页面 / API / 片段里各写一遍） |
+| `require_paper(id)` / `require_entry(rows, key, what)` | 取不到就 404，避免每个端点各写一次查找 |
+| `filter_papers` / `hit_visible` | 分类 → 搜索 → 命中类型 → 按分数排序 |
+| `run_summary(result)` | 把监控运行结果裁成计数（`RunSummary`），watch / ccf 共用 |
 
 ## 路由分类
 
@@ -75,7 +95,7 @@ class PaperFilters:
     show_expand: bool = True
     show_other: bool = False
 
-# glean/web/routes.py
+# glean/web/common.py
 Filters = Annotated[PaperFilters, Depends()]
 
 @router.get("/api/papers")

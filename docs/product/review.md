@@ -89,8 +89,10 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 | `glean/htmlkit.py` | 静态快照共享构件：内联 CSS/JS（暗色 opt-in）、`escape()`、筛选控件、页面外壳 `page()`；三条链路共用 | ✅ |
 | `glean/report.py` | 独立 HTML 快照渲染：arXiv 的 `build_html()`（理由从 digest 反解析）+ watch/ccf 的 `MonitorView`/`build_monitor_html()`（零新增也出页面，含运行证据表与盲区标注） | ✅ |
 | `glean/web/main.py` | FastAPI 应用工厂、静态挂载；`watch_new_count` / `ccf_new_count` 模板全局（导航未读角标） | ✅ |
-| `glean/web/routes.py` | 页面 / API（含 `/api/ping` 存活探测）/ HTMX 片段三类路由；`PaperFilters` 查询参数组与 `_require_paper` / `_require_entry` / `_run_summary` 三个共用助手 | ✅ |
-| `glean/web/models.py` | Pydantic 线上模型 + `PaperFilters`（`Depends()` 注入的查询参数组） | ✅ |
+| `glean/web/routes.py` | **只做聚合**：`include_router` 三个子路由（不加前缀，路径与拆分前逐字相同） | ✅ |
+| `glean/web/routes_papers.py` / `routes_watch.py` / `routes_ccf.py` | 一屏一组路由（各带 OpenAPI `tags`），此前 526 行全挤在一个 `routes.py` 里 | ✅ |
+| `glean/web/common.py` | 三模块共用助手；其中 `current_papers()` 消掉了「取哪一天」在页面 / API / 片段里的三份复制 | ✅ |
+| `glean/web/models.py` | Pydantic 线上模型 + `PaperFilters`（`Depends()` 注入的查询参数组）+ 监控共用契约 `RunSummary`/`NewItems`/`AckResult` | ✅ |
 | `glean/web/templates_config.py` | Starlette `Jinja2Templates`（模板环境 + `format_timestamp` 过滤器）；已去掉过时的私有 API 兼容子类 | ✅ |
 | `glean/templates/**` | Jinja2 模板（base / digest / profile / archive / **watch** / **ccf** + 3 个 partial） | ✅ |
 | `glean_static/**` | `css/app.css`、`js/app.js`（Alpine 键盘流） | ✅ |
@@ -144,7 +146,7 @@ Crossref 卷期分组与指纹稳定性）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组；
 并在进程内遍历 `build_parser()` 的命令树，断言**每个叶子子命令都挂了 `func`**、
 命令面恰好是文档所载的 22 个叶子、`watch run` 与 `ccf run` 共用同一组标志）。
-共 **193 个测试，全部通过**（`pytest -q` → `193 passed`）。
+共 **197 个测试，全部通过**（`pytest -q` → `197 passed`）。
 
 ---
 
@@ -191,6 +193,18 @@ Crossref 卷期分组与指纹稳定性）、
 | F4 | `mkdocs.yml`（新建于仓库根，删除 `docs/mkdocs.yml`）· `.github/workflows/docs.yml` | 配置位于 `docs/mkdocs.yml` 且写 `docs_dir: .` + `site_dir: ../site`（MkDocs ≥1.6 **拒绝** `docs_dir` 为配置所在目录，严格构建必失败）；CI 里又是 `cd docs && mkdocs build --strict`；另有 3 个断链（`product/review.md` 指向仓库根 `plan.md` / `survey.md`，`user-guide/ccf-watching.md` 指向 `watching.md#配置-webhook`——该标题经 MkDocs 的 ASCII 归一后 slug 为 `webhook`） | 配置迁到仓库根：`docs_dir: docs` / `site_dir: site`；CI 改为在根目录直接 `mkdocs build --strict`；3 个断链分别改为 GitHub 绝对链接与 `#webhook` | `mkdocs build --strict` **0 警告**（原 3 警告即 abort），docs 作业的严格门禁恢复有效 |
 | F5 | `pyproject.toml` 的 `[tool.setuptools.package-data]` | 只声明 `templates/*.html` | 补 `templates/partials/*.html` | 修复：装 wheel 后 `paper_card` / `paper_detail` / `paper_list` 三个片段缺失，Web 界面会 500 |
 | F6 | `glean/web/` | `templates_config.py` 的 `NoCacheJinja2Templates` 依赖私有符号 `starlette.templating._TemplateResponse`；`models.py` 有从未作响应模型使用的 `PaperResponse` 与死模型 `FilterState` | 删除该子类改用官方 `Jinja2Templates`；`FilterState` 转为真正生效的 `PaperFilters`（`Annotated[..., Depends()]` 注入） | 移除对 Starlette 私有 API 的耦合（见第 2 轮 commit） |
+
+### 4.2 迭代重构（2026-09-14）—— 现代 Web 最佳实践，共三轮
+
+> 判据同 §4.1：**只收敛已被写第二遍、或已经被写错的东西**。已合并的共享功能
+> （`monitor.py` 内核、`notify.py` 双命名空间、`report.py` 三链路共用快照）保持并加强，
+> 不拆回去。每轮独立提交、独立推送。
+
+| 轮 | 收敛对象 | 主要内容 | 验证 |
+|----|---------|---------|------|
+| 第 1 轮 | 监控内核 | 新增 `forget_state()` / `set_enabled()` / `set_enabled_where()` 三个改名单原语，`watch`/`ccf` 各自那份退为一行转发；`MonitorJob` 增加 `save_entries`（显式化「谁落盘」）与 `request_interval`；digest 更新收敛为一次无条件 upsert；新增叶子模块 `glean/kinds.py` 收编 `kind` 图标文案（此前 watch / ccf / notify 三份，且 `program` 的文案已漂移）；删除 14 个空壳转发函数 | 测试 186 → 193；`mkdocs build --strict` 通过 |
+| 第 2 轮 | Web 层 | 526 行的 `routes.py` 拆为 `routes_papers` / `routes_watch` / `routes_ccf`，`routes.py` 只做 `include_router` 聚合（不加前缀，路径逐字不变）；共用助手集中到 `common.py`，其中 `current_papers()` 消掉「取哪一天」在页面 / API / 片段里的三份复制；监控线共用的 `/new`、`/ack`、`/run` 契约落成 Pydantic 模型 `NewItems` / `AckResult` / `RunSummary`；修正 CCF 勾选接口丢弃 `set_enabled` 返回值、恒报 `success: true` 的问题 | 测试 193 → 197；OpenAPI 31 条路径逐条比对不变，按 `papers`/`watch`/`ccf` 分组 |
+| 第 3 轮 | CLI 层 | 待做 | — |
 
 ---
 
