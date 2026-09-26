@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from glean import notify
-from glean.config import DEFAULT_CAP
+from glean.config import DEFAULT_CAP, EXPORT_DIR
 from glean.core import (
     annotate_hits,
     day_section,
@@ -116,6 +116,22 @@ def _render_monitor_html(view: MonitorView, res: dict, *, scope: str | None = No
     print(f"[OK] html snapshot -> {path}")
 
 
+def _print_display_hint(url: str | None) -> None:
+    """Tell the operator *which page* holds this run's result.
+
+    展示口径只有一种：**页面**。定时任务不弹窗口、不发系统通知，它只负责让页面
+    存在——在线时是可交互的本地应用（`/digest` · `/watch` · `/ccf`，NEW 徽标即
+    本轮新增），离线时是 `exports/` 里那份可直接双击打开的静态快照。把这两条
+    路径打出来，「结果去哪看」就不需要靠记忆。
+    """
+    if url:
+        print("[SHOW] 浏览器打开:")
+        print(f"       {url}/digest    arXiv 日报")
+        print(f"       {url}/watch     学者监控（NEW 徽标 = 本轮新作）")
+        print(f"       {url}/ccf       CCF-A 会议 / 期刊监控")
+    print(f"[SHOW] 离线快照: {EXPORT_DIR}\\*-digest-*.html（双击即开，无需联网）")
+
+
 def _report_monitor_run(res: dict, view: MonitorView) -> None:
     """Print one monitor run.
 
@@ -165,6 +181,7 @@ def cmd_daily(args: argparse.Namespace) -> None:
 
     if not args.serve:
         print("[HINT] 需要顺带拉起本地 Web 服务请加 --serve")
+        _print_display_hint(None)
         return
 
     online, started = ensure(args.host, args.port)
@@ -174,6 +191,7 @@ def cmd_daily(args: argparse.Namespace) -> None:
     else:
         print(f"[WARN] web app 未在 {args.host}:{args.port} 上线; 日志: {log_path(args.host, args.port)}")
         print("[WARN] digest 与 data/*.json 已生成，可直接阅读 arXiv-schedule.md")
+    _print_display_hint(url if online else None)
 
 
 # 周频聚合的默认窗口：168h = 7 × 24h。
@@ -255,6 +273,7 @@ def cmd_weekly(args: argparse.Namespace) -> int | None:
     print(f"[{'OK' if done == len(results) else 'WARN'}] {done}/{len(results)} 段完成")
 
     # 服务放在最后：三段产物都已落盘，服务起不来不影响已有结果（同 `daily` 的降级口径）。
+    url: str | None = None
     if not args.no_serve:
         online, started = ensure(args.host, args.port)
         url = base_url(args.host, args.port)
@@ -262,7 +281,9 @@ def cmd_weekly(args: argparse.Namespace) -> int | None:
             print(f"[OK] web app {'started' if started else 'already online'} -> {url}")
         else:
             print(f"[WARN] web app 未在 {args.host}:{args.port} 上线; 日志: {log_path(args.host, args.port)}")
+            url = None
 
+    _print_display_hint(url)
     print("[NEXT] agent 填 ★/🧐 推荐 -> reanchor -> html，再经 lark-cli 推飞书")
     return 0 if done else 1
 
@@ -340,12 +361,18 @@ def cmd_watch_ack(args: argparse.Namespace) -> None:
 
 
 def cmd_watch_push_test(args: argparse.Namespace) -> None:
-    """Report which push channels would fire, and send a probe payload."""
+    """Report which push channels would fire, and send a probe payload.
+
+    展示一律走页面，因此这里只有两个通道可查：``file``（喂给 HTML 页面的未读
+    集合）与 ``webhook``（可选，唯一出网的通道）。**没有桌面弹窗通道**——
+    想确认「有没有新东西」请看页面，不要等一个会自己消失的气泡。
+    """
     states = notify.enabled_channels()
     for name, on in states.items():
         print(f"[{'ON ' if on else 'OFF'}] {name}")
     if not states["webhook"]:
-        print("[HINT] 设置环境变量 PAPER_GLEAN_WEBHOOK_URL 以启用 webhook")
+        print("[HINT] 设置环境变量 PAPER_GLEAN_WEBHOOK_URL 以启用 webhook（可选）")
+    _print_display_hint(None)
     if args.send:
         probe = [
             {

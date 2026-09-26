@@ -15,7 +15,7 @@
 | AI 摘要/周报 | — | 结构化摘要 + 周报 | 库内 RAG | 自研 + LLM |
 | 协作与分享 | 导出 Markdown | 导出 HTML/RSS | 组内共享 | 自研 |
 | 通知渠道 | — | 邮件 + Webhook | RSS 输出 | 自研 |
-| 监控与推送 | 按人监控（主页 → DBLP/S2，四通道推送）✅ | 按会议/期刊监控 CFP/Program/接收论文 ✅ | 三线合并为统一简报 | 自研 |
+| 监控与推送 | 按人监控（主页 → DBLP/S2，HTML 页面展示 + 可选 webhook）✅ | 按会议/期刊监控 CFP/Program/接收论文 ✅ | 三线合并为统一简报 | 自研 |
 | 移动端/PWA | 响应式布局 | PWA 离线缓存 | 推送通知 | 自研 |
 
 ## 1. 多源采集
@@ -121,6 +121,9 @@
 见 [定时运行](../user-guide/scheduling.md)。
 
 **已实现（2026-09）**：
+- **展示口径只有页面**：定时任务不弹窗口、不发系统通知。曾经的 `desktop` 通道
+  （Windows 托盘气泡，靠 PowerShell 弹窗）**已移除**——气泡看完即消失、留不下证据，
+  也回答不了「是安静日还是源挂了」。要外部提醒就用可选的 `webhook`
 - **飞书投递（定时任务层）**：三条链路各自把「摘要文字 + HTML 快照附件」发到飞书机器人单聊。
   投递由自动化调用 `lark-cli` 承担，**不在 `paper-glean` 进程内** —— 凭据不进仓库、
   投递失败不影响 digests/状态落盘、换目标只改自动化 prompt
@@ -140,8 +143,9 @@
 - 解析顺序 **个人主页 → DBLP → Semantic Scholar**；主页唯一覆盖视频/TR/talk
 - 不做 Google Scholar（无官方 API、违反 ToS、易封）；以 DBLP + S2 公开 API 覆盖
 - 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
-- 推送四通道：`file`（digest + Web NEW 徽标）、Web 高亮、`desktop`、`webhook`
-  （`generic`/`feishu`/`wecom`）；全部 fail-soft
+- 推送两通道：`file`（`data/watch_new.json` → Web NEW 徽标）、`webhook`
+  （`generic`/`feishu`/`wecom`）；全部 fail-soft。**展示只有 HTML 一种**（在线页面 + 离线快照），
+  不弹窗口、不发系统通知
 - **静态 HTML 快照**：每次 `run` 无条件产出 `exports/watch-digest-<YYYY-MM-DD>.html`（自包含单文件、
   可当附件发出），零新作也出页面；顶部带「本次运行」证据表（扫描范围 / **各源取回条数** /
   新建基线 / 推送通道 / 抓取错误）
@@ -171,8 +175,8 @@
 - 解析顺序：会议 = **ccfddl 截稿 RSS → 会议主页**；期刊 = **Crossref（按 ISSN 取卷期）→ 期刊主页**
 - 三类信号：`cfp` 征稿 / `program` 日程 / `papers` 接收论文列表，每条带置信度
 - 差异判定：指纹去重；**首次建基线不推送**，`--force` 可强制
-- 复用同一套推送四通道，但走**独立命名空间**（`data/ccf_new.json` + `CCF-digest.md`），
-  与学者监控的未读互不清除
+- 复用同一套展示与推送通道（HTML 页面 + 可选 webhook），但走**独立命名空间**
+  （`data/ccf_new.json` + `CCF-digest.md`），与学者监控的未读互不清除
 - **静态 HTML 快照** `exports/ccf-digest-<YYYY-MM-DD>.html` + **盲区告警**（同 §11；
   注意 `last_error` 恒为空，判抓取成败只能看指纹数）
 - Web `/ccf` 页面：勾选框名单 + 批量勾选 + NEW 徽标 + 推送历史

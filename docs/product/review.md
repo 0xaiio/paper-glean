@@ -13,7 +13,7 @@
 
 > **2026-09-14 跟进（监控与推送）**：新增「按人监控」能力（`plan.md §4.11` /
 > `features.md §11`）。`glean/watch.py` + `glean/homeparse.py`（主页启发式解析）
-> + `glean/notify.py`（四通道推送）+ `watchlist.md` / `WATCH-digest.md`
+> + `glean/notify.py`（推送通道）+ `watchlist.md` / `WATCH-digest.md`
 > + Web `/watch` 页面与 `/api/watch/*`；关键取舍：**不做 Google Scholar**
 > （无官方 API、违反 ToS、易封禁），改以 DBLP + Semantic Scholar 公开 API 覆盖，
 > 个人主页作为唯一能覆盖「视频 / 技术报告 / talk」的首选源。
@@ -26,7 +26,7 @@
 > ① **CFP 走结构化来源**（ccfddl.com 公开 RSS，带等级/领域/官网），不去猜 HTML；
 > ② **期刊走 Crossref 开放 API**（按 ISSN 取卷期），因为 ACM DL / IEEE Xplore 是 JS 渲染空壳；
 > ③ **DBLP 已不可抓取**（2026-09 起全部端点返回 Anubis 反爬拦截页），`dblp` 字段降级为人工参考链接；
-> ④ 推送复用同一套四通道但走**独立命名空间**，与学者监控的未读互不清除。
+> ④ 推送复用同一套通道（HTML 页面 + 可选 webhook）但走**独立命名空间**，与学者监控的未读互不清除。
 > 详见 [CCF 会议期刊监控](../user-guide/ccf-watching.md)。
 
 ---
@@ -85,7 +85,7 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（71 会议 + 22 期刊，含官网/领域/DBLP/ISSN），由 `scripts/gen_ccf_catalog.py` 生成 | ✅ |
 | `glean/homeparse.py` | 主页启发式解析（stdlib `html.parser` 零依赖）：论文/视频/TR/talk + 置信度 | ✅ |
 | `glean/venueparse.py` | 会议/期刊页启发式解析（cfp/program/papers）+ ccfddl RSS + Crossref 卷期 | ✅ |
-| `glean/notify.py` | 推送四通道 `file`/Web NEW/`desktop`/`webhook`（generic·feishu·wecom），全 fail-soft；支持 `watch`/`ccf` 双命名空间 | ✅ |
+| `glean/notify.py` | 推送两通道 `file`（Web NEW 徽标的数据源）/`webhook`（generic·feishu·wecom），全 fail-soft；支持 `watch`/`ccf` 双命名空间；**展示一律走 HTML 页面，无弹窗通道** | ✅ |
 | `glean/htmlkit.py` | 静态快照共享构件：内联 CSS/JS（暗色 opt-in）、`escape()`、筛选控件、页面外壳 `page()`；三条链路共用 | ✅ |
 | `glean/report.py` | 独立 HTML 快照渲染：arXiv 的 `build_html()`（理由从 digest 反解析）+ watch/ccf 的 `MonitorView`/`build_monitor_html()`（零新增也出页面，含运行证据表与盲区标注） | ✅ |
 | `glean/web/main.py` | FastAPI 应用工厂、静态挂载；`watch_new_count` / `ccf_new_count` 模板全局（导航未读角标） | ✅ |
@@ -142,11 +142,12 @@ add/toggle/toggle-area/ack/remove 五个写操作）+ 共享筛选项在页面/A
 `tests/test_ccf.py`（勾选框名单、目录同步保留勾选、三源分工、跨源去重、基线/差异、事件、digest 幂等）、
 `tests/test_venueparse.py`（venue 页 cfp/program/papers 分类、nav/logo 剔除、ccfddl 匹配与实体反转义、
 Crossref 卷期分组与指纹稳定性）、
-`tests/test_notify.py`（文件通道去重/ack、**双命名空间隔离**、桌面通道开关、webhook 三种载荷与失败降级）、
+`tests/test_notify.py`（文件通道去重/ack、**双命名空间隔离**、webhook 三种载荷与失败降级、
+通道集合恰为 `file`/`webhook` 与**不得出现弹窗符号**的源码级回归）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组；
 并在进程内遍历 `build_parser()` 的命令树，断言**每个叶子子命令都挂了 `func`**、
 命令面恰好是文档所载的 22 个叶子、`watch run` 与 `ccf run` 共用同一组标志）。
-共 **197 个测试，全部通过**（`pytest -q` → `197 passed`）。
+共 **196 个测试，全部通过**（`pytest -q` → `196 passed`）。
 
 ---
 
@@ -205,6 +206,14 @@ Crossref 卷期分组与指纹稳定性）、
 | 第 1 轮 | 监控内核 | 新增 `forget_state()` / `set_enabled()` / `set_enabled_where()` 三个改名单原语，`watch`/`ccf` 各自那份退为一行转发；`MonitorJob` 增加 `save_entries`（显式化「谁落盘」）与 `request_interval`；digest 更新收敛为一次无条件 upsert；新增叶子模块 `glean/kinds.py` 收编 `kind` 图标文案（此前 watch / ccf / notify 三份，且 `program` 的文案已漂移）；删除 14 个空壳转发函数 | 测试 186 → 193；`mkdocs build --strict` 通过 |
 | 第 2 轮 | Web 层 | 526 行的 `routes.py` 拆为 `routes_papers` / `routes_watch` / `routes_ccf`，`routes.py` 只做 `include_router` 聚合（不加前缀，路径逐字不变）；共用助手集中到 `common.py`，其中 `current_papers()` 消掉「取哪一天」在页面 / API / 片段里的三份复制；监控线共用的 `/new`、`/ack`、`/run` 契约落成 Pydantic 模型 `NewItems` / `AckResult` / `RunSummary`；修正 CCF 勾选接口丢弃 `set_enabled` 返回值、恒报 `success: true` 的问题 | 测试 193 → 197；OpenAPI 31 条路径逐条比对不变，按 `papers`/`watch`/`ccf` 分组 |
 | 第 3 轮 | CLI 层 | 待做 | — |
+
+> **附带的行为变更（2026-09-26）：移除 `desktop` 推送通道。** 它此前靠 `subprocess` 调
+> PowerShell + WinForms `NotifyIcon` 弹一个系统气泡。展示口径统一为**页面**：
+> `exports/*.html`（离线快照）+ 本地 Web 应用 `/digest` `/watch` `/ccf`（`NEW` 徽标即未读）。
+> 理由是它挡在本项目的核心判据前面——气泡看完即消失、留不下任何证据，而「是安静日还是
+> 源挂了」恰恰只能靠 HTML 页面上的证据表回答。移除后 `push()` 只剩 `file` 与可选的
+> `webhook`（唯一出网通道），并新增**源码级**回归测试（禁 `subprocess` / `NotifyIcon`
+> 等符号出现），让弹窗通道无法悄悄复活。
 
 ---
 

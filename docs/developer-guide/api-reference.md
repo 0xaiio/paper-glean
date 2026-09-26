@@ -193,6 +193,10 @@
 
 ## 推送
 
+> **展示面是 HTML，不是弹窗。** 本模块只有两个通道：`file`（把未读条目写进
+> `data/<ns>_new.json`，供页面渲染 `NEW` 徽标）与可选的 `webhook`（唯一出网通道）。
+> 页面的另一半见下面的「静态快照：渲染」与 Web 层的 `/watch` `/ccf`。
+
 ::: glean.notify
     options:
       members:

@@ -170,16 +170,19 @@ DBLP 现在对 **所有** 端点（HTML 与 API）返回 Anubis「Making sure yo
 
 ---
 
-## 五、推送通道
+## 五、展示与推送通道
 
-与[学者监控](watching.md) **完全一致**的四个通道，全部 **fail-soft**：
+与[学者监控](watching.md) **完全一致**的两个通道，全部 **fail-soft**。
+展示口径同样只有**页面**：不弹窗口、不发系统通知。
 
 | 通道 | 默认 | 落点 | 开关 |
 |------|------|------|------|
-| `file` | ✅ 常开 | `CCF-digest.md` + `data/ccf_new.json`（Web 的 NEW 徽标数据源） | — |
-| Web 高亮 | ✅ 常开 | `/ccf` 页面新条目打 `NEW` 红标，导航「CCF」显示未读计数 | 页面上「全部标记已读」或 `ccf ack` |
-| `desktop` | ✅ Windows 开 | 系统气泡通知（标题为「paper-glean CCF 监控提醒」） | `PAPER_GLEAN_DESKTOP=0` |
-| `webhook` | ❌ 关 | POST JSON 到自定义 URL | 设 `PAPER_GLEAN_WEBHOOK_URL` |
+| `file` | ✅ 常开 | `data/ccf_new.json` —— `/ccf` 页面 `NEW` 红标与导航未读计数的数据源（`CCF-digest.md` 由 `ccf run` 直接写，不走通道） | — |
+| `webhook` | ❌ 关 | POST JSON 到自定义 URL；唯一出网的通道 | 设 `PAPER_GLEAN_WEBHOOK_URL` |
+
+页面产物同样是三样：`CCF-digest.md`（事实源）、`exports/ccf-digest-<YYYYMMDD>.html`
+（双击即开的离线快照，零新增也会出页面）、在线的 `/ccf`（`NEW` 徽标即未读）。
+清空 `NEW`：页面上「全部标记已读」或 `ccf ack`。
 
 > **两条监控线互不干扰**：`watch ack` 不会清掉 CCF 的未读，`ccf ack` 也不会清掉学者的未读
 > —— 它们各自写 `data/watch_new.json` 与 `data/ccf_new.json`。
@@ -194,7 +197,7 @@ python -X utf8 arxiv_daily.py watch push-test          # 通道是共用的，�
 python -X utf8 arxiv_daily.py watch push-test --send
 ```
 
-### 第五个落点：HTML 快照
+### 离线快照
 
 每次 `ccf run` 还会**无条件**写一份自包含单文件：
 

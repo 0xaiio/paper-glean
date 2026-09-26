@@ -158,8 +158,10 @@ Web 应用**没有自己的数据库**，直接复用现有三件套作为初始
   服务在线）+ `scripts/register_task.ps1`（Windows 计划任务），或 WorkBuddy 平台
   定时任务——由 agent 抓取、填写推荐、`present_files` 呈递页面。见
   [docs/user-guide/scheduling.md](docs/user-guide/scheduling.md)。
-  **推送框架已实现**（供 §4.11 复用）：`glean/notify.py` 的
-  `file` / `desktop` / `webhook` 三通道，webhook 支持 `generic` / `feishu` / `wecom`。
+  **展示与推送框架已实现**（供 §4.11 复用）：`glean/notify.py` 的
+  `file` / `webhook` 两通道（webhook 支持 `generic` / `feishu` / `wecom`）。
+  **展示一律落在 HTML 页面**——定时任务负责把 `exports/*.html` 与本地 Web 应用
+  （`/digest` `/watch` `/ccf`）产出来，**不弹窗口、不发系统通知**。
 - **增强**：每日 digest 邮件（本地 SMTP 配置）；Telegram / 企业微信 webhook
   推送「今日 ★≥4 论文 N 篇」摘要卡。
 - **远期**：RSS 输出端点（本地服务暴露 `/feed.xml`）。
@@ -186,8 +188,9 @@ Web 应用**没有自己的数据库**，直接复用现有三件套作为初始
     以 DBLP + Semantic Scholar 的公开 API 达到同等覆盖。
   - 差异判定：指纹 = sha1(规范化标题 + 可选 URL 主机指纹)；**首次运行建基线不推送**，
     之后只推未见过条目（`--force` 可强制）。
-  - 推送四通道：`file`（`WATCH-digest.md` + Web NEW 徽标）、Web 高亮、
-    `desktop`（Windows 气泡）、`webhook`（`generic`/`feishu`/`wecom`）。全部 fail-soft。
+  - 推送两通道：`file`（`data/watch_new.json` → Web NEW 徽标）、`webhook`
+    （`generic`/`feishu`/`wecom`）。全部 fail-soft。**展示只有 HTML 一种**：
+    在线页面 `/watch` + 离线快照 `exports/watch-digest-*.html`。
   - Web：新增 `/watch` 页面（名单增删 + NEW 徽标 + 推送历史）与 `/api/watch/*`。
 - **增强**：
   - 主页解析支持可选 JS 渲染兜底（仅对 JS 型站点启用）；
@@ -219,7 +222,7 @@ Web 应用**没有自己的数据库**，直接复用现有三件套作为初始
   - 差异判定：指纹 = sha1(规范化标题 + URL 主机指纹)；**首次运行建基线不推送**。
     期刊指纹刻意锚定 `(venue, volume, issue)`、URL 固定用期刊主页——
     同一期持续有新文章入库不重复播报，只有**新卷新期**才算事件。
-  - 推送复用 §4.11 的四通道（`file` / Web 高亮 / `desktop` / `webhook`），
+  - 推送复用 §4.11 的两通道（`file` / `webhook`），展示同样只有 HTML 页面，
     但走**独立命名空间**：`data/ccf_new.json` + `CCF-digest.md`，与学者监控的未读互不清除。
   - Web：新增 `/ccf` 页面与 `/api/ccf/*` 端点；导航「CCF」显示自身未读计数。
 - **增强**：

@@ -67,7 +67,7 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（生成物）：71 会议 + 22 期刊，含官网/领域/DBLP/ISSN | 网络（由 `scripts/gen_ccf_catalog.py` 生成） |
 | `glean/homeparse.py` | 个人主页启发式解析（stdlib `html.parser`），输出带 `kind` 与 `confidence` 的条目 | 网络（由调用方 fetch） |
 | `glean/venueparse.py` | 会议/期刊页启发式解析（`cfp`/`program`/`papers`）+ ccfddl RSS + Crossref 卷期 | 网络（由调用方 fetch） |
-| `glean/notify.py` | 推送：`file` / Web NEW / `desktop` / `webhook`，全 fail-soft；**密钥只从环境变量读**；`watch`/`ccf` 双命名空间 | 决定是否推送、推送什么 |
+| `glean/notify.py` | 推送：`file`（喂给 HTML 页面的未读集合）/ `webhook`，全 fail-soft；**密钥只从环境变量读**；`watch`/`ccf` 双命名空间。**不含任何弹窗通道**——展示面是 `report.py` 的 HTML 页面与本地 Web 应用 | 决定是否推送、推送什么 |
 | `glean/htmlkit.py` | **静态快照的共享构件**：内联 CSS（`STYLE`）、渐进增强脚本（`SCRIPT`，暗色为 opt-in）、`escape()`、筛选控件、页面外壳 `page()`；三条链路共用，避免样式/暗色逻辑三份漂移 | 业务逻辑、网络（纯字符串拼装） |
 | `glean/report.py` | **独立 HTML 快照渲染**：`build_html()`（arXiv，理由从 `arXiv-schedule.md` 反解析而非重算）+ `MonitorView` / `build_monitor_html()` / `render_monitor_day()`（watch/ccf 共用，零新增也出页面，含「本次运行」证据表与盲区标注）；输出 `exports/<namespace>-digest-<day>.html` | 网络、画像重算 |
 | `glean/web/main.py` | `create_app()` 应用工厂；挂载 `/static`；`/` 重定向 | 路由实现 |
