@@ -42,6 +42,7 @@ from glean.config import (
     WATCH_ITEM_KINDS,
     WATCH_LOOKBACK_YEARS,
     WATCH_MAX_ITEMS,
+    WATCH_REQUEST_INTERVAL,
     WATCH_STATE,
     WATCH_TIMEOUT,
     WATCHLIST_MD,
@@ -54,25 +55,10 @@ from glean.homeparse import parse_homepage
 # internally now), the rest are used below.
 from glean.monitor import fingerprint, kind_of, norm_title, slugify, year_of
 
-KIND_ICONS = {
-    "paper": "\U0001f4c4",  # 📄
-    "video": "\U0001f3a5",  # 🎥
-    "report": "\U0001f4d5",  # 📕
-    "talk": "\U0001f3a4",  # 🎤
-    "other": "\U0001f517",  # 🔗
-}
-
-# Single vocabulary for every surface (console / Web / digest / HTML snapshot).
-# The digest line itself carries only the icon — the label is what makes
-# ``kind`` readable to a human, so it lives next to the icons rather than being
-# re-typed per consumer.
-KIND_LABELS = {
-    "paper": "论文",
-    "video": "视频",
-    "report": "技术报告",
-    "talk": "报告/演讲",
-    "other": "其它",
-}
+# 词表来自 glean.kinds —— 与 ccf / notify 共用同一份，避免同一 kind 在不同
+# 界面出现两种说法（历史上 program 就漂移成了「会议日程」/「会议日程 (Program)」）。
+from glean.kinds import WATCH_KIND_ICONS as KIND_ICONS
+from glean.kinds import WATCH_KIND_LABELS as KIND_LABELS
 
 DBLP_SEARCH = "https://dblp.org/search/publ/api"
 DBLP_PID = "https://dblp.org/pid/{pid}.xml"
@@ -257,25 +243,14 @@ def remove_researcher(name: str) -> bool:
     if len(kept) == len(entries):
         return False
     _save_entries(kept)
-    state = load_state()
-    if key in state.get("researchers", {}):
-        state["researchers"].pop(key)
-        save_state(state)
+    # 指纹也必须一起删：否则日后重新加入同名学者时，会因为他「全都见过」而永不推送。
+    monitor.forget_state(_job(), key)
     return True
 
 
 def set_enabled(name: str, enabled: bool) -> bool:
     """Pause/resume a researcher. Returns True if found."""
-    entries = load_watchlist()
-    key = slugify(name)
-    hit = False
-    for e in entries:
-        if e["key"] == key:
-            e["enabled"] = enabled
-            hit = True
-    if hit:
-        _save_entries(entries)
-    return hit
+    return monitor.set_enabled(_job(), name, enabled)
 
 
 # ------------------------------------------------------------------
@@ -433,11 +408,6 @@ def save_state(state: dict[str, Any]) -> None:
     monitor.save_state(WATCH_STATE, state)
 
 
-def append_events(items: list[dict[str, Any]], pushed_to: list[str], run_id: str) -> None:
-    """Append one JSON line per new item to ``watch_events.jsonl``."""
-    monitor.append_events(WATCH_EVENTS, items, pushed_to, run_id, _SPEC.subject_field)
-
-
 def load_events(limit: int = 200) -> list[dict[str, Any]]:
     """Most recent watch events, newest first."""
     return monitor.load_events(WATCH_EVENTS, limit)
@@ -501,6 +471,7 @@ def _job() -> monitor.MonitorJob:
     return monitor.MonitorJob(
         spec=_SPEC,
         entries=load_watchlist,
+        save_entries=_save_entries,
         state_path=WATCH_STATE,
         events_path=WATCH_EVENTS,
         digest_path=WATCH_DIGEST_MD,
@@ -509,6 +480,7 @@ def _job() -> monitor.MonitorJob:
         collect=lambda entry, use_network, _ctx: collect_items(
             entry, use_network=use_network
         ),
+        request_interval=WATCH_REQUEST_INTERVAL,
         accept=_recent_items,
     )
 
@@ -527,14 +499,11 @@ def run(
     "errors", "pushed_to", "collected"}`` — ``collected`` (条目名 → 本轮取回数)
     is what separates "真的没有新作" from "主页不可达导致静默空转"。
     """
-    from glean.config import WATCH_REQUEST_INTERVAL
-
-    delay = WATCH_REQUEST_INTERVAL if request_interval is None else request_interval
     return monitor.run_monitor(
         _job(),
         only=only,
         use_network=use_network,
         force=force,
         push=push,
-        delay=delay,
+        delay=request_interval,  # None → 回落到 job.request_interval
     )

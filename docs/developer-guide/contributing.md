@@ -54,7 +54,8 @@ paper-glean/
 │   ├── core.py         # 业务逻辑（共享）
 │   ├── cli.py          # CLI 入口
 │   ├── serve.py        # 本地 Web 服务保活
-│   ├── monitor.py      # 监控内核（共享）：diff / 基线 / 推送 / 审计 / digest 幂等
+│   ├── monitor.py      # 监控内核（共享）：diff / 基线 / 启停 / 推送 / 审计 / digest 幂等
+│   ├── kinds.py        # kind 图标与文案（共享，叶子模块：不得 import 同层模块）
 │   ├── watch.py        # 学者监控（名单 + 三源 + digest 文案）
 │   ├── homeparse.py    # 个人主页启发式解析（零依赖）
 │   ├── ccf.py          # CCF 会议/期刊监控（名单 + 目录同步 + 三源）
@@ -174,19 +175,27 @@ type:
 
 1. 在 `glean/config.py` 中登记该线的路径与常量
 2. 在 `glean/notify.py` 的 `_NEW_PATHS` / `NS_LABEL` 中注册新命名空间（保证未读集合互相隔离）
-3. 新建 `glean/<line>.py`，**只写这条线独有的部分**：
-   - 名单解析 / 增删 / 启停（对标 `load_watchlist` / `load_venues`）
+3. 若该线有新的条目类型，在 `glean/kinds.py` 登记图标与文案（**不要在子系统里另起一份词表**）
+4. 新建 `glean/<line>.py`，**只写这条线独有的部分**：
+   - 名单解析 / 增删（对标 `load_watchlist` / `load_venues`）
    - 采集函数 `collect_items()`（对标 watch / ccf）
    - 一个 `MonitorSpec`（`namespace` / `subject_field` / `state_key` / `digest_marker` /
      `item_noun` / `max_items`）
-   - 一个 `_job()`：从**模块全局**读路径常量并组装 `MonitorJob`
+   - 一个 `_job()`：从**模块全局**读路径常量并组装 `MonitorJob`（含 `save_entries`
+     与 `request_interval`）
    - digest 单行渲染 `_item_line()` 与两个薄包装 `render_section()` / `upsert_*_digest()`
    - `run()` 一行转调 `monitor.run_monitor(...)`
-4. 在 `glean/cli.py` 中挂子命令，在 `glean/web/routes.py` 中挂 API 与页面
-5. 补测试：新增 `tests/test_<line>.py`（隔离路径 + stub 抓取），引擎本身的语义由
-   `tests/test_monitor.py` 覆盖，**不要**在新线里重复测基线/差异/幂等
+   - **启停与移除不用自己写**：`set_enabled()` / `set_enabled_where()` / `forget_state()`
+     直接转调 `monitor`，一行即可
+5. 在 `glean/cli.py` 中挂子命令，在 `glean/web/routes.py` 中挂 API 与页面
+6. 补测试：新增 `tests/test_<line>.py`（隔离路径 + stub 抓取），引擎本身的语义由
+   `tests/test_monitor.py` 覆盖，**不要**在新线里重复测基线/差异/幂等/启停/遗忘指纹
 
 > 判断标准：如果一段代码在两条监控线里长得一样，它就应该在 `monitor.py` 里，而不是被抄两遍。
+>
+> `glean/kinds.py` 是**叶子模块**：`watch` / `ccf` 都要 import 它，而 `notify` 又被
+> `monitor` 依赖（`monitor → notify → kinds`）。一旦它反向 import 同层模块就会成环，
+> 所以这里只允许 import 标准库。
 
 ## 文档更新
 

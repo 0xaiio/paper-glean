@@ -78,7 +78,8 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 | `glean/core.py` | 纯业务逻辑：抓取/命中/生成 digest/反馈/下载/持久化 | ✅ 共享核心 |
 | `glean/cli.py` | argparse 壳：`fetch`/`daily`/`serve`/`download`/`feedback`/`reanchor` | ✅ |
 | `glean/serve.py` | 本地 Web 服务保活：`/api/ping` 探测（绕过环境代理）+ 后台 detached 拉起 + `ensure()` 复用 | ✅ |
-| `glean/monitor.py` | **监控内核（watch/ccf 共享）**：`run_monitor()` 统一实现基线 → 指纹 diff → digest → 推送 → 审计；含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of`。**不发网络请求**（抓取由调用方注入） | ✅ |
+| `glean/monitor.py` | **监控内核（watch/ccf 共享）**：`run_monitor()` 统一实现基线 → 指纹 diff → digest → 推送 → 审计；`set_enabled`/`set_enabled_where`/`forget_state` 收口改名单的动作；含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of`。**不发网络请求**（抓取由调用方注入） | ✅ |
+| `glean/kinds.py` | `kind` 图标与文案的唯一事实源（叶子模块）；此前分散在 watch/ccf/notify 三处且已漂移 | ✅ |
 | `glean/watch.py` | 学者监控：名单解析/增删/启停、主页→DBLP→S2 解析、digest 文案；diff/基线/推送/审计委托 `monitor` | ✅ |
 | `glean/ccf.py` | 会议期刊监控：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源、digest 文案；diff/基线/推送/审计委托 `monitor` | ✅ |
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（71 会议 + 22 期刊，含官网/领域/DBLP/ISSN），由 `scripts/gen_ccf_catalog.py` 生成 | ✅ |
@@ -143,7 +144,7 @@ Crossref 卷期分组与指纹稳定性）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组；
 并在进程内遍历 `build_parser()` 的命令树，断言**每个叶子子命令都挂了 `func`**、
 命令面恰好是文档所载的 22 个叶子、`watch run` 与 `ccf run` 共用同一组标志）。
-共 **183 个测试，全部通过**（`pytest -q` → `183 passed`）。
+共 **193 个测试，全部通过**（`pytest -q` → `193 passed`）。
 
 ---
 

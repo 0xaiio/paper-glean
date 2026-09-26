@@ -43,7 +43,8 @@ glean/
 ├── core.py          # 纯业务逻辑（共享）
 ├── cli.py           # CLI 包装器（fetch/daily/serve/watch/ccf/download/feedback/reanchor）
 ├── serve.py         # 本地 Web 服务保活（探测 / 后台拉起 / ensure）
-├── monitor.py       # 监控内核（共享）：名单 diff / 基线 / 推送 / 审计 / digest 幂等
+├── monitor.py       # 监控内核（共享）：名单 diff / 基线 / 启停 / 推送 / 审计 / digest 幂等
+├── kinds.py         # 条目类型（kind）图标与文案——watch / ccf / notify 唯一事实源（叶子模块）
 ├── watch.py         # 学者监控（watchlist.md / 主页→DBLP→S2 / digest 文案）
 ├── ccf.py           # 会议期刊监控（勾选框名单 / 目录同步 / ccfddl→Crossref→主页）
 ├── ccf_catalog.py   # CCF-A 目录快照（71 会议 + 22 期刊，生成物，勿手改）
@@ -79,6 +80,16 @@ glean/
 一份带幂等标记的 digest 并推送多通道。差别只有「抓什么」「主语叫什么」「写到哪个文件」，
 因此共性收敛在 `glean/monitor.py`（`MonitorSpec` 描述静态身份，`MonitorJob` 注入抓取与
 渲染函数，`run_monitor()` 是唯一实现）——修一次 diff / 基线 / 推送缺陷不再需要改两处。
+
+收口范围不止「跑一轮」：**改名单**的动作也在内核里。`set_enabled()` /
+`set_enabled_where()`（批量）/ `forget_state()` 各自只有一份实现，子系统里的
+`set_enabled` / `remove_*` 是一行转发。其中 `forget_state` 尤其不能漏——移除条目
+后若指纹留在状态文件里，日后重新加入同名条目会因「全都见过」而**永不推送且不报错**。
+
+同理，`kind` 的图标与文案收敛在 `glean/kinds.py`（不依赖任何同层模块的叶子模块）：
+`watch` / `ccf` / `notify` 三处引用同一份定义。此前 `notify` 存的是手工合并副本，
+已经漂移成同一件事两种说法（`program` 在 digest 写作「会议日程」、在推送写作
+「会议日程 (Program)」）。
 
 **按人（`watch`）**：
 

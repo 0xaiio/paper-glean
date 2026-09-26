@@ -52,6 +52,13 @@
 | `test_empty_run_still_writes_a_digest_section` | 无新条目也写 digest | ✅ |
 | `test_push_failure_is_recorded_not_raised` | 推送异常降级为 `errors`，审计仍落盘 | ✅ |
 | `test_collect_receives_the_network_flag` | `use_network` 原样透传给 `collect`（参数化） | ✅ |
+| `test_set_enabled_toggles_one_and_leaves_the_rest_alone` | `set_enabled` 只动目标条目（参数化 `True`/`False`） | ✅ |
+| `test_set_enabled_is_false_for_unknown_name_and_writes_nothing` | 名字不存在 → 返回 `False` 且不落盘 | ✅ |
+| `test_set_enabled_where_is_bulk_and_reports_touched` | `set_enabled_where` 批量启停并返回被改条目；无匹配不落盘 | ✅ |
+| `test_forget_state_removes_seen_fingerprints` | 移除条目时同步遗忘指纹（否则加回来会全量误报） | ✅ |
+| `test_each_subsystem_wires_its_own_request_interval_into_the_job` | `watch` / `ccf` 各自把节流间隔注入 `MonitorJob` | ✅ |
+| `test_run_monitor_prefers_an_explicit_delay_over_the_job_default` | 显式 `delay` 覆盖 job 默认 | ✅ |
+| `test_kind_vocabulary_has_one_source_of_truth` | `kinds.py` 是唯一词表，`watch`/`ccf`/`notify` 仅再导出 | ✅ |
 
 ### `tests/test_web.py`
 
