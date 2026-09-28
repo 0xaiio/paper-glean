@@ -229,7 +229,7 @@ python -X utf8 arxiv_daily.py watch <action> [options]
 
 | action | 说明 | 主要参数 |
 |--------|------|---------|
-| `add` | 添加监控对象 | `<姓名>` `--homepage` `--dblp` `--s2` `--tags` |
+| `add` | 添加监控对象 | `[姓名]`（**可省略**，见下）`--homepage` `--dblp` `--s2` `--tags` |
 | `remove` | 移除监控对象（同时清除其已见状态） | `<姓名>` |
 | `enable` / `disable` | 启用 / 暂停（保留条目与历史） | `<姓名>` |
 | `list` | 列出名单 | `--all`（含已暂停） |
@@ -243,6 +243,9 @@ python -X utf8 arxiv_daily.py watch <action> [options]
 # 添加（主页为首选解析源；DBLP/S2 兜底）
 python -X utf8 arxiv_daily.py watch add "魏恒峰 Hengfeng Wei" `
   --homepage https://hengxin.github.io --tags "分布式一致性;形式化方法"
+
+# 姓名可省略 —— 给任一信息源即可，姓名会先被解析出来（与 Web 端「解析监控对象」同一契约）
+python -X utf8 arxiv_daily.py watch add --homepage https://hengxin.github.io
 
 # 扫描（首次建基线不推送；之后只推新作）
 python -X utf8 arxiv_daily.py watch run

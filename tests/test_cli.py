@@ -235,6 +235,54 @@ def test_weekly_isolates_a_failing_stage(monkeypatch, capsys):
     assert "42 篇" in captured.out         # 第三段照常跑完
 
 
+def test_watch_add_name_is_optional(monkeypatch, capsys):
+    """姓名可省略，从所给信息源解析得到 —— 与 Web 表单同一契约。
+
+    「CLI 永为 fallback」是本项目的既定原则，所以 Web 端放开了姓名必填，
+    CLI 就必须一起放开，否则手里只有主页 URL 的人仍然被挡在门外。
+    """
+    from glean import cli
+
+    called: dict = {}
+
+    def fake_resolve(name, homepage, dblp, s2, **kw):
+        called["resolve"] = (name, homepage, dblp, s2)
+        return {"resolved": {"name": "Hengfeng Wei (魏恒峰)"}, "warnings": ["DBLP 不可抓取"]}
+
+    def fake_add(name, homepage, dblp, s2, tags):
+        called["added"] = (name, homepage, dblp, s2, tags)
+        return {"name": name, "key": "hengfeng-wei-hengfeng-wei"}
+
+    monkeypatch.setattr(cli, "resolve_identity", fake_resolve)
+    monkeypatch.setattr(cli, "add_researcher", fake_add)
+
+    args = cli.build_parser().parse_args(
+        ["watch", "add", "--homepage", "https://hengxin.github.io"]
+    )
+    cli.cmd_watch_add(args)
+    out = capsys.readouterr().out
+
+    assert args.name == ""                       # 位置参数现在是可选的
+    assert called["resolve"] == ("", "https://hengxin.github.io", "", "")
+    assert called["added"][0] == "Hengfeng Wei (魏恒峰)"   # 用解析到的姓名落盘
+    assert "已添加" in out
+
+
+def test_watch_add_without_a_name_and_without_a_source_explains_itself(monkeypatch, capsys):
+    """姓名与信息源全空 → 明确报错，且**不**发起解析（不打无谓的网络请求）。"""
+    from glean import cli
+
+    def explode(*a, **kw):  # pragma: no cover - 一旦被调用即为失败
+        raise AssertionError("没有任何可用信息时不应尝试解析")
+
+    monkeypatch.setattr(cli, "resolve_identity", explode)
+
+    cli.cmd_watch_add(cli.build_parser().parse_args(["watch", "add"]))
+    out = capsys.readouterr().out
+
+    assert "[ERR]" in out
+
+
 def test_cli_serve_help():
     result = subprocess.run(
         [sys.executable, "-m", "glean.cli", "serve", "--help"],

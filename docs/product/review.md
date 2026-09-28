@@ -128,11 +128,16 @@ H4 数据本地主权。**H1+H3 的组合是本系统相对 20+ 现成系统不�
 日文件、不把 `data/` 里的监控状态文件当日期；以及 `http_get` 与 `http_get_text`
 共用一个请求构造与 User-Agent、charset 取自 `Content-Type` 且坏 charset 降级为 UTF-8、
 `homeparse.fetch_html` 确实委托 core 而不自带第二份 `urlopen`）、`tests/test_web.py`（`TestClient` 集成测试，
-覆盖 5 页面 + 6 个 API（含 `/api/ping`）+ 1 个 HTMX 片段 + 8 个 `/api/watch/*` 端点
-（4 只读 + add/toggle/delete/ack 四个写操作）+ `/api/ccf/*` 端点（venues/new/events 只读，
+覆盖 5 页面 + 6 个 API（含 `/api/ping`）+ 1 个 HTMX 片段 + 9 个 `/api/watch/*` 端点
+（3 只读 + add/toggle/delete/ack/resolve/run 六个写操作）+ `/api/ccf/*` 端点（venues/new/events 只读，
 add/toggle/toggle-area/ack/remove 五个写操作）+ 共享筛选项在页面/API/HTMX 三处行为一致 +
-`paper_card` 推荐理由契约，
+`paper_card` 推荐理由契约 + **无 CDN 依赖与失败可见性**的源码级回归
+（`base.html` 不得再引 `unpkg.com` / `cdn.jsdelivr.net`；列表按钮不得再有
+「先 `setTimeout` 整页刷新」的写法），
 写操作与筛选断言均隔离到 `tmp_path` 不碰真实文件）、
+`tests/test_resolve.py`（**身份解析，全离线**：标题→姓名的参数化用例、DBLP/S2 输入归一化、
+同名多候选**不自动选用**而列为 `alternates`、S2 429 降级、主页不可达降级为警告而非异常、
+以及「本模块永远不发 DBLP 请求」的源码级断言）、
 `tests/test_serve.py`（`probe` / `ensure` 单元 + 端到端环回服务存活测试，含环境代理绕过回归）、
 `tests/test_monitor.py`（**监控内核**：身份基元、状态容错、审计字段、digest 幂等与新日期插入、
 首轮静默建基线 → 增量、`--force`、逐条失败隔离、`prepare` 错误与 context 透传、`accept`
@@ -147,7 +152,7 @@ Crossref 卷期分组与指纹稳定性）、
 `tests/test_cli.py`（子进程验证 CLI 八个子命令与包装器，含 `watch` / `ccf` 两个子命令组；
 并在进程内遍历 `build_parser()` 的命令树，断言**每个叶子子命令都挂了 `func`**、
 命令面恰好是文档所载的 22 个叶子、`watch run` 与 `ccf run` 共用同一组标志）。
-共 **196 个测试，全部通过**（`pytest -q` → `196 passed`）。
+共 **233 个测试，全部通过**（`pytest -q` → `233 passed`）。
 
 ---
 
@@ -204,7 +209,7 @@ Crossref 卷期分组与指纹稳定性）、
 | 轮 | 收敛对象 | 主要内容 | 验证 |
 |----|---------|---------|------|
 | 第 1 轮 | 监控内核 | 新增 `forget_state()` / `set_enabled()` / `set_enabled_where()` 三个改名单原语，`watch`/`ccf` 各自那份退为一行转发；`MonitorJob` 增加 `save_entries`（显式化「谁落盘」）与 `request_interval`；digest 更新收敛为一次无条件 upsert；新增叶子模块 `glean/kinds.py` 收编 `kind` 图标文案（此前 watch / ccf / notify 三份，且 `program` 的文案已漂移）；删除 14 个空壳转发函数 | 测试 186 → 193；`mkdocs build --strict` 通过 |
-| 第 2 轮 | Web 层 | 526 行的 `routes.py` 拆为 `routes_papers` / `routes_watch` / `routes_ccf`，`routes.py` 只做 `include_router` 聚合（不加前缀，路径逐字不变）；共用助手集中到 `common.py`，其中 `current_papers()` 消掉「取哪一天」在页面 / API / 片段里的三份复制；监控线共用的 `/new`、`/ack`、`/run` 契约落成 Pydantic 模型 `NewItems` / `AckResult` / `RunSummary`；修正 CCF 勾选接口丢弃 `set_enabled` 返回值、恒报 `success: true` 的问题 | 测试 193 → 197；OpenAPI 31 条路径逐条比对不变，按 `papers`/`watch`/`ccf` 分组 |
+| 第 2 轮 | Web 层 | 526 行的 `routes.py` 拆为 `routes_papers` / `routes_watch` / `routes_ccf`，`routes.py` 只做 `include_router` 聚合（不加前缀，路径逐字不变）；共用助手集中到 `common.py`，其中 `current_papers()` 消掉「取哪一天」在页面 / API / 片段里的三份复制；监控线共用的 `/new`、`/ack`、`/run` 契约落成 Pydantic 模型 `NewItems` / `AckResult` / `RunSummary`；修正 CCF 勾选接口丢弃 `set_enabled` 返回值、恒报 `success: true` 的问题 | 测试 193 → 197；OpenAPI 路径集逐条比对不变（**当时 32 条**，2026-09-28 新增 `/api/watch/resolve` 后为 33 条），按 `papers`/`watch`/`ccf` 分组 |
 | 第 3 轮 | CLI 层 | 待做 | — |
 
 > **附带的行为变更（2026-09-26）：移除 `desktop` 推送通道。** 它此前靠 `subprocess` 调
@@ -214,6 +219,21 @@ Crossref 卷期分组与指纹稳定性）、
 > 源挂了」恰恰只能靠 HTML 页面上的证据表回答。移除后 `push()` 只剩 `file` 与可选的
 > `webhook`（唯一出网通道），并新增**源码级**回归测试（禁 `subprocess` / `NotifyIcon`
 > 等符号出现），让弹窗通道无法悄悄复活。
+
+### 4.3 身份解析与交互层本地化（2026-09-28）
+
+> 起因是一次用户报障：「管理监控对象里的『移除』按钮不起作用」。查下来服务端完全正常，
+> 真因在**前端交互层**，顺带把「加人必须先知道姓名」这个不必要的门槛一并去掉。
+
+| # | 位置 | 原状 | 处置 | 验证 |
+|---|------|------|------|------|
+| G1 | `glean/web/routes_watch.py` | `POST /api/watch/researchers` 的 `name` 是**必填** `Form(...)`：手里有主页 URL 或 S2 id 也得先手工查出姓名才能加人 | `name` 改为可空；为空时调 `glean.resolve.resolve()` 反查，只取回姓名；四项输入全空则在**反查之前**返回 400（不打无谓的请求）；查不出姓名返回 400 并提示先点「解析监控对象」 | `test_api_watch_add_without_a_name_resolves_one` 等 4 条；实测由主页 `https://hengxin.github.io` 反查出「Hengfeng Wei (魏恒峰)」 |
+| G2 | `glean/resolve.py`（新增） | 此前没有任何「这是谁」的能力，四个输入源之间无法互相补齐 | 新增身份解析模块：主页 → 姓名 + 页内 DBLP/S2 链接；S2 id/姓名 → 官方 Graph API；**刻意不抓 DBLP**（Anubis 反爬，实测浏览器 UA / 程序 UA × 代理 / 直连四种组合一致返回校验页），并把「取不到」作为 `DBLP_UNFETCHABLE` 警告显式返回而非静默空结果 | `tests/test_resolve.py` **24 条（含参数化），全离线**；含「源码里不得出现任何 DBLP 请求」的断言 |
+| G3 | `glean/web/routes_watch.py` + `models.py` | — | 新增 `POST /api/watch/resolve`，**只返回提案不写盘**；契约落成 `ResolveResult` / `ResolvedIdentity` / `ResolveEvidence` / `ResolveCandidate` 四个 Pydantic 模型，因此 `/openapi.json` 自带字段说明 | `test_api_watch_resolve_does_not_write_anything`；OpenAPI 33 条路径 |
+| G4 | `templates/watch.html` | — | 表单姓名改为可留空；「添加监控对象」左侧新增**「解析监控对象」**按钮，回填四个文本框并列出**判断依据**与**同名候选**；推断字段一律标「含推断，请核对」 | CDP 实测（无头 Edge）：只填主页 → 姓名被回填、依据面板展开 |
+| G5 | `glean/templates/base.html` + `glean_static/vendor/`（新增） | htmx 从 `unpkg.com`、Alpine 从 `jsdelivr` 加载。**任一 CDN 不可达 → 页面上所有 `hx-*` 按钮静默失效**（连请求都不发），而遗留的内联 `onclick="setTimeout(()=>location.reload(),300)"` 仍会刷新一次页面 → 现象正是「点了没反应」。这是「移除按钮不起作用」的**真正原因** | htmx / Alpine 改为**仓库自带**静态文件（`glean_static/vendor/`，附 README 记录来源/版本/许可证）；Tailwind 留在 CDN（它挂了只变朴素，功能完好）。并加橙色**降级横幅**：脚本缺失时点名是哪个 | CDP 复现对照：屏蔽三个 CDN 域名前后，`htmx 就绪` False→True、删除从「服务端仍在」变为「已删除并刷新」；`test_interactive_assets_are_served_locally` |
+| G6 | 全部列表按钮（`watch.html` / `ccf.html`） | 每个按钮都带内联 `onclick` 定时整页刷新 —— **失败也被刷新掩盖**，用户无从知道请求没发出去 | 统一改挂 `hx-on::after-request="pgAfterRequest(event)"`：**成功才刷新**，失败则右下角弹「操作失败：<原因>」提示条（`#action-toast`） | CDP 实测：人为把请求打成 404 → 提示条出现、页面**不**刷新、条目仍在；`test_list_actions_reload_only_after_a_successful_request` |
+| G7 | `glean/templates/base.html` | `tailwind.config = {…}` 无条件执行；CDN 取不到时 `tailwind` 是**未声明全局** → 每次加载抛一条未捕获 `ReferenceError` | 先 `window.tailwind = window.tailwind \|\| {}` 再赋值；另加空 `data:URI` 图标，免掉浏览器对 `/favicon.ico` 的 404 请求 | CDP 实测：屏蔽 CDN 后控制台**零** exception / 零 404 日志 |
 
 ---
 

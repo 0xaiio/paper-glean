@@ -35,7 +35,7 @@
         {% if new_items %}
         <button class="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                 hx-post="/api/watch/ack" hx-swap="none"
-                onclick="setTimeout(()=>location.reload(), 300)">
+                hx-on::after-request="pgAfterRequest(event)">
             全部标记已读
         </button>
         {% endif %}
@@ -88,38 +88,48 @@
 <section class="mb-8">
     <h2 class="text-lg font-semibold mb-3">监控名单（{{ researchers|length }}）</h2>
 
-    <form class="mb-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 grid gap-3 sm:grid-cols-2"
+    <form id="watch-add-form"
+          class="mb-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 grid gap-3 sm:grid-cols-2"
           hx-post="/api/watch/researchers"
-          hx-on::after-request="if(event.detail.successful){ this.reset(); location.reload(); }">
+          hx-on::after-request="pgAfterRequest(event)">
         <div>
-            <label class="block text-xs text-gray-500 mb-1">姓名 *</label>
-            <input name="name" required placeholder="魏恒峰 Hengfeng Wei"
+            <label class="block text-xs text-gray-500 mb-1">
+                姓名 <span class="text-gray-400">（可留空 —— 会从下面的源解析出来）</span>
+            </label>
+            <input name="name" id="wf-name" placeholder="留空则自动解析，或手填 魏恒峰 Hengfeng Wei"
                    class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
         </div>
         <div>
             <label class="block text-xs text-gray-500 mb-1">个人主页（首选解析源）</label>
-            <input name="homepage" placeholder="https://example.edu/~someone"
+            <input name="homepage" id="wf-homepage" placeholder="https://example.edu/~someone"
                    class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
         </div>
         <div>
             <label class="block text-xs text-gray-500 mb-1">DBLP（PID 或姓名，兜底）</label>
-            <input name="dblp" placeholder="pid/00/0000 或 Hengfeng Wei"
+            <input name="dblp" id="wf-dblp" placeholder="pid/00/0000 或 Hengfeng Wei"
                    class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
         </div>
         <div>
             <label class="block text-xs text-gray-500 mb-1">Semantic Scholar id（兜底）</label>
-            <input name="s2" placeholder="1234567"
+            <input name="s2" id="wf-s2" placeholder="1234567 或作者页 URL"
                    class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
         </div>
         <div class="sm:col-span-2">
             <label class="block text-xs text-gray-500 mb-1">标签（分号分隔）</label>
-            <input name="tags" placeholder="分布式; 形式化方法"
+            <input name="tags" id="wf-tags" placeholder="分布式; 形式化方法"
                    class="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-transparent">
         </div>
-        <div class="sm:col-span-2">
+        <div class="sm:col-span-2 flex flex-wrap items-center gap-3">
+            <button type="button" id="wf-resolve" onclick="pgResolve()"
+                    class="px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                解析监控对象
+            </button>
             <button type="submit"
                     class="px-3 py-1.5 text-sm rounded bg-primary text-white hover:opacity-90">添加监控对象</button>
+            <span id="wf-status" class="text-xs text-gray-500 dark:text-gray-400"></span>
         </div>
+        <div id="wf-panel"
+             class="sm:col-span-2 hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 text-xs leading-relaxed"></div>
     </form>
 
     <ul class="space-y-2">
@@ -141,16 +151,16 @@
             </div>
             <div class="flex items-center gap-2 shrink-0">
                 <button class="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        hx-post="/api/watch/researchers/{{ r.key }}/toggle?enabled={{ 'false' if r.enabled else 'true' }}"
+                        hx-post="/api/watch/researchers/{{ r.key|urlencode }}/toggle?enabled={{ 'false' if r.enabled else 'true' }}"
                         hx-swap="none"
-                        onclick="setTimeout(()=>location.reload(), 300)">
+                        hx-on::after-request="pgAfterRequest(event)">
                     {{ '暂停' if r.enabled else '启用' }}
                 </button>
                 <button class="text-xs px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
-                        hx-delete="/api/watch/researchers/{{ r.key }}"
+                        hx-delete="/api/watch/researchers/{{ r.key|urlencode }}"
                         hx-swap="none"
                         hx-confirm="移除「{{ r.name }}」？其已见状态也会一并清除。"
-                        onclick="setTimeout(()=>location.reload(), 300)">
+                        hx-on::after-request="pgAfterRequest(event)">
                     移除
                 </button>
             </div>
@@ -177,4 +187,123 @@
     <p class="text-sm text-gray-500">还没有推送记录。</p>
     {% endif %}
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+/* 「解析监控对象」：把表单里任意一项信息交给 /api/watch/resolve，
+   把补全结果写回文本框，并把「依据 / 同名候选 / 告警」摊开，供用户判断
+   找到的是不是目标学者。解析本身不写任何文件 —— 写盘只发生在「添加」。
+
+   安全：这些字符串来自任意第三方网页，一律经 textContent 写入，
+   绝不拼 innerHTML（否则一个恶意主页就能往本页注入脚本）。 */
+(function () {
+    function mk(tag, cls, text) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text !== undefined && text !== null) n.textContent = String(text);
+        return n;
+    }
+    function val(id) {
+        var el = document.getElementById(id);
+        return el ? el.value.trim() : '';
+    }
+    var FIELD_TO_INPUT = {name: 'wf-name', homepage: 'wf-homepage', dblp: 'wf-dblp', s2: 'wf-s2'};
+
+    function renderPanel(data) {
+        var panel = document.getElementById('wf-panel');
+        var r = data.resolved || {};
+        panel.textContent = '';
+        panel.classList.remove('hidden');
+
+        var head = mk('div', 'flex items-center gap-2 mb-1');
+        head.appendChild(mk('span', 'font-medium',
+            '解析结果：' + (r.name || '（未能推断出姓名）')));
+        if (data.needs_review) {
+            head.appendChild(mk('span',
+                'px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200',
+                '含推断，请核对'));
+        }
+        panel.appendChild(head);
+
+        (data.evidence || []).forEach(function (e) {
+            var row = mk('div', 'flex flex-wrap gap-x-2 py-0.5');
+            row.appendChild(mk('span', 'text-gray-500 w-24 shrink-0', e.field));
+            row.appendChild(mk('span', 'break-all', e.value));
+            row.appendChild(mk('span', 'text-gray-400 shrink-0',
+                '← ' + e.source + (e.note ? '（' + e.note + '）' : '')));
+            panel.appendChild(row);
+        });
+
+        (data.warnings || []).forEach(function (w) {
+            panel.appendChild(mk('div', 'mt-1 text-amber-700 dark:text-amber-300', '⚠ ' + w));
+        });
+
+        var alts = data.alternates || [];
+        if (alts.length) {
+            panel.appendChild(mk('div', 'mt-2 font-medium', '同名候选 —— 点「用这位」选目标学者'));
+            alts.forEach(function (a) {
+                var row = mk('div', 'flex flex-wrap items-center gap-2 py-0.5');
+                var btn = mk('button',
+                    'px-2 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700',
+                    '用这位');
+                btn.type = 'button';
+                btn.onclick = function () {
+                    document.getElementById('wf-name').value = a.name;
+                    document.getElementById('wf-s2').value = a.s2;
+                    window.pgToast('已选用 ' + a.name + '（S2 ' + a.s2 + '），确认后点「添加监控对象」');
+                };
+                row.appendChild(btn);
+                row.appendChild(mk('span', '', a.name + '（S2 ' + a.s2 + '，' + a.paper_count + ' 篇）'));
+                if ((a.affiliations || []).length) {
+                    row.appendChild(mk('span', 'text-gray-400', a.affiliations.join(' / ')));
+                }
+                panel.appendChild(row);
+            });
+        }
+    }
+
+    window.pgResolve = function () {
+        var btn = document.getElementById('wf-resolve');
+        var status = document.getElementById('wf-status');
+        var panel = document.getElementById('wf-panel');
+        var payload = {
+            name: val('wf-name'), homepage: val('wf-homepage'),
+            dblp: val('wf-dblp'), s2: val('wf-s2')
+        };
+        if (!payload.name && !payload.homepage && !payload.dblp && !payload.s2) {
+            window.pgToast('请至少填写一项：姓名 / 个人主页 / DBLP / Semantic Scholar');
+            return;
+        }
+        btn.disabled = true;
+        panel.classList.add('hidden');
+        status.textContent = '解析中…（会抓个人主页并向 Semantic Scholar 查询，可能几秒）';
+
+        window.fetch('/api/watch/resolve', {method: 'POST', body: new URLSearchParams(payload)})
+            .then(function (resp) {
+                return resp.json().catch(function () { return {}; })
+                    .then(function (data) {
+                        if (!resp.ok) throw new Error(data.detail || ('HTTP ' + resp.status));
+                        return data;
+                    });
+            })
+            .then(function (data) {
+                var r = data.resolved || {};
+                Object.keys(FIELD_TO_INPUT).forEach(function (k) {
+                    var node = document.getElementById(FIELD_TO_INPUT[k]);
+                    if (node && r[k]) node.value = r[k];
+                });
+                status.textContent = r.name
+                    ? (data.needs_review ? '已补全 —— 请先核对下方依据' : '已补全 —— 可直接添加')
+                    : '未能推断出姓名';
+                renderPanel(data);
+            })
+            .catch(function (err) {
+                status.textContent = '';
+                window.pgToast('解析失败：' + (err && err.message ? err.message : err));
+            })
+            .then(function () { btn.disabled = false; });
+    };
+})();
+</script>
 {% endblock %}

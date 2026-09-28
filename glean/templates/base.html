@@ -11,11 +11,21 @@
             document.documentElement.classList.add('dark');
         }
     </script>
+    {# Tailwind 只影响外观，继续走 CDN：它取不到时页面依然完全可用（只是变朴素）。
+       但 htmx / Alpine 是交互本身 —— 一旦取不到，所有 hx-* 按钮会**静默失效**，
+       看起来就像「按钮坏了」。所以这两个改为仓库内自带的静态文件，见
+       glean_static/vendor/README.md。 #}
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="/static/vendor/htmx.min.js"></script>
+    <script defer src="/static/vendor/alpine.min.js"></script>
     <link rel="stylesheet" href="/static/css/app.css">
+    {# 空 data-URI 图标：不去请求 /favicon.ico（服务端没有它，每次加载都会留一条 404 日志）。 #}
+    <link rel="icon" href="data:,">
     <script>
+        /* Tailwind 走 CDN，取不到时 `tailwind` 这个全局根本不存在，
+           直接 `tailwind.config = …` 会抛未捕获的 ReferenceError（每次加载都报一条）。
+           先兜底建对象再赋值；样式由本地 app.css 保证基本可读。 */
+        window.tailwind = window.tailwind || {};
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -36,6 +46,31 @@
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen"
       x-data="appStore()"
       @keydown.window="handleKeydown($event)">
+
+    {# 交互脚本缺失时不装死：以前按钮点了毫无反应，用户只会以为「按钮坏了」。 #}
+    <div id="ui-degraded" role="alert"
+         class="hidden bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-100 border-b border-red-300
+                px-4 py-2 text-sm">
+        ⚠️ 页面交互脚本加载失败（<span data-missing></span>）——「添加 / 暂停 / 移除」等按钮都不会生效。
+        请刷新页面；若持续失败，检查 <code>/static/vendor/</code> 是否可访问。
+    </div>
+    <div id="action-toast" role="alert"
+         class="hidden fixed bottom-4 right-4 z-50 max-w-md rounded-lg border border-red-300
+                bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-100 px-4 py-3 text-sm
+                cursor-pointer"></div>
+    <script>
+        /* 等 defer 的 Alpine 执行完再判定，避免误报。 */
+        window.addEventListener('DOMContentLoaded', function () {
+            var missing = [];
+            if (typeof window.htmx === 'undefined') missing.push('htmx');
+            if (typeof window.Alpine === 'undefined') missing.push('Alpine');
+            if (!missing.length) return;
+            var el = document.getElementById('ui-degraded');
+            if (!el) return;
+            el.querySelector('[data-missing]').textContent = missing.join(' / ');
+            el.classList.remove('hidden');
+        });
+    </script>
 
     <!-- Navigation -->
     {# 导航项只声明一次：桌面与移动两种版式共用同一份列表，

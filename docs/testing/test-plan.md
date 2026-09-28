@@ -77,6 +77,14 @@
 | `test_api_watch_add_then_toggle_then_remove` | POST / DELETE / toggle 写操作往返（隔离到 tmp） | ✅ |
 | `test_api_watch_add_duplicate_is_conflict` | 重名添加返回 409 | ✅ |
 | `test_api_watch_remove_unknown_is_404` | 删除不存在条目返回 404 | ✅ |
+| `test_api_watch_add_without_a_name_resolves_one` | **不填姓名**也能加人：由主页/S2 反查出姓名 | ✅ |
+| `test_api_watch_add_without_a_name_does_not_write_guessed_ids` | 自动推断**只用于姓名**，猜出来的 dblp/s2 id **不得**写进名单（错的 id 会让人永远盯错人） | ✅ |
+| `test_api_watch_add_without_a_name_or_any_source_is_400` | 四项全空 → 400，且**在反查之前**就拒绝（不打无谓的网络请求） | ✅ |
+| `test_api_watch_add_reports_a_name_it_cannot_infer` | 反查不出姓名 → 400 并提示改用「解析监控对象」 | ✅ |
+| `test_api_watch_resolve_needs_at_least_one_input` | `/api/watch/resolve` 四项全空 → 400 | ✅ |
+| `test_api_watch_resolve_returns_the_proposal_shape` | 解析接口返回提案形状（含来源标注等字段） | ✅ |
+| `test_api_watch_resolve_does_not_write_anything` | 解析接口**只提案不落盘**（名单文件逐字节不变） | ✅ |
+| `test_add_form_does_not_require_a_name` | 表单姓名**不再**带 `required`（否则浏览器会拦住「只填主页」的用法） | ✅ |
 | `test_api_watch_ack_clears_badge` | ack 清空 NEW 徽标 | ✅ |
 | `test_ccf_page` | GET /ccf 页面渲染 | ✅ |
 | `test_api_ccf_venues` | GET /api/ccf/venues 名单 + area/enabled 过滤 | ✅ |
@@ -98,12 +106,35 @@
 | `test_openapi_groups_operations_by_surface` | `/docs` 按 `papers` / `watch` / `ccf` 分组，标签来自各路由模块 | ✅ |
 | `test_monitor_surfaces_answer_new_and_ack_with_the_same_shape` | watch 与 ccf 的 `/new`、`/ack` 返回同一形状（同一个内核，契约必须一致） | ✅ |
 | `test_toggle_reports_whether_it_actually_worked` | 勾选接口如实上报 `success`（此前 CCF 侧丢弃 `set_enabled` 的返回值、恒报 true） | ✅ |
+| `test_interactive_assets_are_served_locally` | **源码级回归**：`base.html` 不得再从 `unpkg.com` / `cdn.jsdelivr.net` 拉 htmx / Alpine，且 `/static/vendor/*` 必须 200（CDN 一挂全站按钮静默失效，见 `review.md` §4.3 G5） | ✅ |
+| `test_list_actions_reload_only_after_a_successful_request` | **源码级回归**（`watch.html` / `ccf.html` 参数化）：列表按钮不得再用「先 `setTimeout` 整页刷新」的写法 —— 那会把失败也刷新掉 | ✅ |
 
 > 注：`/api/watch/*` 与 `/api/ccf/*` 的写操作分别通过 `isolated_watch` /
 > `isolated_ccf` fixture 把 `watchlist.md`、`ccf.md` 及其状态/未读文件
 > 重定向到 `tmp_path`，**不会改动仓库内的真实文件**；
 > 筛选与日期断言用 `isolated_papers` fixture 重定向 `core.DATA_DIR` / `core.INTERESTS_MD`，
 > 并在同一目录里放一份 `watch_state.json` 以守住日期枚举的回归。
+
+### `tests/test_resolve.py`
+
+> **全离线。** 身份解析会碰网络，因此这里要么用替身函数接管抓取，要么直接对**源码文本**
+> 断言（例如「本模块不得出现指向 dblp 的请求」）—— 没有任何一条会真的打网络，
+> 所以不会因限流而 flaky。用例数 24（含参数化）。
+
+| 测试函数 | 测试内容 | 状态 |
+|----------|----------|------|
+| `test_name_from_title` | 从 `<title>` 抽姓名（参数化）：剥站点后缀、CJK 名、门派/职务等噪声 | ✅ |
+| `test_name_from_homepage_prefers_h1_and_says_where_it_came_from` | 主页姓名优先取 `<h1>`，并**如实报告来源**（`← 个人主页（取自 <h1>）`） | ✅ |
+| `test_normalize_dblp` | DBLP 输入归一化（URL / `pid/…` / 纯姓名） | ✅ |
+| `test_normalize_s2` | S2 输入归一化：从 `/author/<Name-Slug>/<数字id>` 里取**末尾数字**（取首个数字段会得到 `Hengfeng` 这种半截名字） | ✅ |
+| `test_dblp_is_never_requested` | **源码级**：全模块不得出现任何指向 dblp 的 `http_get` 调用（Anubis 反爬） | ✅ |
+| `test_dblp_input_is_recorded_but_flagged_as_unverifiable` | 给了 DBLP 值时**记录为线索**并回一条 `DBLP_UNFETCHABLE` 警告，而不是静默当「查无此人」 | ✅ |
+| `test_ambiguous_name_search_is_never_auto_selected` | 姓名检索到多位同名 → **不自动选用**，全部列为 `alternates` 并置 `ambiguous` | ✅ |
+| `test_a_single_candidate_is_adopted` | 唯一候选时采用其姓名/S2 id，但因是**检索得来**，`needs_review` 仍为真 | ✅ |
+| `test_a_rate_limit_is_not_reported_as_no_such_person` | S2 返回 429 → 报限流，**不得**伪装成「没这个人」 | ✅ |
+| `test_empty_input_yields_no_name_and_still_explains_itself` | 输入全空 → 无姓名，且仍给出可读说明 | ✅ |
+| `test_homepage_supplies_the_name_and_the_ids_it_links_to` | 主页同时提供姓名与页面上暴露的 DBLP / S2 链接 | ✅ |
+| `test_an_unreachable_homepage_becomes_a_warning_not_an_exception` | 主页不可达 → 降级为警告，**不抛异常**（fail-soft） | ✅ |
 
 ### `tests/test_watch.py`
 
@@ -246,6 +277,8 @@
 | `test_cli_weekly_help` | `weekly` 暴露 `--hours/--cap/--no-serve/--skip-*` 等全套开关 | ✅ |
 | `test_weekly_window_defaults_cover_a_full_week` | 周频默认值不变量：`--hours 168`、`--cap 300`、服务默认开 | ✅ |
 | `test_weekly_isolates_a_failing_stage` | 一段崩掉不带走其余两段；退出码仅在全部失败时非 0 | ✅ |
+| `test_watch_add_name_is_optional` | `watch add` **姓名可省略**：位置参数改为 `nargs="?"`，从所给信息源解析出姓名再落盘（与 Web 表单同一契约） | ✅ |
+| `test_watch_add_without_a_name_and_without_a_source_explains_itself` | 姓名与信息源全空 → 明确报错，且**不发起解析**（不打无谓的网络请求） | ✅ |
 | `test_cli_serve_help` | `serve` 暴露 `--reload` | ✅ |
 | `test_cli_watch_help` | `watch` 暴露 add/remove/enable/disable/list/run/ack/push-test | ✅ |
 | `test_cli_watch_list_is_read_only` | `watch list --all` 只读输出名单 | ✅ |

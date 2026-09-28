@@ -67,6 +67,7 @@ glean/web/
 | `/api/interests` | GET | 获取兴趣画像条目 |
 | `/api/feedback` | POST | 提交反馈打分 |
 | `/api/download/{paper_id}` | POST | 下载 PDF |
+| `/api/watch/resolve` | POST | **身份解析**：由姓名 / 主页 / DBLP / S2 任一线索反查其余字段，返回提案（不写盘，见 [`glean.resolve`](api-reference.md)） |
 | `/api/watch/*` | GET/POST/DELETE | 学者名单增删启停、`new` / `ack`、`events`、`run` |
 | `/api/ccf/*` | GET/POST/DELETE | venue 增删启停、`toggle-area`、`refresh`、`new` / `ack`、`events`、`run` |
 
@@ -219,8 +220,12 @@ Alpine.data('appStore', () => ({
 glean_static/
 ├── css/
 │   └── app.css         # 样式（Tailwind CDN + 自定义变量）
-└── js/
-    └── app.js          # Alpine.js 应用逻辑
+├── js/
+│   └── app.js          # Alpine.js 应用逻辑 + 统一失败提示
+└── vendor/             # htmx / Alpine 的仓库内副本（不再走公网 CDN）
+    ├── htmx.min.js
+    ├── alpine.min.js
+    └── README.md       # 来源、版本、许可证，以及「为什么不再挂 CDN」
 ```
 
 静态文件通过 FastAPI 的 `StaticFiles` 挂载（目录存在才挂，便于纯 API 场景）：
@@ -230,3 +235,54 @@ static_dir = Path(__file__).resolve().parent.parent.parent / "glean_static"
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 ```
+
+## 交互脚本与「不许静默失败」
+
+两条规则，都是踩过坑之后定下来的。
+
+### 一、交互层不从公网 CDN 加载
+
+`base.html` 里 htmx 与 Alpine 指向 `/static/vendor/*`（**仓库自带**），
+只有 Tailwind 还留在 CDN。
+
+原因是一次真实的误诊：`/watch` 页「移除」按钮被报「点了没反应」。
+服务端查下来完全正常（`DELETE` 返回 200、条目真的没了），最后定位到
+**htmx 从 `unpkg.com` 加载失败** —— htmx 没起来，页面上**所有** `hx-*` 按钮就全部失效，
+连点击都不会发出请求。而 `hx-confirm` 是 htmx 自己的确认框实现，
+**不是** 原生 `window.confirm`，所以连对话框都不弹。
+
+关键区分：
+
+| 依赖 | 取不到时的后果 | 策略 |
+|------|----------------|------|
+| Tailwind | 页面变朴素，**功能完好** | 继续走 CDN |
+| htmx / Alpine | **所有交互静默失效** | 仓库自带静态文件 |
+
+兜底还要**自己报告**：`base.html` 里一段内联脚本在 `DOMContentLoaded` 检查
+`window.htmx` / `window.Alpine`，缺失就显示橙色降级横幅（`#ui-degraded`）点名是哪个脚本。
+
+> 附带修掉一个同源问题：`tailwind.config = {…}` 在 CDN 取不到时，
+> `tailwind` 是未声明的全局 → 抛未捕获 `ReferenceError`。现改为先 `window.tailwind ||= {}`。
+
+### 二、请求失败必须可见
+
+所有列表操作（`/watch` 与 `/ccf` 的 添加 / 暂停 / 移除 / 全选 / 全不选 / ack / refresh）
+统一挂 `hx-on::after-request="pgAfterRequest(event)"`，由 `app.js` 决定下一步：
+
+```javascript
+window.pgAfterRequest = function (event) {
+    const detail = event.detail || {};
+    if (detail.successful) { window.location.reload(); return; }   // 成功才刷新
+    // 失败：把原因显示出来，而不是刷新页面把它盖过去
+    let reason = /* detail.xhr.responseText 里的 detail 字段 */ '';
+    if (!reason) reason = detail.xhr.status ? ('HTTP ' + detail.xhr.status) : '网络请求未送达';
+    window.pgToast('操作失败：' + reason);
+};
+```
+
+约定：**成功才整页刷新；失败一律走右下角 `#action-toast` 提示条**（8 秒自动消失、点击关闭）。
+
+> 以前每个按钮上还带一个 `onclick="setTimeout(()=>location.reload(), 300)"`，
+> 本意是「刷新看到结果」，实际效果是**把失败也刷新掉** —— 请求没发出去时页面照样重载一次，
+> 用户看到的现象就是「点了没反应」。那个内联 `onclick` 已全部删除，刷新改由
+> `htmx:afterRequest` 的成功分支负责。

@@ -78,6 +78,50 @@ class WatchResearcher(BaseModel):
     note: str = ""
 
 
+# --- Identity resolution (the "解析监控对象" step) -----------------------------
+#
+# A proposal, never a silent write: the UI fills its inputs from `resolved` but
+# shows `evidence` / `alternates` / `warnings` so the user can tell whether the
+# person found is the person they meant. See glean.resolve for the source rules.
+
+class ResolvedIdentity(BaseModel):
+    """The four watchlist fields, filled as far as the sources allowed."""
+
+    name: str = ""
+    homepage: str | None = None
+    dblp: str | None = None
+    s2: str | None = None
+
+
+class ResolveEvidence(BaseModel):
+    """One field, where its value came from, and any caveat."""
+
+    field: str
+    value: str
+    source: str
+    note: str = ""
+
+
+class ResolveCandidate(BaseModel):
+    """A same-name candidate from Semantic Scholar, for the user to choose."""
+
+    name: str
+    s2: str = ""
+    affiliations: list[str] = Field(default_factory=list)
+    paper_count: int = 0
+
+
+class ResolveResult(BaseModel):
+    """What ``POST /api/watch/resolve`` answers."""
+
+    query: ResolvedIdentity
+    resolved: ResolvedIdentity
+    evidence: list[ResolveEvidence] = Field(default_factory=list)
+    alternates: list[ResolveCandidate] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    needs_review: bool = False
+
+
 # --- The contract shared by both monitoring surfaces (watch / ccf) -----------
 #
 # These three are typed because they are the *only* payloads produced by the

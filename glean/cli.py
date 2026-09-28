@@ -38,6 +38,7 @@ from glean.ccf import (
     sync_catalog,
 )
 from glean.report import MonitorView, render_day, render_monitor_day
+from glean.resolve import resolve as resolve_identity
 from glean.serve import DEFAULT_HOST, DEFAULT_PORT, base_url, ensure, log_path
 from glean.watch import (
     KIND_ICONS as WATCH_KIND_ICONS,
@@ -305,10 +306,28 @@ def cmd_serve(args: argparse.Namespace) -> None:
 
 
 def cmd_watch_add(args: argparse.Namespace) -> None:
-    """Add a researcher to watchlist.md."""
+    """Add a researcher to watchlist.md.
+
+    The name may be omitted, in which case it is resolved from whichever source
+    was given — same contract as the Web form (see :mod:`glean.resolve`).
+    """
     tags = [t.strip() for t in args.tags.split(";") if t.strip()] if args.tags else []
+    name = (args.name or "").strip()
+    if not name:
+        if not any((args.homepage, args.dblp, args.s2)):
+            print("[ERR] 未给姓名时，至少还要给一项: --homepage / --dblp / --s2")
+            return
+        print("[..] 姓名为空，正在从所给信息源解析…")
+        info = resolve_identity("", args.homepage or "", args.dblp or "", args.s2 or "")
+        for warning in info.get("warnings") or []:
+            print(f"[WARN] {warning}")
+        name = (info.get("resolved") or {}).get("name") or ""
+        if not name:
+            print("[ERR] 无法从所给信息推断出姓名; 请直接给出姓名，或换一个信息源")
+            return
+        print(f"[..] 解析到姓名: {name}")
     try:
-        entry = add_researcher(args.name, args.homepage, args.dblp, args.s2, tags)
+        entry = add_researcher(name, args.homepage, args.dblp, args.s2, tags)
     except ValueError as exc:
         print(f"[ERR] {exc}")
         return
@@ -567,7 +586,8 @@ def _build_watch(sub: argparse._SubParsersAction) -> None:
     wsub = w.add_subparsers(dest="watch_cmd", required=True)
 
     wa = wsub.add_parser("add", help="添加监控对象")
-    wa.add_argument("name", help="姓名，建议「中文名 英文名」")
+    wa.add_argument("name", nargs="?", default="",
+                    help="姓名(可省略; 会从下面任一信息源解析)，建议「中文名 英文名」")
     wa.add_argument("--homepage", help="个人主页 URL(首选解析源)")
     wa.add_argument("--dblp", help="DBLP PID(pid/xx/yyyy) 或作者全名(兜底)")
     wa.add_argument("--s2", help="Semantic Scholar author id(兜底)")

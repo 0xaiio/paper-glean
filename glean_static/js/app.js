@@ -142,3 +142,51 @@ document.addEventListener('alpine:init', () => {
 document.addEventListener('DOMContentLoaded', () => {
     // Any initialization that doesn't depend on Alpine
 });
+
+/**
+ * Show a transient, clickable error message.
+ *
+ * List actions (add / pause / remove) used to reload the page on a fixed timer
+ * regardless of what happened, so a 404 / 409 / network failure looked exactly
+ * like a dead button. Every action now reports through here instead.
+ */
+window.pgToast = function (message, timeoutMs) {
+    const el = document.getElementById('action-toast');
+    if (!el) {
+        window.alert(message);
+        return;
+    }
+    el.textContent = message;
+    el.classList.remove('hidden');
+    clearTimeout(el._pgTimer);
+    el._pgTimer = setTimeout(() => el.classList.add('hidden'), timeoutMs || 8000);
+    el.onclick = () => el.classList.add('hidden');
+};
+
+/**
+ * Shared `hx-on::after-request` handler for list mutations.
+ *
+ * Reload only on success. The previous pattern — `onclick` arming a 300ms
+ * `location.reload()` — did two harmful things: it fired *before* htmx's
+ * `hx-confirm` dialog (so a reload could abort the request that had just been
+ * sent), and it reloaded even when the request had failed, leaving no trace of
+ * why nothing changed.
+ */
+window.pgAfterRequest = function (event) {
+    const detail = event.detail || {};
+    if (detail.successful) {
+        window.location.reload();
+        return;
+    }
+    const xhr = detail.xhr || {};
+    let reason = '';
+    try {
+        reason = (JSON.parse(xhr.responseText || '{}') || {}).detail || '';
+    } catch (e) {
+        reason = '';
+    }
+    if (!reason) {
+        reason = xhr.status ? ('HTTP ' + xhr.status) : '网络请求未送达';
+    }
+    window.pgToast('操作失败：' + reason);
+};
