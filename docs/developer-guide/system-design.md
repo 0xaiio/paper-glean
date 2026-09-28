@@ -63,6 +63,7 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/monitor.py` | **监控内核（共享）**：`MonitorSpec`/`MonitorJob` 描述子系统，`run_monitor()` 实现「名单 → 抓取 → 指纹 diff → 基线 → digest → 推送 → 审计」；`set_enabled`/`set_enabled_where`/`forget_state` 收口**改名单**的动作；另含身份基元 `slugify`/`norm_title`/`fingerprint`/`kind_of`/`year_of` | **任何网络请求**（抓取函数由调用方注入，故可离线测试） |
 | `glean/kinds.py` | `kind` 的图标与文案：watch / ccf 分组 + 合并视图；**唯一事实源**（此前三处各存一份并已漂移） | 任何同层模块（叶子模块，防 import 成环） |
 | `glean/watch.py` | 学者监控：`watchlist.md` 解析/增删/启停、主页→DBLP→S2 解析、digest 文案；diff/基线/推送/审计委托 `monitor` | HTTP 细节（委托 homeparse / core.http_get） |
+| `glean/resolve.py` | **身份解析**：由 姓名 / 个人主页 / DBLP / S2 **任一线索**反查「这是谁」，产出带来源标注的提案（`evidence`/`alternates`/`needs_review`）供用户核对；**刻意不抓 DBLP**（Anubis 反爬）并把这件事作为警告显式返回 | 采集产出（那是 `watch.py` 的事）；**写盘**（只出提案，写入由路由层在用户确认后执行） |
 | `glean/ccf.py` | 会议期刊监控：`ccf.md` 勾选框名单、目录同步、ccfddl/Crossref/主页三源、digest 文案；diff/基线/推送/审计委托 `monitor` | HTTP 细节（委托 venueparse） |
 | `glean/ccf_catalog.py` | CCF-A 目录**快照**（生成物）：71 会议 + 22 期刊，含官网/领域/DBLP/ISSN | 网络（由 `scripts/gen_ccf_catalog.py` 生成） |
 | `glean/homeparse.py` | 个人主页启发式解析（stdlib `html.parser`），输出带 `kind` 与 `confidence` 的条目 | 网络（由调用方 fetch） |
@@ -73,10 +74,10 @@ Agent 层不属于代码，而是**围绕同一批文件的语义工作流**—�
 | `glean/web/main.py` | `create_app()` 应用工厂；挂载 `/static`；`/` 重定向 | 路由实现 |
 | `glean/web/routes.py` | **只做聚合**：把三个子路由 `include_router` 进一个 router（不加前缀，路径不变） | 端点实现 |
 | `glean/web/routes_papers.py` | 论文流：`/digest` `/profile` `/archive` + `/api/ping` `/api/days` `/api/papers` `/api/interests` `/api/feedback` `/api/download/*` + `/htmx/*` | 业务逻辑（全部委托 core） |
-| `glean/web/routes_watch.py` | 学者监控：`/watch` + `/api/watch/*`（名单增删启停、`new`/`ack`、`events`、`run`） | 业务逻辑（委托 watch） |
+| `glean/web/routes_watch.py` | 学者监控：`/watch` + `/api/watch/*`（名单增删启停、`new`/`ack`、`events`、`run`、身份解析 `resolve`） | 业务逻辑（委托 watch / resolve） |
 | `glean/web/routes_ccf.py` | 会议期刊监控：`/ccf` + `/api/ccf/*`（venue 增删启停、`toggle-area`、`refresh`、`new`/`ack`、`events`、`run`） | 业务逻辑（委托 ccf） |
 | `glean/web/common.py` | 三个路由模块的共用助手：`Filters`、`current_papers()`（取哪一天的唯一实现）、`require_paper`/`require_entry`（查不到即 404）、`filter_papers`/`hit_visible`、`run_summary()` | — |
-| `glean/web/models.py` | Pydantic 线上模型（`FeedbackRequest` 带 0–5 校验）+ `PaperFilters`（`Depends()` 注入的查询参数组）+ 监控共用契约 `RunSummary`/`NewItems`/`AckResult` | 持久化 |
+| `glean/web/models.py` | Pydantic 线上模型（`FeedbackRequest` 带 0–5 校验）+ `PaperFilters`（`Depends()` 注入的查询参数组）+ 监控共用契约 `RunSummary`/`NewItems`/`AckResult` + 身份解析契约 `ResolvedIdentity`/`ResolveEvidence`/`ResolveCandidate`/`ResolveResult`（因此 `/openapi.json` 自带该接口的字段契约） | 持久化 |
 | `glean/web/templates_config.py` | 共享 Jinja2 环境（Starlette `Jinja2Templates`）+ `format_timestamp` 过滤器 | — |
 | `arxiv_daily.py` | 向后兼容入口 → `glean.cli:main` | — |
 | `scripts/run_daily.ps1` / `register_task.ps1` | Windows 计划任务入口（ASCII-only）与注册器 | 业务逻辑 |

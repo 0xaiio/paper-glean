@@ -210,6 +210,147 @@ def test_api_watch_remove_unknown_is_404(client, isolated_watch):
     assert response.status_code == 404
 
 
+# ------------------------------------------------------------------
+# Identity resolution + the list-action contract
+#
+# The three tests at the end are *source-level* guards. Both regressions they
+# cover were invisible to the API tests: the server side was always correct, and
+# what broke lived entirely in the rendered page / the CDN it leaned on.
+# ------------------------------------------------------------------
+
+def _fake_resolver(name="Resolved Person", **resolved):
+    payload = {"name": name, "homepage": None, "dblp": None, "s2": None}
+    payload.update(resolved)
+    return lambda *a, **k: {
+        "query": {}, "resolved": payload, "evidence": [], "alternates": [],
+        "warnings": [], "needs_review": True,
+    }
+
+
+def test_api_watch_add_without_a_name_resolves_one(client, isolated_watch, monkeypatch):
+    """姓名不再是必填：只给非姓名信息也能加成。"""
+    monkeypatch.setattr("glean.web.routes_watch.resolve", _fake_resolver())
+
+    added = client.post(
+        "/api/watch/researchers",
+        data={"homepage": "https://example.edu/~someone"},
+    )
+
+    assert added.status_code == 200
+    body = added.json()
+    assert body["researcher"]["name"] == "Resolved Person"
+    assert body["resolved_name"] == "Resolved Person"
+
+
+def test_api_watch_add_without_a_name_does_not_write_guessed_ids(
+    client, isolated_watch, monkeypatch
+):
+    """名字可以从别处推来，但**推断出的 id 不许悄悄写盘**。
+
+    A wrong s2 id would point every future scan at the wrong publication list —
+    silently. Filling those in is what the explicit 「解析监控对象」 step is for.
+    """
+    monkeypatch.setattr(
+        "glean.web.routes_watch.resolve",
+        _fake_resolver(name="Resolved Person", s2="999", dblp="pid/1/2"),
+    )
+
+    body = client.post(
+        "/api/watch/researchers", data={"homepage": "https://example.edu/~someone"}
+    ).json()
+
+    assert body["researcher"]["name"] == "Resolved Person"
+    assert body["researcher"]["s2"] is None
+    assert body["researcher"]["dblp"] is None
+
+
+def test_api_watch_add_without_a_name_or_any_source_is_400(client, isolated_watch):
+    response = client.post("/api/watch/researchers", data={"tags": "db"})
+    assert response.status_code == 400
+    assert "至少还要给一项" in response.json()["detail"]
+
+
+def test_api_watch_add_reports_a_name_it_cannot_infer(client, isolated_watch, monkeypatch):
+    monkeypatch.setattr("glean.web.routes_watch.resolve", _fake_resolver(name=""))
+
+    response = client.post(
+        "/api/watch/researchers", data={"dblp": "pid/00/0000"}
+    )
+
+    assert response.status_code == 400
+    assert "无法从所填信息推断出姓名" in response.json()["detail"]
+
+
+def test_api_watch_resolve_needs_at_least_one_input(client):
+    response = client.post("/api/watch/resolve", data={"name": "  "})
+    assert response.status_code == 400
+    assert "至少填写一项" in response.json()["detail"]
+
+
+def test_api_watch_resolve_returns_the_proposal_shape(client, monkeypatch):
+    monkeypatch.setattr("glean.web.routes_watch.resolve", _fake_resolver(name="Resolved Person"))
+
+    response = client.post("/api/watch/resolve", data={"homepage": "https://example.edu/~x"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["resolved"]["name"] == "Resolved Person"
+    assert body["needs_review"] is True
+    for key in ("query", "resolved", "evidence", "alternates", "warnings"):
+        assert key in body
+
+
+def test_api_watch_resolve_does_not_write_anything(client, isolated_watch, monkeypatch):
+    """解析只是提案：watchlist.md 在解析后必须一字未动。"""
+    from glean import watch
+
+    before = watch.WATCHLIST_MD.read_text(encoding="utf-8")
+    monkeypatch.setattr("glean.web.routes_watch.resolve", _fake_resolver())
+
+    client.post("/api/watch/resolve", data={"name": "Resolved Person"})
+
+    assert watch.WATCHLIST_MD.read_text(encoding="utf-8") == before
+
+
+def test_add_form_does_not_require_a_name(client):
+    """表单层也要真的放开：``required`` 留在 input 上就白改了后端。"""
+    page = client.get("/watch").text
+    tag = next(
+        line for line in page.splitlines() if 'id="wf-name"' in line
+    )
+    assert "required" not in tag
+    assert "解析监控对象" in page
+
+
+def test_interactive_assets_are_served_locally(client):
+    """htmx / Alpine 必须来自本机，取不到 CDN 时按钮会**静默失效**。"""
+    from pathlib import Path
+
+    base = Path(__file__).resolve().parent.parent / "glean" / "templates" / "base.html"
+    text = base.read_text(encoding="utf-8")
+
+    assert "/static/vendor/htmx.min.js" in text
+    assert "/static/vendor/alpine.min.js" in text
+    assert "unpkg.com" not in text
+    assert "cdn.jsdelivr.net" not in text
+
+    # …and the mount actually serves them.
+    assert client.get("/static/vendor/htmx.min.js").status_code == 200
+    assert client.get("/static/vendor/alpine.min.js").status_code == 200
+
+
+@pytest.mark.parametrize("template", ["watch.html", "ccf.html"])
+def test_list_actions_reload_only_after_a_successful_request(template):
+    """没有「定时刷新」这种写法了：它会掩盖失败、也会抢在请求完成前刷掉页面。"""
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent.parent / "glean" / "templates" / template
+    text = path.read_text(encoding="utf-8")
+
+    assert "setTimeout(()=>location.reload()" not in text
+    assert "pgAfterRequest(event)" in text
+
+
 def test_api_watch_ack_clears_badge(client, isolated_watch):
     from glean import notify
 

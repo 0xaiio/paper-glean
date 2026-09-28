@@ -155,6 +155,38 @@
         - fetch_html
         - parse_homepage
 
+## 身份解析
+
+> 回答「**这是谁**」——与「他最近发表了什么」（`glean.watch`）是两件事，源优先级也不同：
+> 监控要**完整覆盖**（主页 → DBLP → S2），解析只要**最先答得出来**的那个源。
+> 入口可以是姓名 / 个人主页 / DBLP / Semantic Scholar 四者之一。
+>
+> **本模块刻意不抓 DBLP**：它已启用 Anubis 反爬，每个请求都返回人机校验页
+> （浏览器 UA / 程序 UA × 代理 / 直连，四种组合实测一致）→ 拿到的永远不是数据。
+> 因此遇到 DBLP 值只**记录为链接与姓名线索**，并把 `DBLP_UNFETCHABLE` 作为警告
+> 显式返回，而不是让一次失败的抓取伪装成「查无此人」。
+>
+> 返回值是一个**提案**，不是静默写入：每个字段都带来源（`evidence`），
+> 同名的多个候选走 `alternates` 交给用户挑，`needs_review` 标出「姓名是推断来的」。
+
+::: glean.resolve
+    options:
+      members:
+        - looks_like_person_name
+        - name_from_title
+        - links_from_homepage
+        - name_from_homepage
+        - normalize_dblp
+        - normalize_s2
+        - s2_author
+        - s2_search
+        - dblp_search_url
+        - resolve
+        - DBLP_AUTHOR_SEARCH
+        - DBLP_UNFETCHABLE
+        - S2_GRAPH
+        - S2_RATE_LIMITED
+
 ## 会议期刊监控
 
 ::: glean.ccf

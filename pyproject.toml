@@ -59,6 +59,11 @@ exclude = ["tests*"]
 
 [tool.setuptools.package-data]
 glean = ["templates/*.html", "templates/partials/*.html"]
+# 注意：glean_static/（css / js / vendor 的 htmx+Alpine）**不在上面**，因此它不进 wheel，
+# 只在源码树里存在。`glean/web/main.py` 是「目录存在才挂载 /static」，所以非 editable 安装
+# 下 Web 界面会缺样式与交互脚本（htmx 缺失 = 所有按钮静默失效，见 docs/product/review.md §4.3 G5）。
+# 本项目不分发 wheel（CI 与文档均为 `pip install -e`），故按现状保留并在
+# glean_static/vendor/README.md 里写明；若日后要出包，需把 glean_static 一并纳入包数据。
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

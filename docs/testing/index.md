@@ -30,6 +30,7 @@
 | `glean/monitor.py` | ✅ | — | — |
 | `glean/kinds.py` | ✅ | — | — |
 | `glean/watch.py` | ✅ | — | ✅ |
+| `glean/resolve.py` | ✅ | ✅ | — |
 | `glean/homeparse.py` | — | — | ✅ |
 | `glean/ccf.py` | ✅ | — | ✅ |
 | `glean/ccf_catalog.py` | — | — | — |
@@ -44,7 +45,9 @@
 | 数据文件格式 | — | ✅ | — |
 | 端到端工作流 | — | — | ✅ |
 
-> 全量测试数：**196 passed**（`pytest tests/ -q`）。
+> 全量测试数：**233 passed**（`pytest tests/ -q`）。
+> `resolve.py`（身份解析）的测试**全部离线**：抓取被替身函数接管，或直接断言源码文本
+> （例如「不得出现任何对 dblp 的 `http_get` 调用」），因此没有一条会真的打网络。
 > `weekly`（三条链路的聚合入口）由 `tests/test_cli.py` 的两条测试守住：命令面锁定
 > （含全套开关）与**默认值不变量**（`--hours 168` / `--cap 300` / 服务默认开）。
 > 后者才是真正要防的回归 —— 周频沿用 `daily` 的 `--hours 24` 会静默漏掉一周里

@@ -35,7 +35,7 @@
         {% if new_items %}
         <button class="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                 hx-post="/api/ccf/ack" hx-swap="none"
-                onclick="setTimeout(()=>location.reload(), 300)">
+                hx-on::after-request="pgAfterRequest(event)">
             全部标记已读
         </button>
         {% endif %}
@@ -96,7 +96,7 @@
         <h2 class="text-lg font-semibold">监控名单（{{ on_n }} / {{ venues|length }} 已勾选）</h2>
         <button class="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                 hx-post="/api/ccf/refresh" hx-swap="none"
-                onclick="setTimeout(()=>location.reload(), 800)">
+                hx-on::after-request="pgAfterRequest(event)">
             同步内置目录
         </button>
     </div>
@@ -111,10 +111,10 @@
             <span class="max-w-[16rem] truncate">{{ a }}</span>
             <button class="text-green-600 hover:underline"
                     hx-post="/api/ccf/venues/toggle-area" hx-vals='{"area": "{{ a }}", "enabled": true}'
-                    hx-swap="none" onclick="setTimeout(()=>location.reload(), 300)">全选</button>
+                    hx-swap="none" hx-on::after-request="pgAfterRequest(event)">全选</button>
             <button class="text-gray-500 hover:underline"
                     hx-post="/api/ccf/venues/toggle-area" hx-vals='{"area": "{{ a }}", "enabled": false}'
-                    hx-swap="none" onclick="setTimeout(()=>location.reload(), 300)">全不选</button>
+                    hx-swap="none" hx-on::after-request="pgAfterRequest(event)">全不选</button>
         </span>
         {% endfor %}
     </div>
@@ -122,7 +122,7 @@
 
     <form class="mb-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 grid gap-3 sm:grid-cols-2"
           hx-post="/api/ccf/venues"
-          hx-on::after-request="if(event.detail.successful){ this.reset(); location.reload(); }">
+          hx-on::after-request="pgAfterRequest(event)">
         <div>
             <label class="block text-xs text-gray-500 mb-1">名称 *</label>
             <input name="name" required placeholder="ICDT"
@@ -164,9 +164,9 @@
                     <button class="w-4 h-4 shrink-0 rounded border border-gray-400 flex items-center justify-center text-[10px] leading-none
                                    {% if v.enabled %}bg-primary border-primary text-white{% endif %}"
                             title="{{ '取消勾选' if v.enabled else '勾选' }}"
-                            hx-post="/api/ccf/venues/{{ v.key }}/toggle?enabled={{ 'false' if v.enabled else 'true' }}"
+                            hx-post="/api/ccf/venues/{{ v.key|urlencode }}/toggle?enabled={{ 'false' if v.enabled else 'true' }}"
                             hx-swap="none"
-                            onclick="setTimeout(()=>location.reload(), 300)">
+                            hx-on::after-request="pgAfterRequest(event)">
                         {{ '✓' if v.enabled else '' }}
                     </button>
                     <span class="font-medium">{{ v.name }}</span>
@@ -190,10 +190,10 @@
                    class="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">DBLP</a>
                 {% endif %}
                 <button class="px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
-                        hx-delete="/api/ccf/venues/{{ v.key }}"
+                        hx-delete="/api/ccf/venues/{{ v.key|urlencode }}"
                         hx-swap="none"
                         hx-confirm="移除「{{ v.name }}」？其已见状态也会一并清除。"
-                        onclick="setTimeout(()=>location.reload(), 300)">移除</button>
+                        hx-on::after-request="pgAfterRequest(event)">移除</button>
             </div>
         </li>
         {% endfor %}
