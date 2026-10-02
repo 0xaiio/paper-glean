@@ -85,10 +85,15 @@ def _day_section_text(day: str) -> str:
 
 
 def _parse_row(cells: list[str], symbol: str) -> dict[str, Any] | None:
-    """Turn one markdown table row into a recommendation dict."""
+    """Turn one markdown table row into a recommendation dict.
+
+    ``symbol`` may hold several accepted glyphs (e.g. ``"🧐★"``): the 🧐 block
+    has historically been filled with ★ glyphs, and silently dropping those rows
+    loses agent-written recommendations from the rendered page.
+    """
     level_cell, paper_cell, reason_cell = (cells + ["", "", ""])[:3]
     level = level_cell.strip()
-    if not level.startswith(symbol) or "推荐" in level_cell:
+    if not any(level.startswith(s) for s in symbol) or "推荐" in level_cell:
         return None  # header row (含「推荐」) 或无关行
     m_id = _ROW_ID_RE.search(paper_cell)
     m_title = _ROW_TITLE_RE.search(paper_cell)
@@ -97,7 +102,7 @@ def _parse_row(cells: list[str], symbol: str) -> dict[str, Any] | None:
     m_cat = _ROW_CAT_RE.search(paper_cell.strip())
     return {
         "level": level,
-        "count": level.count(symbol),
+        "count": max(level.count(s) for s in symbol),
         "title": m_title.group(1).strip() if m_title else paper_cell.strip(),
         "id": m_id.group(1) if m_id else "",
         "category": m_cat.group(1) if m_cat else "",
@@ -117,7 +122,7 @@ def parse_recommendations(day: str) -> dict[str, list[dict[str, Any]]]:
         return out
     for symbol, heading, key in (
         ("★", "### 📌", "star"),
-        ("🧐", "### 🧐", "expand"),
+        ("🧐★", "### 🧐", "expand"),
     ):
         i = sec.find(heading)
         if i == -1:
