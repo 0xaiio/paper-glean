@@ -4,7 +4,7 @@
     "sigmod": {
       "name": "SIGMOD",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:16.092931+00:00",
+      "last_checked": "2026-10-23T02:42:30.232442+00:00",
       "fingerprints": [
         "f5d63e96c0c00a42",
         "130a993ecffecf54",
@@ -34,7 +34,16 @@
         "8795c542030084e2",
         "e2b60dec07db6f51",
         "f64e214c6599a848",
-        "2e433539049fe404"
+        "2e433539049fe404",
+        "662461e98915175d",
+        "5fead7f236f6e8b7",
+        "791235bdb8d08608",
+        "360b52d055e44459",
+        "70128ce4c143503c",
+        "77510d67a50a2a4d",
+        "864971fb5184e5cd",
+        "229ff4f26544f7fe",
+        "72d9fd4e5c4d1ff5"
       ],
       "sources": [
         "ccfddl",
@@ -44,7 +53,7 @@
     "aaai": {
       "name": "AAAI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:26.694522+00:00",
+      "last_checked": "2026-10-23T02:36:42.909210+00:00",
       "fingerprints": [
         "2c842d358d3cef58",
         "4b140368f31c68b5",
@@ -76,7 +85,9 @@
         "61fdde48f2cdd900",
         "0fbb1298df5c542f",
         "a75e16d1d896dddd",
-        "5b24198bb5f803f4"
+        "5b24198bb5f803f4",
+        "2cc5211a9c4ec615",
+        "ced36161fbae539b"
       ],
       "sources": [
         "ccfddl",
@@ -86,7 +97,7 @@
     "acl": {
       "name": "ACL",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:28.393123+00:00",
+      "last_checked": "2026-10-23T02:36:45.663036+00:00",
       "fingerprints": [
         "3a113356dfb87a8c",
         "e54b62bec4f3573d",
@@ -98,7 +109,15 @@
         "6e4456e5eebe09b1",
         "065ca2ec2682888a",
         "052a8e5b17f3a168",
-        "81e305ee952d05b8"
+        "81e305ee952d05b8",
+        "ed8a5698b3bc0136",
+        "20aee5cfde351c44",
+        "2c1d8950e1443433",
+        "92e8be2732c5ea2e",
+        "c8c8bed78e9ef6ce",
+        "1c7e35f5458feddd",
+        "a80d2cdd382435d1",
+        "ced79d09091c0dec"
       ],
       "sources": [
         "ccfddl",
@@ -108,7 +127,7 @@
     "acm-mm": {
       "name": "ACM MM",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:31.076445+00:00",
+      "last_checked": "2026-10-23T02:36:49.726502+00:00",
       "fingerprints": [
         "2ca5373d9c3103c3",
         "1106a92433789a65",
@@ -122,7 +141,7 @@
     "acm-siggraph": {
       "name": "ACM SIGGRAPH",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:35.166324+00:00",
+      "last_checked": "2026-10-23T02:36:54.625755+00:00",
       "fingerprints": [
         "4c84f73c69e138de",
         "2e76cc50e78c55cc",
@@ -155,7 +174,11 @@
         "4f080d01b4dc119f",
         "70e8f8f50f02f69e",
         "3f9123e54c50ac3a",
-        "d55cf119c954aa33"
+        "d55cf119c954aa33",
+        "ae4b10f097effb70",
+        "6d0700cc0248001d",
+        "9d1c8187429e47ff",
+        "567303f0601f3e65"
       ],
       "sources": [
         "ccfddl",
@@ -165,7 +188,7 @@
     "ase": {
       "name": "ASE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:38.094445+00:00",
+      "last_checked": "2026-10-23T02:36:58.141740+00:00",
       "fingerprints": [
         "b799b7c1747512f2",
         "063aaff33ef769c0",
@@ -226,7 +249,13 @@
         "e827b3ba8951bc32",
         "23e0831a63c4804f",
         "6f96e58636b1a768",
-        "ef09c6d450217e65"
+        "ef09c6d450217e65",
+        "b291f750c8bb0d30",
+        "c0a848f6979c243a",
+        "fca82b5bd70c49c1",
+        "0632f785a3c4322a",
+        "7a2d204d19e77bf9",
+        "aa015b9313b4c0dd"
       ],
       "sources": [
         "ccfddl",
@@ -236,7 +265,7 @@
     "asplos": {
       "name": "ASPLOS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:41.383365+00:00",
+      "last_checked": "2026-10-23T02:37:04.522410+00:00",
       "fingerprints": [
         "4fa5ad67f19b53c5",
         "32e6e3b3f62420b2",
@@ -255,7 +284,13 @@
         "a0b4c1bbf586b50d",
         "ddbeee8005506261",
         "50084f40f485cb2d",
-        "8151325dcdbae9e0"
+        "8151325dcdbae9e0",
+        "4d15571198bd43b0",
+        "5af73ca814ceee44",
+        "c74af164293cae0b",
+        "871d89568a5f4aea",
+        "fd419b9c9998738d",
+        "f6309be803498233"
       ],
       "sources": [
         "ccfddl",
@@ -265,7 +300,7 @@
     "cav": {
       "name": "CAV",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:43.098337+00:00",
+      "last_checked": "2026-10-23T02:37:09.410179+00:00",
       "fingerprints": [
         "24ed7858c201a3d0",
         "0b4421247a1aba6a",
@@ -283,7 +318,9 @@
         "e9f4ac8cecac1faa",
         "73a3a7393cf0ef36",
         "7d43dd525d3ff47c",
-        "c74b6edce83a6859"
+        "c74b6edce83a6859",
+        "c069426f9e921ee8",
+        "c1ac0b47a3c54a0e"
       ],
       "sources": [
         "ccfddl",
@@ -293,13 +330,21 @@
     "ccs": {
       "name": "CCS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:46.176878+00:00",
+      "last_checked": "2026-10-23T02:37:14.829623+00:00",
       "fingerprints": [
         "004576016ea216b6",
         "70858e733a491c32",
         "6633ca0bb3d3db0a",
         "cd43ae84bb7919cd",
-        "0ef9a992b16f66f4"
+        "0ef9a992b16f66f4",
+        "a917771896dc381f",
+        "749d14ac0b485155",
+        "3d8cad8a00fc60ff",
+        "c8d12f028d219cf1",
+        "6a98c72c577e9e34",
+        "f0cf6ccf41aced25",
+        "a4988b21ab650b1c",
+        "3c6a6d51a9c01738"
       ],
       "sources": [
         "ccfddl",
@@ -309,7 +354,7 @@
     "chi": {
       "name": "CHI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:49.626638+00:00",
+      "last_checked": "2026-10-23T02:37:19.674333+00:00",
       "fingerprints": [
         "5c480e2a392a8cb3",
         "5e63a4dd91f89e43",
@@ -317,7 +362,13 @@
         "5ddcdf89502b8dd8",
         "04cac1eac6675507",
         "7172d7d2c028d943",
-        "f301a545924826b6"
+        "f301a545924826b6",
+        "17988dbf574fc0a3",
+        "7679ddabae8a55b3",
+        "a533728ae25f3264",
+        "18eea792a293f2b8",
+        "0de81de401c1fa59",
+        "9b9d4777f7184c54"
       ],
       "sources": [
         "ccfddl",
@@ -327,7 +378,7 @@
     "crypto": {
       "name": "CRYPTO",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:51.550832+00:00",
+      "last_checked": "2026-10-23T02:37:22.223444+00:00",
       "fingerprints": [
         "bb7f2d2d225d1769",
         "2f3097c1dfdcadfe",
@@ -349,7 +400,7 @@
     "cscw": {
       "name": "CSCW",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:54.198225+00:00",
+      "last_checked": "2026-10-23T02:37:27.654086+00:00",
       "fingerprints": [
         "5aec9fdf0b370f33",
         "34c56e2f09dc718c",
@@ -368,7 +419,9 @@
         "92172dd5f218ebdf",
         "3a0339d5ad176bc9",
         "e2325530a7f040d3",
-        "5a9dc72dab9e59d5"
+        "5a9dc72dab9e59d5",
+        "ea004dc57f34a8b1",
+        "31b2b450c2a4bac6"
       ],
       "sources": [
         "ccfddl",
@@ -378,7 +431,7 @@
     "cvpr": {
       "name": "CVPR",
       "baseline": true,
-      "last_checked": "2026-09-26T07:51:57.224514+00:00",
+      "last_checked": "2026-10-23T02:37:31.997677+00:00",
       "fingerprints": [
         "aa92594b553b4d99",
         "f75bafc1f21156e3",
@@ -389,7 +442,11 @@
         "ee0d88c780548d35",
         "1b1b04100b44d4c7",
         "40b10c56b21d83a4",
-        "d4f3d9d33a878385"
+        "d4f3d9d33a878385",
+        "80b128ef4ded6dcb",
+        "9742efa6bccae021",
+        "a8c88e32595e9cb6",
+        "f0fe973adbeb8618"
       ],
       "sources": [
         "ccfddl",
@@ -399,7 +456,7 @@
     "dac": {
       "name": "DAC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:03.475658+00:00",
+      "last_checked": "2026-10-23T02:37:36.944076+00:00",
       "fingerprints": [
         "b38592ec25346df7",
         "69fcccd85a8616e6",
@@ -420,7 +477,10 @@
         "70f1ff549ef3bcca",
         "47685289d49da1fb",
         "5836dfbded9dbd88",
-        "b05891fd3d32f0aa"
+        "b05891fd3d32f0aa",
+        "78e2b88d177d9da1",
+        "ac0eeac58136e5ca",
+        "eee5db5866e93159"
       ],
       "sources": [
         "ccfddl",
@@ -430,7 +490,7 @@
     "date": {
       "name": "DATE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:06.487781+00:00",
+      "last_checked": "2026-10-23T02:37:40.229465+00:00",
       "fingerprints": [
         "ef6f7730019cfdd6",
         "a08db69ecd6c6766",
@@ -450,7 +510,9 @@
         "d21549f70944163a",
         "7294be4935e50264",
         "a6d35b6ee156ff61",
-        "58deadfbaa789e65"
+        "58deadfbaa789e65",
+        "e5e67009b2154d9c",
+        "59b1bf8600c53e60"
       ],
       "sources": [
         "ccfddl",
@@ -460,7 +522,7 @@
     "disc": {
       "name": "DISC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:10.067229+00:00",
+      "last_checked": "2026-10-23T02:37:46.457057+00:00",
       "fingerprints": [
         "85b7ec3b1a8c4403",
         "3faf1559b9d40070"
@@ -472,7 +534,7 @@
     "eccv": {
       "name": "ECCV",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:13.394351+00:00",
+      "last_checked": "2026-10-23T02:37:51.693153+00:00",
       "fingerprints": [
         "f442bd74d6da63c9",
         "e04a19bafdbdb7af",
@@ -499,7 +561,7 @@
     "emnlp": {
       "name": "EMNLP",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:15.945968+00:00",
+      "last_checked": "2026-10-23T02:37:54.995193+00:00",
       "fingerprints": [
         "ffcb7e0570f66b48",
         "c543dabf63ed088b",
@@ -559,7 +621,11 @@
         "44afeb33ca72998a",
         "c09d45b30f8cc5d6",
         "c95cc12db1d58fd4",
-        "873dbcd7f03a97cf"
+        "873dbcd7f03a97cf",
+        "b982baaa0e71badc",
+        "994614c3d119e7c5",
+        "be0f77de01031bd0",
+        "8a5036518c5f8cef"
       ],
       "sources": [
         "ccfddl",
@@ -569,14 +635,16 @@
     "eurocrypt": {
       "name": "EUROCRYPT",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:17.828711+00:00",
+      "last_checked": "2026-10-23T02:37:57.957774+00:00",
       "fingerprints": [
         "224ca1704ebc7c3e",
         "46b1bba2cf9d3eaa",
         "f9951bc666466424",
         "a29ebaf9605af978",
         "2b07de906a57818e",
-        "8b4c011c5d0d4f5a"
+        "8b4c011c5d0d4f5a",
+        "aebdd99ec915bfee",
+        "b96a36bfb02cdcec"
       ],
       "sources": [
         "ccfddl",
@@ -586,7 +654,7 @@
     "eurosys": {
       "name": "EuroSys",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:19.515414+00:00",
+      "last_checked": "2026-10-23T02:38:00.701280+00:00",
       "fingerprints": [
         "2ea9fd0930c92496",
         "d4b93620bba95c8f",
@@ -601,7 +669,9 @@
         "a00cc7f7899b8b17",
         "f778ab2150f1c1b1",
         "1c5c5a213cabcc2b",
-        "94e1748cdb6fce53"
+        "94e1748cdb6fce53",
+        "54b69e05708d2fd2",
+        "68e35d8a710897e0"
       ],
       "sources": [
         "ccfddl",
@@ -611,7 +681,7 @@
     "fast": {
       "name": "FAST",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:22.847406+00:00",
+      "last_checked": "2026-10-23T02:38:05.051874+00:00",
       "fingerprints": [
         "c67a2ca8d2f812e0",
         "3f5fe8cafbc5de96",
@@ -621,7 +691,9 @@
         "47eb2e978ccc7c3c",
         "d6857486514dfb81",
         "ab6bcf14588e5cfa",
-        "24408fe913bd3cce"
+        "24408fe913bd3cce",
+        "8de12a8b589bd8f7",
+        "7bc2c3a95d643089"
       ],
       "sources": [
         "ccfddl",
@@ -631,7 +703,7 @@
     "fm": {
       "name": "FM",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:26.300057+00:00",
+      "last_checked": "2026-10-23T02:38:07.703387+00:00",
       "fingerprints": [
         "d15314c540dc8f11",
         "f80832203011f7d9",
@@ -647,7 +719,9 @@
         "d2f383efac9bf8a0",
         "908fc48b5f884a53",
         "a05211ba612f7e6f",
-        "09112e07447a0060"
+        "09112e07447a0060",
+        "6f9a8afaef395967",
+        "964fc5781dc72bfc"
       ],
       "sources": [
         "ccfddl",
@@ -657,7 +731,7 @@
     "focs": {
       "name": "FOCS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:28.360563+00:00",
+      "last_checked": "2026-10-23T02:38:10.184335+00:00",
       "fingerprints": [
         "e05732a6af7d8e53",
         "e657b761a26ad1ca",
@@ -672,7 +746,7 @@
     "fse": {
       "name": "FSE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:30.755150+00:00",
+      "last_checked": "2026-10-23T02:38:12.843502+00:00",
       "fingerprints": [
         "b820f67a26776070",
         "867c3a45c17158be",
@@ -693,7 +767,19 @@
         "dbc66e6134c2e5d3",
         "035041a2b0c29673",
         "c56e573c0276cad6",
-        "32a174b3f26d1209"
+        "32a174b3f26d1209",
+        "d849aeb2ab7d6aa6",
+        "aef0c8de0b0db804",
+        "56260f40904049f7",
+        "b5de9eb6ddd02209",
+        "5496d0744a7a18ff",
+        "9edebd69493273f3",
+        "2e3227765a534948",
+        "fb599c2c1e9fcf66",
+        "4330b4167c66779a",
+        "dfb7f0c3cd08915a",
+        "c2f8428b8c441226",
+        "bb1f85a459c683e5"
       ],
       "sources": [
         "ccfddl",
@@ -703,7 +789,7 @@
     "hpca": {
       "name": "HPCA",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:33.123906+00:00",
+      "last_checked": "2026-10-23T02:38:17.636668+00:00",
       "fingerprints": [
         "6cfe837411063d12",
         "6cf73d7ac939d7ee",
@@ -718,7 +804,11 @@
         "279f87769b9b15b3",
         "9e1a6fa6fa9bb6b5",
         "f304309ed035c373",
-        "a1cc9893bc32f8d8"
+        "a1cc9893bc32f8d8",
+        "5d4f709baa227c2f",
+        "57d3395aa535347b",
+        "b3dad33d0921b813",
+        "0d008e12bda170be"
       ],
       "sources": [
         "ccfddl",
@@ -728,7 +818,7 @@
     "hpdc": {
       "name": "HPDC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:35.727851+00:00",
+      "last_checked": "2026-10-23T02:38:21.263539+00:00",
       "fingerprints": [
         "4132b6e4953a5e01",
         "1e97bff76d67c2dd",
@@ -741,7 +831,10 @@
         "bbff8dfee0846347",
         "371ea6a87233e85b",
         "d49bdc9bea55ebb4",
-        "2a092d278e4348f2"
+        "2a092d278e4348f2",
+        "e27a5c22cf68a88e",
+        "25f1a87c22152ce0",
+        "487a7ee207a83a07"
       ],
       "sources": [
         "ccfddl",
@@ -751,7 +844,7 @@
     "iccad": {
       "name": "ICCAD",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:40.689185+00:00",
+      "last_checked": "2026-10-23T02:38:31.054539+00:00",
       "fingerprints": [
         "6f146f0eea213b0d",
         "9fcd80ba119463fd",
@@ -774,7 +867,9 @@
         "046e9fd14600fded",
         "41c1ad5a0f8c83df",
         "34163829e36da1d6",
-        "5f8e84a7c4dc7779"
+        "5f8e84a7c4dc7779",
+        "d5b65a2cb07ae504",
+        "0ca90c11a4f59e41"
       ],
       "sources": [
         "ccfddl",
@@ -784,7 +879,7 @@
     "iccv": {
       "name": "ICCV",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:43.953820+00:00",
+      "last_checked": "2026-10-23T02:38:35.265625+00:00",
       "fingerprints": [
         "c6f379455f96744f",
         "f3db106e2f03d44a",
@@ -815,7 +910,7 @@
     "icde": {
       "name": "ICDE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:45.730498+00:00",
+      "last_checked": "2026-10-23T02:38:37.615766+00:00",
       "fingerprints": [
         "97aa631f21a8c09a",
         "517097b8822ef5a7",
@@ -826,7 +921,10 @@
         "8a020f8dccd1f9e4",
         "97eb20c330b0c6e4",
         "b83f9e5fe807778f",
-        "78548d2ad3021e60"
+        "78548d2ad3021e60",
+        "cb3bc7e92c2782d4",
+        "0d686117c8e39efe",
+        "6bcb77a372b57577"
       ],
       "sources": [
         "ccfddl",
@@ -836,7 +934,7 @@
     "icfp": {
       "name": "ICFP",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:48.365016+00:00",
+      "last_checked": "2026-10-23T02:38:40.947436+00:00",
       "fingerprints": [
         "0c88f9e8ca4633c4",
         "9653dbae48161d26",
@@ -848,7 +946,10 @@
         "c47da04c0599bec8",
         "d5f47b9ca23a94e6",
         "5131483713bd8f94",
-        "cdc4a8e21aa33cf7"
+        "cdc4a8e21aa33cf7",
+        "05b6d2a3f3c855c4",
+        "d3407c87b38b4ef4",
+        "56e6103cf5628b69"
       ],
       "sources": [
         "ccfddl",
@@ -858,14 +959,16 @@
     "iclr": {
       "name": "ICLR",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:52.954974+00:00",
+      "last_checked": "2026-10-23T02:38:43.453592+00:00",
       "fingerprints": [
         "d2ec68ec563dc692",
         "cc6e238291e332ac",
         "e38d23acdd9e4b5a",
         "b662fde2588aa805",
         "2f41809eb105a9b1",
-        "af30fc47544df2b7"
+        "af30fc47544df2b7",
+        "41d5b2a02600e365",
+        "a2b1e41143350896"
       ],
       "sources": [
         "ccfddl"
@@ -874,7 +977,7 @@
     "icml": {
       "name": "ICML",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:55.018656+00:00",
+      "last_checked": "2026-10-23T02:38:45.584297+00:00",
       "fingerprints": [
         "d8b56095ba6756a0",
         "3f98a9c4c6c76dea",
@@ -888,7 +991,7 @@
     "icse": {
       "name": "ICSE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:57.692314+00:00",
+      "last_checked": "2026-10-23T02:38:49.291171+00:00",
       "fingerprints": [
         "b1cf9e0b4d42b1ec",
         "f76ce85d04b2d441",
@@ -1003,7 +1106,22 @@
         "df711cf52a59fb69",
         "5c11225c050272a2",
         "b637348bce34b842",
-        "1ebfac9c0b0a4411"
+        "1ebfac9c0b0a4411",
+        "a56690dce3679a54",
+        "83900cdb05416a70",
+        "c04838e9421eeb79",
+        "d885f8352e43abab",
+        "329eb2fab2822800",
+        "bb565bf7c13a3c02",
+        "414baa63e02240a6",
+        "b6ad057d022b8611",
+        "831f1337ec9c4c8f",
+        "d73eb0ea05a0215c",
+        "5bea20818f963892",
+        "8fbeba5a3b020290",
+        "9476601836538d22",
+        "f17329f66567b9ee",
+        "1e8c8b6df15f5a07"
       ],
       "sources": [
         "ccfddl",
@@ -1013,7 +1131,7 @@
     "ieee-vis": {
       "name": "IEEE VIS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:52:59.603934+00:00",
+      "last_checked": "2026-10-23T02:38:52.475134+00:00",
       "fingerprints": [
         "8a3142182847f3a3",
         "6de7f81469236c4c",
@@ -1044,7 +1162,16 @@
         "299b46135dc7a21b",
         "d05b4034b464540c",
         "a4b984eb6a6509ad",
-        "9f9593a6922f50c0"
+        "9f9593a6922f50c0",
+        "dd5ee93bdfd00645",
+        "7ea5a807f6b2d8d7",
+        "427f3a06219e49bb",
+        "e5ea11bd09f26b89",
+        "af791fffa0af3d01",
+        "b02ea25f2adad9a5",
+        "3770abfef5cb3e62",
+        "8e992b3256123aa6",
+        "430e7aea88fb859d"
       ],
       "sources": [
         "ccfddl",
@@ -1054,7 +1181,7 @@
     "ieee-vr": {
       "name": "IEEE VR",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:01.573437+00:00",
+      "last_checked": "2026-10-23T02:38:54.987734+00:00",
       "fingerprints": [
         "b3e7770ecb00f4bf",
         "dfbbd89284c304de",
@@ -1064,7 +1191,9 @@
         "3077162f15f48bcd",
         "75d9d1618583c617",
         "5cf02d681652ee7a",
-        "0a935f52f198bb62"
+        "0a935f52f198bb62",
+        "6d2f26939473b497",
+        "65970262bf91206c"
       ],
       "sources": [
         "ccfddl",
@@ -1074,7 +1203,7 @@
     "ijcai": {
       "name": "IJCAI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:04.244008+00:00",
+      "last_checked": "2026-10-23T02:38:59.523795+00:00",
       "fingerprints": [
         "82c39511194ee3a7",
         "f3db4d07ab0e74b4",
@@ -1085,7 +1214,17 @@
         "08ae2a15878dc140",
         "4b395b6c02ff5706",
         "2d53168b16a567ef",
-        "90f54918ed38e54e"
+        "90f54918ed38e54e",
+        "9d2683cd36fc460d",
+        "c32c1ed7fe53baec",
+        "2e302fcd8907eb60",
+        "8d66a5d4e612fc8e",
+        "dc949f973963b051",
+        "d1fbfbc727c0f6f8",
+        "2068d017fae652eb",
+        "876fff2bc7bc2c07",
+        "436fded3ecdb025a",
+        "eda4754035211fbd"
       ],
       "sources": [
         "ccfddl",
@@ -1095,7 +1234,7 @@
     "infocom": {
       "name": "INFOCOM",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:06.890408+00:00",
+      "last_checked": "2026-10-23T02:39:04.718326+00:00",
       "fingerprints": [
         "1476edeff12f2585",
         "0bf728aa477386fe",
@@ -1119,7 +1258,7 @@
     "ipdps": {
       "name": "IPDPS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:09.375462+00:00",
+      "last_checked": "2026-10-23T02:39:16.107523+00:00",
       "fingerprints": [
         "3a4e4edbac0b4b24",
         "55c031cf2693830d",
@@ -1132,7 +1271,9 @@
         "c7a6af73ce3a9c3b",
         "f2719f319095de24",
         "6e832b7300d0096e",
-        "a715d6df366ae670"
+        "a715d6df366ae670",
+        "996f760e1d40baec",
+        "62781a20ddc0b49e"
       ],
       "sources": [
         "ccfddl",
@@ -1142,7 +1283,7 @@
     "isca": {
       "name": "ISCA",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:12.196824+00:00",
+      "last_checked": "2026-10-23T02:39:28.809888+00:00",
       "fingerprints": [
         "39f0cb0a4cd3ba03",
         "1392ffa603f388a7",
@@ -1160,7 +1301,15 @@
         "d7ce5862c0fd93fb",
         "13df67a0729668f0",
         "de711eab3648a65e",
-        "63546f729a314dbe"
+        "63546f729a314dbe",
+        "1cc721d882593fb7",
+        "e720d5e341e6644e",
+        "b13e7448a2741122",
+        "ea043d8dd6c1f738",
+        "f7dab8a2523d4408",
+        "a45cd77d7911708b",
+        "7692e53a5b2d2442",
+        "1dfcad6b2c783d5c"
       ],
       "sources": [
         "ccfddl",
@@ -1170,7 +1319,7 @@
     "issta": {
       "name": "ISSTA",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:14.746676+00:00",
+      "last_checked": "2026-10-23T02:39:31.697213+00:00",
       "fingerprints": [
         "a205c3a39b727c21",
         "4f42dfa34ea7f195",
@@ -1178,7 +1327,11 @@
         "9d7b1dec1c13e77b",
         "87a92c59717483b4",
         "a46a0bd7ee88d277",
-        "b837c1d4a81f195d"
+        "b837c1d4a81f195d",
+        "f1f7b17f22861ec0",
+        "5bc91439958873a4",
+        "fbd3afbb15d12726",
+        "bf0f980865985532"
       ],
       "sources": [
         "ccfddl",
@@ -1188,7 +1341,7 @@
     "lics": {
       "name": "LICS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:17.370771+00:00",
+      "last_checked": "2026-10-23T02:39:46.988221+00:00",
       "fingerprints": [
         "b187c8a90958a391",
         "39555ebd4332e075",
@@ -1198,7 +1351,9 @@
         "d243d8c0186632bd",
         "47cb3a753a98237e",
         "81d19d65a8f32015",
-        "6bec0426c75bf43c"
+        "6bec0426c75bf43c",
+        "e51c0840f5eb1c83",
+        "762897ffe0c55607"
       ],
       "sources": [
         "ccfddl",
@@ -1208,7 +1363,7 @@
     "micro": {
       "name": "MICRO",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:20.301718+00:00",
+      "last_checked": "2026-10-23T02:39:55.577677+00:00",
       "fingerprints": [
         "dcbccecaa0ff24b7",
         "936137f63524e1b8",
@@ -1225,7 +1380,8 @@
         "5079c7ea941b0aba",
         "443f01322e53247c",
         "48f9fd298a6592d9",
-        "d8bcf3f8c89312e2"
+        "d8bcf3f8c89312e2",
+        "ffb01e2476bccd98"
       ],
       "sources": [
         "ccfddl",
@@ -1235,7 +1391,7 @@
     "mobicom": {
       "name": "MobiCom",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:23.346381+00:00",
+      "last_checked": "2026-10-23T02:40:22.997308+00:00",
       "fingerprints": [
         "d545d684718c16b6",
         "3cf1214130b181d7",
@@ -1247,7 +1403,8 @@
         "332b18e96909c9ed",
         "8bfba4a9dbe487fa",
         "8a53ca52e30bbe4b",
-        "ab6bcf14588e5cfa"
+        "ab6bcf14588e5cfa",
+        "f7470b40e1d8cc3e"
       ],
       "sources": [
         "ccfddl",
@@ -1257,7 +1414,7 @@
     "naacl": {
       "name": "NAACL",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:25.872751+00:00",
+      "last_checked": "2026-10-23T02:40:26.817533+00:00",
       "fingerprints": [
         "0df0aab61d1b516b",
         "113e630fe85766e9",
@@ -1318,7 +1475,12 @@
         "a1851b1f6dcb7369",
         "7acb539db7d35291",
         "837c48b4d2fe55f0",
-        "13afe2d32a510c3d"
+        "13afe2d32a510c3d",
+        "ea834d8b9aaa3524",
+        "90c6073f69bbc4b5",
+        "a08c7a9c9ab45861",
+        "5771d625bd58389a",
+        "48a50038e6e1743c"
       ],
       "sources": [
         "ccfddl",
@@ -1328,7 +1490,7 @@
     "ndss": {
       "name": "NDSS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:28.279260+00:00",
+      "last_checked": "2026-10-23T02:40:32.886709+00:00",
       "fingerprints": [
         "10da4d98769bfc0f",
         "d4845a37b47b989b",
@@ -1344,7 +1506,10 @@
         "165b2ef0dd046cc4",
         "81d9aeea0e1a408d",
         "4c2a29e25ea4ec9c",
-        "7e41d092859de08c"
+        "7e41d092859de08c",
+        "8a3ad3b5f5da9668",
+        "139abf0152a30870",
+        "c842fa184d7223d1"
       ],
       "sources": [
         "ccfddl",
@@ -1354,7 +1519,7 @@
     "neurips": {
       "name": "NeurIPS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:31.368569+00:00",
+      "last_checked": "2026-10-23T02:40:35.714819+00:00",
       "fingerprints": [
         "e2602cd46a8e66a6",
         "8f6b1250a4554497",
@@ -1368,7 +1533,7 @@
     "nsdi": {
       "name": "NSDI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:34.512753+00:00",
+      "last_checked": "2026-10-23T02:40:39.731471+00:00",
       "fingerprints": [
         "6660c0f003f3f1f7",
         "f1081e8d082b04e1",
@@ -1389,7 +1554,7 @@
     "oopsla": {
       "name": "OOPSLA",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:37.920154+00:00",
+      "last_checked": "2026-10-23T02:40:45.917283+00:00",
       "fingerprints": [
         "40151a50a9b515f4",
         "cda60b1209546483",
@@ -1450,7 +1615,18 @@
         "472057689c907778",
         "ef75974e9b4e2e7b",
         "3412ebef44823c5f",
-        "5bf18ec26d0812f7"
+        "5bf18ec26d0812f7",
+        "b03340ff5d42c4a0",
+        "c9fdf8c5c283b611",
+        "1183c7a7a5cee77f",
+        "106851931451bc73",
+        "a6d4e723a35eb715",
+        "2863669d571891f0",
+        "4e15cd5437627665",
+        "95ba7afe2a2abcfb",
+        "5cff8c12ca5bfebd",
+        "eebd476f16f5e227",
+        "c43cfc077ea394a0"
       ],
       "sources": [
         "ccfddl",
@@ -1460,7 +1636,7 @@
     "osdi": {
       "name": "OSDI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:40.592471+00:00",
+      "last_checked": "2026-10-23T02:40:49.351851+00:00",
       "fingerprints": [
         "d67c3d6e8737a67d",
         "1c6fa848f85c6f27",
@@ -1480,14 +1656,16 @@
     "pldi": {
       "name": "PLDI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:42.920317+00:00",
+      "last_checked": "2026-10-23T02:40:53.455309+00:00",
       "fingerprints": [
         "865fca60fed8e051",
         "dc3617c8d14e006f",
         "fe90e535a89fe637",
         "7d1c177ae0759559",
         "480579ea9991b44e",
-        "32d7648ca4cc5c80"
+        "32d7648ca4cc5c80",
+        "6a789b779e2f1392",
+        "48526276774b1032"
       ],
       "sources": [
         "ccfddl",
@@ -1497,7 +1675,7 @@
     "podc": {
       "name": "PODC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:46.227682+00:00",
+      "last_checked": "2026-10-23T02:41:23.745282+00:00",
       "fingerprints": [
         "df5fd609512274f9",
         "500e78f17545708c",
@@ -1524,7 +1702,7 @@
     "pods": {
       "name": "PODS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:48.809207+00:00",
+      "last_checked": "2026-10-23T02:41:34.200635+00:00",
       "fingerprints": [
         "d77b3a5f230b0bbf",
         "4a6dc9abf94302c5",
@@ -1533,7 +1711,15 @@
         "4bbf27242c9ec5cd",
         "186c63a96122bcc2",
         "9abbdf69eb60f4ca",
-        "a3b5ebfd19c1693f"
+        "a3b5ebfd19c1693f",
+        "d99c4410882ea893",
+        "a58362e1e99bba52",
+        "e5aa88980848b6a7",
+        "7070852ec6c1a297",
+        "0252318b1184b1ce",
+        "08de6ea36d1c1553",
+        "3ce049da0520f8a1",
+        "d7bab29646fd3e8e"
       ],
       "sources": [
         "ccfddl"
@@ -1542,7 +1728,7 @@
     "popl": {
       "name": "POPL",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:51.237927+00:00",
+      "last_checked": "2026-10-23T02:41:37.868926+00:00",
       "fingerprints": [
         "e1d82048df90e32f",
         "164451c73aab3c76",
@@ -1580,7 +1766,13 @@
         "dc1fa0b0391744cc",
         "f53638e276486cde",
         "c37f0d734ec2a68a",
-        "ebeab65ebb47e92e"
+        "ebeab65ebb47e92e",
+        "ce5430afc4dca5d5",
+        "5d3fb78586516809",
+        "f61331b0b8790ff8",
+        "66b2444fdf99c21c",
+        "db20c7d33daf4701",
+        "7e0dbb0ae26f0e0f"
       ],
       "sources": [
         "ccfddl",
@@ -1590,7 +1782,7 @@
     "ppopp": {
       "name": "PPoPP",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:53.578668+00:00",
+      "last_checked": "2026-10-23T02:41:41.910584+00:00",
       "fingerprints": [
         "96620b1eaec566cb",
         "ae50146710ee49e4",
@@ -1602,7 +1794,10 @@
         "279f87769b9b15b3",
         "9e1a6fa6fa9bb6b5",
         "df55492df6708466",
-        "07e14476ee2f840c"
+        "07e14476ee2f840c",
+        "08af093e2e711611",
+        "b3dad33d0921b813",
+        "0d008e12bda170be"
       ],
       "sources": [
         "ccfddl",
@@ -1612,7 +1807,7 @@
     "rtss": {
       "name": "RTSS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:53:57.708313+00:00",
+      "last_checked": "2026-10-23T02:41:45.796336+00:00",
       "fingerprints": [
         "a9ae958242a535c0",
         "b5710c8cbb0898df",
@@ -1626,7 +1821,9 @@
         "8edf24cced254113",
         "dcf2512bf047637f",
         "5ae345bd34120179",
-        "047cfbeaea376913"
+        "047cfbeaea376913",
+        "ce2f9d3aa83b216b",
+        "809a20ec2252df62"
       ],
       "sources": [
         "ccfddl",
@@ -1636,7 +1833,7 @@
     "s-p": {
       "name": "S&P",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:00.234839+00:00",
+      "last_checked": "2026-10-23T02:41:49.233329+00:00",
       "fingerprints": [
         "3254a975996b7732",
         "e7ceedc531503242",
@@ -1646,7 +1843,17 @@
         "e8c828eccf3986e8",
         "d037d031160bb563",
         "15e706f9a0f06b18",
-        "914f81e8bba96376"
+        "914f81e8bba96376",
+        "d7debb06d3060606",
+        "b2c0d2cc9d73a045",
+        "f7701934e366280b",
+        "0ba9d45033485491",
+        "883654083e45104d",
+        "60022d59763b5752",
+        "502104feb86caf88",
+        "f085ac27d1e321fc",
+        "ca1c524f26a2f389",
+        "f1c081587d4beb6b"
       ],
       "sources": [
         "ccfddl",
@@ -1656,7 +1863,7 @@
     "sc": {
       "name": "SC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:02.004651+00:00",
+      "last_checked": "2026-10-23T02:41:52.297316+00:00",
       "fingerprints": [
         "516fe6c8a764db60",
         "f216341f62b69565",
@@ -1686,7 +1893,8 @@
         "f14bcb35900e12d3",
         "fe199cf21ec14891",
         "1ae4c137a532cbbf",
-        "722ae81a0c27b212"
+        "722ae81a0c27b212",
+        "150a8514781bd646"
       ],
       "sources": [
         "ccfddl",
@@ -1696,7 +1904,7 @@
     "sigcomm": {
       "name": "SIGCOMM",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:05.133321+00:00",
+      "last_checked": "2026-10-23T02:42:05.688765+00:00",
       "fingerprints": [
         "3f8732f90f046e63",
         "a30e3aeb6b0d263d",
@@ -1721,7 +1929,8 @@
         "7bccfbc824a786fd",
         "b09aca520a9c8d86",
         "2b6d0ad922d95f5b",
-        "d763b8587316dd51"
+        "d763b8587316dd51",
+        "9557c2bbf6ef26bf"
       ],
       "sources": [
         "ccfddl",
@@ -1731,7 +1940,7 @@
     "sigir": {
       "name": "SIGIR",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:08.170489+00:00",
+      "last_checked": "2026-10-23T02:42:11.482307+00:00",
       "fingerprints": [
         "7054e8562ddd2042",
         "ddeff44870645388",
@@ -1747,7 +1956,7 @@
     "sigkdd": {
       "name": "SIGKDD",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:09.893893+00:00",
+      "last_checked": "2026-10-23T02:42:18.338472+00:00",
       "fingerprints": [
         "fb714ee9e38e631a",
         "0a2edb68c4b9cfb7",
@@ -1762,7 +1971,17 @@
         "313d5dd1accb4ce8",
         "9634f75f4f615af5",
         "cd02157b581cff5d",
-        "0b38912856b08ec4"
+        "0b38912856b08ec4",
+        "e8079fbfd62758a6",
+        "f496d0acaed1f530",
+        "997187cd8641760e",
+        "c67dc464d91e6898",
+        "2d0986ee776df43f",
+        "2941e34b0af9fb1e",
+        "51fb2ec145fada69",
+        "028a617fc862b5b8",
+        "6548a6a29b21057e",
+        "cae32dfc7928ac9d"
       ],
       "sources": [
         "ccfddl",
@@ -1772,7 +1991,7 @@
     "sigmetrics": {
       "name": "SIGMETRICS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:13.018858+00:00",
+      "last_checked": "2026-10-23T02:42:23.729632+00:00",
       "fingerprints": [
         "c687b0448e86de1f",
         "1c09c4c69d66a8b3",
@@ -1804,12 +2023,16 @@
     "sigops-atc": {
       "name": "SIGOPS ATC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:18.940502+00:00",
+      "last_checked": "2026-10-23T02:42:35.735472+00:00",
       "fingerprints": [
         "9300843cce7135b0",
         "6038a35c5393d2ef",
         "3fdc8d00aff1ce20",
-        "e20a4d88b0342a31"
+        "e20a4d88b0342a31",
+        "0fec771e7efd2471",
+        "b5cf4d1e7027d2a6",
+        "4ba4abeb690478cf",
+        "65bfb704b8596e76"
       ],
       "sources": [
         "ccfddl",
@@ -1819,11 +2042,12 @@
     "soda": {
       "name": "SODA",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:20.658132+00:00",
+      "last_checked": "2026-10-23T02:42:38.656318+00:00",
       "fingerprints": [
         "8fd4730fcb3826fb",
         "a883ac95c037735e",
-        "2a48e8dee19f2070"
+        "2a48e8dee19f2070",
+        "91bc91793047331c"
       ],
       "sources": [
         "ccfddl"
@@ -1832,7 +2056,7 @@
     "sosp": {
       "name": "SOSP",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:23.538297+00:00",
+      "last_checked": "2026-10-23T02:42:44.428449+00:00",
       "fingerprints": [
         "87a62edc75daf670",
         "d8f3c6bb4d5979a6",
@@ -1853,12 +2077,13 @@
     "stoc": {
       "name": "STOC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:25.918582+00:00",
+      "last_checked": "2026-10-23T02:42:47.964914+00:00",
       "fingerprints": [
         "bc7708f6d8ca3ecb",
         "b72f93e28581cc98",
         "d442c57042d42497",
-        "baa07e11b892db98"
+        "baa07e11b892db98",
+        "27dd7cc79869f832"
       ],
       "sources": [
         "ccfddl",
@@ -1868,14 +2093,14 @@
     "tacas": {
       "name": "TACAS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:28.202604+00:00",
+      "last_checked": "2026-10-23T02:42:51.566751+00:00",
       "fingerprints": [],
       "sources": []
     },
     "ubicomp-iswc": {
       "name": "UbiComp/ISWC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:32.467671+00:00",
+      "last_checked": "2026-10-23T02:43:03.295735+00:00",
       "fingerprints": [
         "4a77c36d97ab7413",
         "08fa9ec072b0737d",
@@ -1898,7 +2123,9 @@
         "2d86969e2b462091",
         "634bce26b0ead26e",
         "cbecdd7cc6bc8125",
-        "0ce7714607f31db6"
+        "0ce7714607f31db6",
+        "5ffe0002332763cf",
+        "a7fd302db00442c2"
       ],
       "sources": [
         "ccfddl",
@@ -1908,7 +2135,7 @@
     "uist": {
       "name": "UIST",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:35.626543+00:00",
+      "last_checked": "2026-10-23T02:43:08.855943+00:00",
       "fingerprints": [
         "9c6a3a3194c7d87f",
         "abd0b766cc7b46ae",
@@ -1922,7 +2149,19 @@
         "8060c8e70dff62ca",
         "b62badd2b27441c7",
         "d965fa1ec03f8e2a",
-        "ff893fd5412f84c3"
+        "ff893fd5412f84c3",
+        "711399a62398839b",
+        "a14a50c417a80bab",
+        "16d5fe45c4c4b312",
+        "afbe33815e2e3a43",
+        "7541d1c00a8693fb",
+        "f4393cfe304d1d34",
+        "5acafc33ea010daa",
+        "e53b0234c9219b6b",
+        "a296dcb10b35951e",
+        "a69e0f57def745b1",
+        "ec50d71eb8253503",
+        "982349e5c109397c"
       ],
       "sources": [
         "ccfddl",
@@ -1932,7 +2171,7 @@
     "usenix-security": {
       "name": "USENIX Security",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:40.935116+00:00",
+      "last_checked": "2026-10-23T02:43:16.305231+00:00",
       "fingerprints": [
         "7888eb4339eb5a75",
         "5a0663e882efa633",
@@ -1948,7 +2187,9 @@
         "ab6bcf14588e5cfa",
         "ba300318dbdd572b",
         "52e21deb66f6768f",
-        "8e9437cc18eec309"
+        "8e9437cc18eec309",
+        "3ff9131f6ab6eaba",
+        "f33d969f2b3b1722"
       ],
       "sources": [
         "ccfddl",
@@ -1958,7 +2199,7 @@
     "vldb": {
       "name": "VLDB",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:44.563806+00:00",
+      "last_checked": "2026-10-23T02:43:26.527827+00:00",
       "fingerprints": [
         "96d7e5d5f563b4c5",
         "9a01d65f227f473a",
@@ -2015,7 +2256,7 @@
     "www": {
       "name": "WWW",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:47.123032+00:00",
+      "last_checked": "2026-10-23T02:43:30.849444+00:00",
       "fingerprints": [
         "72a4a9cc789bb4de",
         "625b6c99abbd07cd",
@@ -2031,7 +2272,10 @@
         "46822e36db223a27",
         "2cd068d1ea79b159",
         "af112f1709fbb42f",
-        "8eaea74abd78bd75"
+        "8eaea74abd78bd75",
+        "4ab0d1d1b3f6ebaf",
+        "4c8206f12a751c23",
+        "d16e076f36b07757"
       ],
       "sources": [
         "ccfddl",
@@ -2041,7 +2285,7 @@
     "aij": {
       "name": "AIJ",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:53.090373+00:00",
+      "last_checked": "2026-10-23T02:43:39.559046+00:00",
       "fingerprints": [
         "fd16823849830896",
         "604a240fb934a980",
@@ -2060,7 +2304,7 @@
     "jacm": {
       "name": "JACM",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:55.747698+00:00",
+      "last_checked": "2026-10-23T02:43:43.313034+00:00",
       "fingerprints": [
         "36f489e52469d6c5",
         "d3167a90b73bccb2",
@@ -2069,7 +2313,8 @@
         "49dc698c41d11f70",
         "33d3bb0646dd19a0",
         "780f76fbb89d9fbd",
-        "428b663dc24853b4"
+        "428b663dc24853b4",
+        "7fd889959de8a29c"
       ],
       "sources": [
         "crossref"
@@ -2078,7 +2323,7 @@
     "jmlr": {
       "name": "JMLR",
       "baseline": true,
-      "last_checked": "2026-09-26T07:54:58.876355+00:00",
+      "last_checked": "2026-10-23T02:43:48.525665+00:00",
       "fingerprints": [
         "72aca2150c205531",
         "8729316a873bb7df",
@@ -2107,7 +2352,7 @@
     "lmcs": {
       "name": "LMCS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:02.969759+00:00",
+      "last_checked": "2026-10-23T02:43:53.507869+00:00",
       "fingerprints": [
         "74e8234ba2e830a8",
         "3326f106c4ebf143",
@@ -2121,7 +2366,10 @@
         "fd2050e412aeb7ae",
         "f72ad3ae94a8bb0d",
         "c1a03f5ec67b5eef",
-        "991d043a405ffa3f"
+        "991d043a405ffa3f",
+        "95a6c3de53dbb4b0",
+        "f174048a404f34ef",
+        "e3d6a0dfd93153a2"
       ],
       "sources": [
         "crossref",
@@ -2131,7 +2379,7 @@
     "tc": {
       "name": "TC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:06.273441+00:00",
+      "last_checked": "2026-10-23T02:43:59.632521+00:00",
       "fingerprints": [
         "210a92fb30e5f70a",
         "0127f31f78a10a74",
@@ -2140,7 +2388,8 @@
         "011b82b080998428",
         "cf5e3590e3010d31",
         "af002dbd42bfe93c",
-        "c90e2ed600e3af33"
+        "c90e2ed600e3af33",
+        "ab89de468a09a7cf"
       ],
       "sources": [
         "crossref"
@@ -2149,7 +2398,7 @@
     "tcad": {
       "name": "TCAD",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:09.346969+00:00",
+      "last_checked": "2026-10-23T02:44:04.369840+00:00",
       "fingerprints": [
         "b8621aad687ac26d",
         "9affc113bf641d88",
@@ -2168,7 +2417,7 @@
     "tifs": {
       "name": "TIFS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:12.870817+00:00",
+      "last_checked": "2026-10-23T02:44:09.543040+00:00",
       "fingerprints": [
         "3923ab829b708cf0",
         "732cd0062750189f"
@@ -2180,7 +2429,7 @@
     "tip": {
       "name": "TIP",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:16.807752+00:00",
+      "last_checked": "2026-10-23T02:44:16.093454+00:00",
       "fingerprints": [
         "aac5475e4f0a2189",
         "8c4abcd4cb612548"
@@ -2192,7 +2441,7 @@
     "tit": {
       "name": "TIT",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:20.513343+00:00",
+      "last_checked": "2026-10-23T02:44:21.213983+00:00",
       "fingerprints": [
         "33e9b941919c0bc6",
         "a6a95374d23502a2",
@@ -2211,7 +2460,7 @@
     "tkde": {
       "name": "TKDE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:23.523410+00:00",
+      "last_checked": "2026-10-23T02:44:25.216499+00:00",
       "fingerprints": [
         "50c039f7306cfd18",
         "e62900db276d6644",
@@ -2220,7 +2469,8 @@
         "e4f44c2dfcb7fe97",
         "55bcb4faa52b3624",
         "9a0c0b80c89d7ae3",
-        "6a1f2e5cadf41a88"
+        "6a1f2e5cadf41a88",
+        "f85d3321aeb29065"
       ],
       "sources": [
         "crossref"
@@ -2229,7 +2479,7 @@
     "tmc": {
       "name": "TMC",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:27.643593+00:00",
+      "last_checked": "2026-10-23T02:44:28.807077+00:00",
       "fingerprints": [
         "28d3b2318fc884b1",
         "3fc359ce396f0595",
@@ -2238,7 +2488,8 @@
         "4e5a94ddd3e8f7e7",
         "15f8dfd1d210cb40",
         "8c0eeb6de4cfd0fd",
-        "94ce1e6896195f78"
+        "94ce1e6896195f78",
+        "c0b32ac834a2a8f5"
       ],
       "sources": [
         "crossref"
@@ -2247,7 +2498,7 @@
     "tnnls": {
       "name": "TNNLS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:31.389809+00:00",
+      "last_checked": "2026-10-23T02:44:35.990540+00:00",
       "fingerprints": [
         "b37054a2d75425fc",
         "a1885f1137a19bb6",
@@ -2256,7 +2507,9 @@
         "bd5eaec4bbe2fd37",
         "b57288cb675b36a9",
         "124435f1a0bca4af",
-        "5134112181579360"
+        "5134112181579360",
+        "33604ab545b436d3",
+        "1f9d96d5bc8cf75c"
       ],
       "sources": [
         "crossref"
@@ -2265,7 +2518,7 @@
     "tochi": {
       "name": "TOCHI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:34.282911+00:00",
+      "last_checked": "2026-10-23T02:44:40.918287+00:00",
       "fingerprints": [
         "08c371a1fba45596",
         "46837bce5eb1db53",
@@ -2274,7 +2527,8 @@
         "872e21b86e0243b1",
         "0e78d3a4bf475a4e",
         "54c8c46cb05a507f",
-        "d1f898edb64b4e46"
+        "d1f898edb64b4e46",
+        "f7a723369c09126d"
       ],
       "sources": [
         "crossref"
@@ -2283,7 +2537,7 @@
     "tocl": {
       "name": "TOCL",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:36.774267+00:00",
+      "last_checked": "2026-10-23T02:44:45.322771+00:00",
       "fingerprints": [
         "8cd7579ee23d7dee",
         "493950e7d7220dec",
@@ -2301,14 +2555,15 @@
     "tocs": {
       "name": "TOCS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:39.335848+00:00",
+      "last_checked": "2026-10-23T02:44:48.719336+00:00",
       "fingerprints": [
         "7298381b7f82d60f",
         "db41a602c607ddc8",
         "619901f250107119",
         "f74cb3b2041b8e2e",
         "ac994fd6c1ed859d",
-        "fbf64cffc0d6e5c8"
+        "fbf64cffc0d6e5c8",
+        "659bd3862d5395e0"
       ],
       "sources": [
         "crossref"
@@ -2317,7 +2572,7 @@
     "tods": {
       "name": "TODS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:41.954090+00:00",
+      "last_checked": "2026-10-23T02:44:52.761865+00:00",
       "fingerprints": [
         "c24e6f6499b0b555",
         "a11356278227b8dc",
@@ -2335,7 +2590,7 @@
     "tog": {
       "name": "TOG",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:44.776752+00:00",
+      "last_checked": "2026-10-23T02:44:57.663893+00:00",
       "fingerprints": [
         "b849dcebccfeb917",
         "f0665eb4b20a27dd",
@@ -2345,7 +2600,8 @@
         "412b53acbad3f0a5",
         "57eb8e963243d08f",
         "6cd256f82750d7f9",
-        "0757e02ca9c9a7da"
+        "0757e02ca9c9a7da",
+        "3e3afa3aaa7698d9"
       ],
       "sources": [
         "crossref"
@@ -2354,7 +2610,7 @@
     "tois": {
       "name": "TOIS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:47.638405+00:00",
+      "last_checked": "2026-10-23T02:45:01.209715+00:00",
       "fingerprints": [
         "e72f2544b4c3f44d",
         "c94ffa3edf8e8921",
@@ -2363,7 +2619,8 @@
         "5ec8b218e010befb",
         "0d55f5652ca6bb4e",
         "ecf1383d3b1adf41",
-        "d84d5406219f5ff7"
+        "d84d5406219f5ff7",
+        "f99e7659f629dcf4"
       ],
       "sources": [
         "crossref"
@@ -2372,7 +2629,7 @@
     "toplas": {
       "name": "TOPLAS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:50.255107+00:00",
+      "last_checked": "2026-10-23T02:45:05.687566+00:00",
       "fingerprints": [
         "292121448aed7560",
         "68e0ee7353b7ef68",
@@ -2389,7 +2646,7 @@
     "tpami": {
       "name": "TPAMI",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:53.483756+00:00",
+      "last_checked": "2026-10-23T02:45:10.197916+00:00",
       "fingerprints": [
         "07d80184831b2d85",
         "aa0e375111c7078f",
@@ -2398,7 +2655,8 @@
         "e6adcadb7447a99e",
         "9c55116c5f60b87b",
         "75d5047147df3ab9",
-        "8f4966be5c1a2a1b"
+        "8f4966be5c1a2a1b",
+        "408c1fc74706854c"
       ],
       "sources": [
         "crossref"
@@ -2407,7 +2665,7 @@
     "tpds": {
       "name": "TPDS",
       "baseline": true,
-      "last_checked": "2026-09-26T07:55:56.814223+00:00",
+      "last_checked": "2026-10-23T02:45:14.982521+00:00",
       "fingerprints": [
         "c117d0c69e4f9a71",
         "fbcf48776d04eea1",
@@ -2417,7 +2675,8 @@
         "ac99509e0410bd3a",
         "a71208ffc08815e2",
         "3f88abd9780135bc",
-        "c58783c71e5e6b91"
+        "c58783c71e5e6b91",
+        "5b4e558404b226c2"
       ],
       "sources": [
         "crossref"
@@ -2426,7 +2685,7 @@
     "tse": {
       "name": "TSE",
       "baseline": true,
-      "last_checked": "2026-09-26T07:56:04.025467+00:00",
+      "last_checked": "2026-10-23T02:45:19.204720+00:00",
       "fingerprints": [
         "5d8723336a44ea29",
         "33fbfab7f41c4eb2",
@@ -2436,7 +2695,8 @@
         "66016c9c83b985a5",
         "9307904d7410584b",
         "5957c059e7b25c35",
-        "4a1a79b577a8fd68"
+        "4a1a79b577a8fd68",
+        "1be67987ff1198d2"
       ],
       "sources": [
         "crossref"

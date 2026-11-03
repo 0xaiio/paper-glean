@@ -4,7 +4,7 @@
     "魏恒峰-hengfeng-wei": {
       "name": "魏恒峰 Hengfeng Wei",
       "baseline": true,
-      "last_checked": "2026-09-26T07:48:25.034004+00:00",
+      "last_checked": "2026-10-23T02:45:22.827461+00:00",
       "fingerprints": [
         "8066d05ee3a4ab63",
         "648a196591060c5e",
@@ -17,7 +17,16 @@
         "e1f389000de26179",
         "9591cb7680073b2d",
         "f42a9909a864fc91",
-        "718681b4327f776c"
+        "718681b4327f776c",
+        "0530b25ef56b2a92",
+        "459f183da2359f03",
+        "425e17b9baa3c9af",
+        "37c054dd4701e1c2",
+        "04b9fa83ca891042",
+        "d59c7277ada38e9a",
+        "3f6c2872cf638dbf",
+        "a1e2ab0cb2dfcafe",
+        "b98562ccc17ae030"
       ],
       "sources": [
         "homepage"
@@ -26,7 +35,7 @@
     "alexey-gotsman": {
       "name": "Alexey Gotsman",
       "baseline": true,
-      "last_checked": "2026-09-26T07:48:27.726550+00:00",
+      "last_checked": "2026-10-23T02:45:27.476360+00:00",
       "fingerprints": [
         "1f83da986680d766",
         "4cc7e49fcc33e825",
@@ -47,7 +56,7 @@
     "hagit-attiya": {
       "name": "Hagit Attiya",
       "baseline": true,
-      "last_checked": "2026-09-26T07:48:32.044697+00:00",
+      "last_checked": "2026-10-23T02:45:32.822136+00:00",
       "fingerprints": [
         "4945c1153d939ba6",
         "b6ae0c09f7fdb3a9",
